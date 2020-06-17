@@ -1,0 +1,26 @@
+body {
+background-image:url("http://www.dmoe.cc/random.php");
+
+}
+h1 {
+text-align:center;
+color:white;
+
+}
+h2 {
+margin-left:60%;
+color:white;
+
+
+}
+p{
+text-indent:32px;
+font-size:16px;
+line-height:32px;
+color:white;
+}
+img{
+position:absolute;
+left:50%;
+margin-left:-250px;
+}

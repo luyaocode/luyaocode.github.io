@@ -1,8 +1,4 @@
 name；Luyao
-<<<<<<< HEAD
-markdown:kramdown
-=======
 markdown:kramdown
 permalink: /blog/:year/:month/:day/:title
->>>>>>> 192493381f60a040c54940962c3a75fe54417e31
  

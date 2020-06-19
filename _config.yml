@@ -1,5 +1,11 @@
+<<<<<<< HEAD
 name：Luyao
 markdown:kramdown
 permalink: /blog/:year/:month/:day/:title
 
+=======
+name；Luyao
+markdown:kramdown
+permalink: /blog/:year/:month/:day/:title
+>>>>>>> 92e990868cc17014d763189723f48e3cb6fdf73a
  

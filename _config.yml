@@ -1,1 +1,3 @@
-theme: jekyll-theme-minimal
+name；Luyao
+markdown:kramdown
+permalink: /blog/:year/:month/:day/:title

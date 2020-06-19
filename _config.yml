@@ -1,8 +1,5 @@
-<<<<<<< HEAD
-name：Luyao
 markdown:kramdown
 permalink: /blog/:year/:month/:day/:title
-<<<<<<< HEAD
 #生成文章的地址格式，我希望它和blog目录下的格式一样
 # timezone: Asia/Shanghai # 解决githubpage显示时间不正确的问题，见<https://www.iana.org/time-zones>
 # future: false # 不发布时间在未来的文章
@@ -30,7 +27,5 @@ kramdown: # 见<https://kramdown.gettalong.org/options.html>
 #kramdown:
 #  math_engine: mathjax
 #  syntax_highlighter: rouge
-=======
->>>>>>> 92e990868cc17014d763189723f48e3cb6fdf73a
->>>>>>> 75c54eaa2b83e5eb6d21bd59b4a12ecb6e6082f1
+
  

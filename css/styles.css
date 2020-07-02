@@ -1,5 +1,7 @@
 body {
-background-image:url("http://www.dmoe.cc/random.php")
+/* background-image:url("http://www.dmoe.cc/random.php") *//*不想用它*/
+background-image:url("/img/bk.jpg")
+
 
 }
 h1 {

@@ -1,6 +1,7 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
-  <head>
+    <head>
+	    <script> window.alert("欢迎光临，随便看看吧~");//弹出提示框</script>
     <title>看不见我看不见我o((>ω< ))o.</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width initial-scale=1.0" >
@@ -17,8 +18,9 @@
     <link rel="stylesheet" type="text/css" href="css/main.css">
 	<!-- 主要css样式 -->
 	<link rel="icon" type="img/x-icon" href="img/fav.gif">
-	<!-- <script type="text/javascript" src="js/hi.js"></script> js示例-->
+	<!-- <script type="text/javascript" src="js/hi.js"></script> -->
     <!-- <script type="text/javascript" src="js/patch.js" defer></script> 延迟js-->
+
 
 	<noscript>
 	    <p>你的浏览器不支持JavaScript,所以你看不到我啦</p>
@@ -37,6 +39,7 @@
 		list-style-image:url("img/ulli16.jpg");
 		}
 	</style>
+
 	<!-- 以下来自WuK.wu -->
 	    <link
           rel="stylesheet"
@@ -108,12 +111,13 @@
     <title>{{ page.title }}</title>
     
     <link rel="stylesheet" type="text/css" href="css/main.css">
+
   
-  </head>
+      </head>
 
 
-  <body>
-    <nav>
+     <body>
+         <nav>
 <ul>
 <li><a href="/">Home</a></li>
 <li><a href="/about">About</a></li>
@@ -121,6 +125,7 @@
 <li><a href="/blog">Blog</a></li>
 <li><a href="/games/lhpy/index.html">H5游戏灵魂漂移</a></li>
 <li><a href="http://staff.ustc.edu.cn/~csli/graduate/algorithms/book6/toc.htm">《算法导论》英文版</a></li>
+<li><a href="/lz/canvas.html">时钟</a></li>
 </ul>
 <a href="/img/α.jpg">希腊字母发音表</a>
 
@@ -130,7 +135,6 @@
   {{ content }}
 
 </div>
-
 
     <!-- <form action="welcome.php" method="post"> -->
 	    <!-- 名字:<inpute type="text" name="name"<br><br> -->
@@ -179,14 +183,42 @@
 	<!-- <p><span><b>这是我的B站主页面</b>:</span><a href="https://space.bilibili.com/36608208"><abbr title="林鹿_fordeer">传送门</abbr></a></p> -->
 	<!-- 以上练习使用 -->
 
+	 <p id="demo"></p>
+	 <script> document.getElementById("demo").innerHTML=
+	 "sukura";//an usual way to insert html.</script>
+	 
+	 <p id="demo1"></p>
+	 <p id="demo2"></p>
+	 <button type="button" onclick="myFunction()">Click on Me,please </button>
+	 <script> function myFunction(){
+	     document.getElementById("demo1").innerHTML=
+		 "mossy,mossy";
+		 document.getElementById("demo2").innerHTML=
+		 "I have a dream";
+		 }//shows how to use js function.</script>
+		 
+	 <p id="demo3"></p>	
+	 <button type="button" onclick='document.getElementById("demo3").innerHTML=
+		     Picachu.name+" is "+Picachu.color+", "+Picachu.height+", "+
+			 Picachu.weight+"."'>You cought a Picachu. </button>    	 
+	 <script>
+	     var Picachu={
+		     name:"Picachu",
+		     color:"yellow",
+			 height:"0.4m",
+			 weight:"6.0kg",
+			 type:"electric",
+			 };//shows how to use object.</script>
+	 
+      <body onresize="alert('You have changed the size of the window')"></body>
   
-  <footer>
-   <ul>
-   <li><a href="mailto:316774040@qq.com">email</a></li>
-   <li><a href="https://github.com/luyaocode">Github</a></li>
-   <li><a href="https://space.bilibili.com/36608208">bilibili</a></li>
-   </ul>
-  </footer>
-  </body>
+     <footer>
+         <ul>
+         <li><a href="mailto:316774040@qq.com">email</a></li>
+         <li><a href="https://github.com/luyaocode">Github</a></li>
+         <li><a href="https://space.bilibili.com/36608208">bilibili</a></li>
+         </ul>
+     </footer>
+      </body>
 
 </html>

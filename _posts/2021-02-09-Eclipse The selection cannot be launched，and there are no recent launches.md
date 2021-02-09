@@ -5,7 +5,7 @@ date: 2020-02-09
 ---
 今天运行该段java程序时，Eclipse报错：
 The selection cannot be launched，and there are no recent launches
-<code>
+<pre>
 public class Stu {
 	int id;
 	int name;
@@ -22,5 +22,5 @@ public class Stu {
 		stu.play();		
 	}
 }
-</code>
+</pre>
 经过百度，参考博客https://www.cnblogs.com/ranter/p/6537621.html，发现源代码12行main单词拼错了，改正后正常运行。

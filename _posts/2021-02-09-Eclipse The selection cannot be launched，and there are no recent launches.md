@@ -23,4 +23,4 @@ public class Stu {
 	}
 }
 </pre>
-经过百度，参考博客https://www.cnblogs.com/ranter/p/6537621.html，发现源代码12行main单词拼错了，改正后正常运行。
+经过百度，<a href="https://www.cnblogs.com/ranter/p/6537621.html">参考博客</a>，发现上述源代码第12行main单词拼错了，改正后正常运行。

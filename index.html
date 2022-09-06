@@ -5,17 +5,57 @@ title: LuyaoCode
 <style type="text/css">
 	.back{
 		/* background-image: url("http://www.dmoe.cc/random.php"); */
-		background-image: url("img/8804f36d9a88a78be0b351b7f0c5254e_preview.gif");
-		background-size: 100%;
+		/* 背景图 */
+		background-image: url("img/back.gif");
+		background-size: cover;
+		background-repeat: no-repeat;
+		background-position: center;
+		background-attachment: fixed;
+		
 	}
+	div{
+		/* 字体属性 */
+		font-family: "隶书";
+		font-size: 45px;
+		/* font-weight: 100px; */
+		font-weight: normal;
+		
+		/* 文本属性 */
+		color: #ED556A;	/*山茶红*/
+		text-align: center;
+		/* text-decoration: underline overline; */
+		text-shadow: 10px;
+		
+	}
+	.divClass{
+		position: absolute;
+		width: 100%;
+		height: 100%;
+	}
+	/* CSS reset */
+	* {
+		margin: 0;
+		padding: 0;
+	}
+	a{
+		text-decoration: none;
+	}
+	/*鼠标悬停的状态颜色*/
+	a:hover{
+		color: #2BAE85;	/*铜绿*/
+		font-size: 48px;
+	}
+	/*鼠标点击没有释放的状态颜色*/
+	a:active{
+		color: #F28E16;	/*杏黄*/
+		font-size: 50px;
+	}
+
+
 </style>
 <body class="back">
-	<div>
-		<h1></h1>
-		<p>欢迎光临，随便看看吧~</p>
-		<br><br><br><br><br><br><br><br><br><br><br><br>
-		<br><br><br><br><br><br><br><br><br><br><br><br>
-		<br><br><br><br><br><br><br><br><br><br><br><br>
+	<div class="divClass">
+		<a>欢迎光临，随便看看吧！</a>
 	</div><!-- /.blurb -->
 </body>
 <!-- jekyll下index.html主要内容只需要以上 -->

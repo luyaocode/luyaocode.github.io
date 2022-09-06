@@ -4,55 +4,84 @@ title: 工作日志
 ---
 <head>
   <meta charset="utf-8">
-  <style type="text/css">
-    /* .randomback{
-      background-image: url('http://www.dmoe.cc/random.php');
-    } */
-
-    .staticback{
-      background-image: url("../img/wallhaven-9mjoy1.png");
-      background-size: 100%;
+</head>
+<style>
+	* {
+		padding: 0px;
+		margin: 0px;
+	}
+    .div1{
+		background-image: url("../img/moon.jpg");
+		position: relative;
+		background-size: cover;
+		background-repeat: no-repeat;
+		background-attachment: fixed;
+		width: 100%;
+		height: 100%;
+		position: relative;
+		
     }
-    .contentstyle{
-      background-color: aliceblue;
-      opacity: 0.65;
-    }
+	
+	.div2{
+		position: absolute;
+		width: 100%;
+		height: 100%;
+		background:rgba(255,255,255,0.3);
+	}
+	
+	
     p{
-      font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+	  text-decoration: underline;
+	  margin-left: 10px;
+      font-family: "隶书";
       font-size: 24px;
       font-style: normal;
-      font-weight: 200;
-      
-      color: chocolate;
-      background-color: aquamarine;
-      opacity: 1;
+      font-weight: bold;
+      color: #ED556A;				/*满江红*/
     }
-  </style>
-  <title>测试背景图接口</title>
-</head>
-<body class="staticback">
-  <div class="contentstyle">
-    <p>2022/8/29</p>
-    <ul>
-      <li>完善modbusTCP协议帧发送方法</li>
-      <li>撰写内蒙古电力项目可行性报告</li>
-    </ul>
-    <p>2022/8/30</p>
-    <ul>
-      <li>继续完善modbusTCP协议帧发送方法</li>
-    </ul>
-    <p>2022/9/5</p>
-    <ul>
-      <li>学习git使用方法</li>
-      <li>解决了网页切换时抖动的问题：通过调整css的overflow属性为scroll</li>
-      <li>提交了培养计划，制作了本学期课表</li>
-      <li>本周工作任务：完成项目前后端交互，并与控制设备串联实现基本的数据显示和控制功能</li>
-    </ul>
-    <p>2022/9/6</p>
-    <ul>
-      <li>对博客样式进行了些许的美化</li>
-      <li>熟悉vue的路由，对前端页面进行规划</li>
-    </ul>
+	ul{
+		margin-top: 10px;
+		margin-bottom: 10px;
+		margin-left: 40px;
+		font-family: "宋体";
+		font-size: 18px;
+		font-weight: bold;
+		line-height: 30px;
+		background-color: #CFCCC9;	/*玛瑙灰*/
+		opacity: 0.8;
+		
+	}
+	li{
+		color: #0F1423;				/*钢蓝*/
+		list-style-type: initial;
+	}
+</style>
+
+<body>
+  <div class="div1">
+	<div class="div2">
+		<p>2022/8/29</p>
+		<ul>
+		  <li>完善modbusTCP协议帧发送方法</li>
+		  <li>撰写内蒙古电力项目可行性报告</li>
+		</ul>
+		<p>2022/8/30</p>
+		<ul>
+		  <li>继续完善modbusTCP协议帧发送方法</li>
+		</ul>
+		<p>2022/9/5</p>
+		<ul>
+		  <li>学习git使用方法</li>
+		  <li>解决了网页切换时抖动的问题：通过调整css的overflow属性为scroll</li>
+		  <li>提交了培养计划，制作了本学期课表</li>
+		  <li>本周工作任务：完成项目前后端交互，并与控制设备串联实现基本的数据显示和控制功能</li>
+		</ul>
+		<p>2022/9/6</p>
+		<ul>
+		  <li>对博客样式进行了些许的美化</li>
+		  <li>熟悉vue的路由，对前端页面进行规划</li>
+		</ul>
+	</div>
   </div>
 </body>
 

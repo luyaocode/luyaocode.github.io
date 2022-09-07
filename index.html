@@ -51,9 +51,18 @@ title: LuyaoCode
 	}
 	
 </style>
+<!-- 欢迎语10秒后自动消失 -->
+<script type="text/javascript">
+	window.onload=function(){
+		setTimeout("fade()",10000);/*10秒后自动消失*/
+	}
+	function fade(){
+		document.getElementById("hello").style.display="none";
+	}
+</script>
 <body class="back">
 	<div class="divClass">
-		<a>欢迎光临，随便看看吧</a>
+		<a id="hello">欢迎光临，随便看看吧</a>
 	</div><!-- /.blurb -->
 </body>
 <!-- jekyll下index.html主要内容只需要以上 -->

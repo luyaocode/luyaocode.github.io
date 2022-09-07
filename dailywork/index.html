@@ -1,3 +1,7 @@
+---
+layout: default
+title: 工作日志
+---
 <head>
   <meta charset="utf-8">
 </head>
@@ -7,13 +11,13 @@
 		margin: 0px;
 	}
     .div1{
-		background-image: url("../img/moon.jpg");
+		background-image: url("img/moon.jpg");
 		position: relative;
 		background-size: cover;
 		background-repeat: no-repeat;
 		background-attachment: fixed;
 		width: 100%;
-		height: 120%;
+		height: 100%;
 		position: relative;
 		
     }
@@ -29,59 +33,52 @@
     p{
 	  text-decoration: underline;
 	  margin-left: 10px;
-      font-family: "隶书";
+      font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
       font-size: 24px;
       font-style: normal;
       font-weight: bold;
-      color: #ED556A;				/*满江红*/
+      color: #A7535A;				/*满江红*/
+	  /* background-color: #CFCCC9; */
+	  /* opacity: 0.6; */
     }
 	ul{
-		margin-top: 10px;
-		margin-bottom: 10px;
-		margin-left: 40px;
+		margin-top: 30px;
+		margin-bottom: 0px;
+		margin-left: 30px;
+		margin-right: 30px;
 		font-family: "宋体";
-		font-size: 18px;
+		font-size: 24px;
 		font-weight: bold;
-		line-height: 30px;
+		line-height: 36px;
 		background-color: #CFCCC9;	/*玛瑙灰*/
-		opacity: 0.8;
+		opacity: 0.7;
 		
 	}
 	li{
 		color: #0F1423;				/*钢蓝*/
-		list-style-type: initial;
+		list-style-type: inherit;
 	}
 </style>
 
 <body>
   <div class="div1">
-	<p><a href="/">首页</a></p>
-	<div class="div2">
+	<div class="div2">	
+	<ul>
 		<p>2022/8/29</p>
-		<ul>
-		  <li>完善modbusTCP协议帧发送方法</li>
-		  <li>撰写内蒙古电力项目可行性报告</li>
-		</ul>
+		<li>完善modbusTCP协议帧发送方法</li>
+		<li>撰写内蒙古电力项目可行性报告</li>
 		<p>2022/8/30</p>
-		<ul>
-		  <li>继续完善modbusTCP协议帧发送方法</li>
-		</ul>
+		<li>继续完善modbusTCP协议帧发送方法</li>
 		<p>2022/9/5</p>
-		<ul>
-		  <li>学习git使用方法</li>
-		  <li>解决了网页切换时抖动的问题：通过调整css的overflow属性为scroll</li>
-		  <li>提交了培养计划，制作了本学期课表</li>
-		  <li>本周工作任务：完成项目前后端交互，并与控制设备串联实现基本的数据显示和控制功能</li>
-		</ul>
+		<li>学习git使用方法</li>
+		<li>解决了网页切换时抖动的问题：通过调整css的overflow属性为scroll</li>
+		<li>提交了培养计划，制作了本学期课表</li>
+		<li>本周工作任务：完成项目前后端交互，并与控制设备串联实现基本的数据显示和控制功能</li>
 		<p>2022/9/6</p>
-		<ul>
-		  <li>对博客样式进行了些许的美化</li>
-		  <li>熟悉vue的路由，对前端页面进行规划</li>
-		</ul>
+		<li>对博客样式进行了些许的美化</li>
+		<li>熟悉vue的路由，对前端页面进行规划</li>
+	</ul>	
 	</div>
   </div>
 </body>
-<!--明月浩空音乐播放器-->
-<script src="https://cdn.bootcdn.net/ajax/libs/jquery/1.10.0/jquery.min.js"></script>
-<script src="https://myhkw.cn/api/player/166175577147" id="myhk" key="166175577147" m="1"></script>
 

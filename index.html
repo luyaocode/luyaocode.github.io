@@ -14,11 +14,15 @@
     <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=1, target-densitydpi=low-dpi" />
     <meta http-equiv="Cache-Control" content="no-siteapp" />
 
-	<link rel="icon" type="img/x-icon" href="img/fav.png">
+	<link rel="icon" type="img/x-icon" href="img/fav.ico">
 	<noscript>
 	    <p>你的浏览器不支持JavaScript,所以你看不到我啦</p>
 		<img alt="嫌弃" src="img/xianqi.jpg">
 	</noscript>
+	<!-- script -->
+	<script src="./js/gif-to-db.js"></script>
+	<script src="./js/mouse-click-special-effect.js"></script>
+
 
 	<!-- 以下来自WuK.wu -->
 	    <!-- <link
@@ -108,7 +112,7 @@
 	.body-css{
 		/* background-image: url("http://www.dmoe.cc/random.php"); */
 		/* 背景图 */
-		background-image: url("img/back.gif");
+		background-image: url("img/back.png");
 		background-size: cover;
 		background-repeat: no-repeat;
 		background-position: center;
@@ -131,9 +135,9 @@
 		color: black;
 	}
 
-a:hover {
-    text-decoration: underline;
-}
+	a:hover {
+		text-decoration: underline;
+	}
 	.divClass{
 		/* 字体属性 */
 		font-family: "隶书";
@@ -181,39 +185,41 @@ a:hover {
 	}
   
 </style>
-<!-- 欢迎语30秒后自动消失 -->
-<script type="text/javascript">
-	window.onload=function(){
-		setTimeout("fade()",10000);/*30秒后自动消失*/
-	}
-	function fade(){
-		document.getElementById("hello").style.display="none";
-	}
-</script>
-<body class="body-css">
-<ul class="topContent">
-<li><a href="/">首页</a></li>
-<li><a href="/bookmarks/index.html">书签</a></li>
-<li><a href="/log/index.html">日志</a></li>
-<!-- <li><a href="/comment/index.html">留言板</a></li> -->
-<!-- <li><a href="/about"></a></li> -->
-<li><a href="/cv">我的简历</a></li>
-<li><a href="mailto:316774040@qq.com">我的邮箱</a></li>
-<li><a href="https://github.com/luyaocode">Github</a></li>
-<!-- <li><a href="/blog">Blog</a></li> -->
-<!-- <li><a href="/games/lhpy/index.html">H5游戏灵魂漂移</a></li> -->
-<!-- <li><a href="http://staff.ustc.edu.cn/~csli/graduate/algorithms/book6/toc.htm">《算法导论》英文版</a></li> -->
-<!-- <li><a href="/lz/canvas.html">时钟小程序</a></li> -->
-<!-- <li><a href="/img/α.jpg">希腊字母发音表</a></li> -->
-</ul>
+
+<body class="body-css" id="body">
+	<ul class="topContent">
+	<li><a href="/">首页</a></li>
+	<li><a href="bookmarks/index.html">书签</a></li>
+	<li><a href="log/index.html">日志</a></li>
+	<li><a href="blog/index.html">博客</a></li>
+	<!-- <li><a href="/comment/index.html">留言板</a></li> -->
+	<!-- <li><a href="/about"></a></li> -->
+	<li><a href="cv/index.html">简历</a></li>
+	<li><a href="mailto:316774040@qq.com">邮箱</a></li>
+	<li><a href="https://github.com/luyaocode">Github</a></li>
+	<!-- <img id="elephant">图片</img> -->
+	<!-- <li><a href="/blog">Blog</a></li> -->
+	<!-- <li><a href="/games/lhpy/index.html">H5游戏灵魂漂移</a></li> -->
+	<!-- <li><a href="http://staff.ustc.edu.cn/~csli/graduate/algorithms/book6/toc.htm">《算法导论》英文版</a></li> -->
+	<!-- <li><a href="/lz/canvas.html">时钟小程序</a></li> -->
+	<!-- <li><a href="/img/α.jpg">希腊字母发音表</a></li> -->
+	</ul>
+	<canvas></canvas>
 <footer>
 	
 </footer>
 
 </body>
+<script type=""
 <!--明月浩空音乐播放器-->
 <script src="https://cdn.bootcdn.net/ajax/libs/jquery/1.10.0/jquery.min.js"></script>
 <script src="https://myhkw.cn/api/player/166175577147" id="myhk" key="166175577147" m="1"></script>
+<script src="./js/main.js"></script>
+</script>
+<!-- <script src="./js/cursor-click.js"></script> -->
+
+
+
 </html>
 
 

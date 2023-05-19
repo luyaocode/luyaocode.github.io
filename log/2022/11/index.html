@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+	
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>日志-2022-11</title>
+	<!-- 设置手机和电脑背景图自适应 -->
+	<meta name="renderer" content="webkit|ie-comp|ie-stand">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=1, target-densitydpi=low-dpi" />
+	<meta http-equiv="Cache-Control" content="no-siteapp" />
+	<!-- style -->
+	<link rel="stylesheet" href="../../../css/main.css">
+	<link rel="icon" type="img/x-icon" href="../../../img/fav.png">
+</head>
+  <body>
+	<div class="div1">
+	  <div class="div2">
+	  <a href="/">首页</a>
+	  <a href="../index.html">返回</a>
+	  <ul>
+		<p>11.7</p>
+		<li>安装了Kali</li>
+		<li>使用Nginx部署了静态页面</li>
+		<li>发现一款好用的工具，可以替代XShell：Tabby</li>
+		<p>11.8</p>
+		<li>v2Ray报错："io timeout"，访问google报500错误，能够ping通，ipcheck显示国内外未屏蔽，排除系统时间不同步的原因，猜测可能是因为服务器开启了防火墙，关闭防火墙之后恢复正常。</li>
+		<li>div2在div1内，div2内容太短，div1背景图显示不完全，div2内容太多，div1背景图不够，解决办法：将div1样式中的height设置为fit-content，将min-height设置为100vh；div2的min-height同样设为100vh</li>
+		<li>给网站设置了域名，使用的是resellerclub的域名服务，配置了在阿里云申请的免费SSL证书。</li>
+		<p>11.9</p>
+		<li>将网站背景图片以blob格式存储于IndexedDB，从而减少了再次加载网页的耗时。</li>
+		<p>11.10</p>
+		<li>在旧版本的移动端chrome使用IndexedDB取用图片字节码放到页面上会崩溃，移动端改为静态背景图片了</li>
+		<li>使用腾讯云部署网站，重新使用阿里云新加坡服务器搭梯子，脚本bash <(curl -s -L https://git.io/v2ray.sh)。</li>
+		<li>v2rRay报错：failed to find an available destination。排除掉时间同步、防火墙的问题，最终发现是因为端口号没开。在阿里云-安全-防火墙开放相应端口就行了。</li>
+		<p>11.16</p>
+		<li>springboot项目打包jar部署到服务器的踩坑经历</li>
+		<li>1、使用java -jar命令运行的时候报ClassNotFoundException（一个Environment类，原因是找不到maven的依赖包，解决办法：使用maven打包插件，最终生成MANIFEST.MF文件，里面指明了启动类和依赖的jar包。最终在项目jar包同目录下生成一个lib文件夹，里面就是项目依赖的jar包</li>
+		<li>2、Failed to configure a DataSource: 'url' attribute is not specified...引用了Druid数据源依赖但是没有写配置类，虽然在application.yml中对druid数据源进行了的配置，但是属性未被读取到。期间怀疑active: @profiles.active@未被识别，最后排除了这个原因</li>
+		<li>3、Caused by: org.yaml.snakeyaml.scanner.ScannerException: while scanning for ...无法识别@profiles.active@的@，忘记怎么解决的了</li>
+		<li>4、knife4j没有写配置类</li>
+		<li>5、io.minio.errors.InvalidEndpointException: null endpoint，因为在application-dev.yml用了endpoint=http://${server.host}:9000，无法识别，不用${}，改成localhost就行了</li>
+		<li>6、Invalid value ‘com.ruoyi.framework.config.KaptchaTextCreator‘ for config parameter...再三确认发现KaptchaTextCreator这个类是存在的，且全限定路径没错。百思不得其解，最后才发现原因是其他编译后的class文件路径没有添加到MANIFEST.MF文件，导致打包后的jar虽然包含了所有class文件但是就是找不到，解决办法，在最开始找到的maven打包插件里面添加<manifestEntries><Class-Path>classes/</Class-Path></manifestEntries>，然后将classes文件夹项目jar包放到同一目录下。</li>
+		<li>7、前端部署的时候，改默认80端口，导致通过域名无法直接访问。因为80端口默认是Http连接用的端口，输入域名不带端口号默认就是访问80端口。</li>
+		<li>最后配置一下nginx前后端代理就可以访问了。有国内ip的网站的域名需要备案才能通过域名访问，否则只能用ip地址访问且无法使用SSL安全连接。至此，配置基本完成，使用VNC登录云服务器然后运行后端程序就可以让整个项目跑起来了（使用SSH登录，在SSH断开连接的时候会让程序崩掉）</li>
+	  </ul>	
+	  <br>
+	  </div>
+	</div>
+  </body>
+  <!--明月浩空音乐播放器-->
+	  <script src="https://cdn.bootcdn.net/ajax/libs/jquery/1.10.0/jquery.min.js"></script>
+	  <script src="https://myhkw.cn/api/player/166175577147" id="myhk" key="166175577147" m="1"></script>
+	  <script src="../../../js/sakura.js"></script>
+	  <script src="../../../js/cursor-click.js"></script>
+</html>

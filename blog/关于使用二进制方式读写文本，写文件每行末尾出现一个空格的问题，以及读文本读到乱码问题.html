@@ -1,0 +1,243 @@
+
+
+
+<!DOCTYPE html>
+	
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>博客</title>
+	<!-- 设置手机和电脑背景图自适应 -->
+	<meta name="renderer" content="webkit|ie-comp|ie-stand">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=1, target-densitydpi=low-dpi" />
+	<meta http-equiv="Cache-Control" content="no-siteapp" />
+	<!-- style -->
+	<link rel="stylesheet" href="../css/main.css">
+	<link rel="icon" type="img/x-icon" href="../img/fav.png">
+
+</head>
+  <body>
+	<div class="div1">
+	  <div class="div2">	
+	  <a href="/">首页</a>
+	  <a href="index.html">返回</a>
+	  <ul>
+        <h3
+        id="关于使用二进制方式读写文本写文件每行末尾出现一个空格的问题以及读文本读到乱码问题">关于使用二进制方式读写文本，写文件每行末尾出现一个空格的问题，以及读文本读到乱码问题</h3>
+        <hr />
+        <p>背景：</p>
+        <li>使用C++编写一个文本读写的小程序，在控制台输入若干行字符串，以空行结尾，程序将输入的字符串写入到文本文件，然后读取文本文件，将其内容输出到控制台。</li>
+        <li>使用fstream, ifstream, 函数对象等方法。</li>
+        <div class="center-image">
+            <img src="../md/关于使用二进制方式读写文本，写文件每行末尾出现一个空格的问题，以及读文本读到乱码问题\屏幕截图 2023-05-19 140955.png" style="zoom: 50%;" alt="Your Image">
+        </div>
+        <p>原因是在每行字符串结尾手动添加了一个字符串结束符和一个换行符：</p>
+        <div class="sourceCode" id="cb1"><pre
+        class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> Store<span class="op">::</span><span class="kw">operator</span><span class="op">()(</span><span class="at">const</span> string<span class="op">&amp;</span> s<span class="op">)</span></span>
+        <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+        <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    string len_s <span class="op">=</span> to_string<span class="op">(</span>s<span class="op">.</span>size<span class="op">());</span></span>
+        <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    ofs<span class="op">.</span>write<span class="op">(</span>len_s<span class="op">.</span>data<span class="op">(),</span> len_s<span class="op">.</span>size<span class="op">());</span></span>
+        <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    ofs<span class="op">.</span>put<span class="op">(</span><span class="ch">&#39;</span><span class="sc">\0</span><span class="ch">&#39;</span><span class="op">);</span>      <span class="co">//insert &#39;\0&#39;</span></span>
+        <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    ofs<span class="op">.</span>put<span class="op">(</span><span class="ch">&#39;</span><span class="sc">\n</span><span class="ch">&#39;</span><span class="op">);</span>      <span class="co">//insert &#39;\n&#39;</span></span>
+        <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    ofs<span class="op">.</span>write<span class="op">(</span>s<span class="op">.</span>data<span class="op">(),</span> s<span class="op">.</span>size<span class="op">());</span></span>
+        <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    ofs<span class="op">.</span>put<span class="op">(</span><span class="ch">&#39;</span><span class="sc">\0</span><span class="ch">&#39;</span><span class="op">);</span></span>
+        <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    ofs<span class="op">.</span>put<span class="op">(</span><span class="ch">&#39;</span><span class="sc">\n</span><span class="ch">&#39;</span><span class="op">);</span></span>
+        <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+        <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+        <p>现在将字符串结束符去掉，空格也就没有了</p>
+        <div class="sourceCode" id="cb2"><pre
+        class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> Store<span class="op">::</span><span class="kw">operator</span><span class="op">()(</span><span class="at">const</span> string<span class="op">&amp;</span> s<span class="op">)</span></span>
+        <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+        <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    string len_s <span class="op">=</span> to_string<span class="op">(</span>s<span class="op">.</span>size<span class="op">());</span></span>
+        <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    ofs<span class="op">.</span>write<span class="op">(</span>len_s<span class="op">.</span>data<span class="op">(),</span> len_s<span class="op">.</span>size<span class="op">());</span></span>
+        <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    ofs<span class="op">.</span>put<span class="op">(</span><span class="ch">&#39;</span><span class="sc">\n</span><span class="ch">&#39;</span><span class="op">);</span>      <span class="co">//insert \n</span></span>
+        <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    ofs<span class="op">.</span>write<span class="op">(</span>s<span class="op">.</span>data<span class="op">(),</span> s<span class="op">.</span>size<span class="op">());</span></span>
+        <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    ofs<span class="op">.</span>put<span class="op">(</span><span class="ch">&#39;</span><span class="sc">\n</span><span class="ch">&#39;</span><span class="op">);</span></span>
+        <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+        <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+        <p>写文本的问题解决了，但是出现新的问题，读取文本出现乱码：</p>
+        <div class="center-image">
+            <img src="../md/关于使用二进制方式读写文本，写文件每行末尾出现一个空格的问题，以及读文本读到乱码问题\屏幕截图 2023-05-19 143007.png" style="zoom: 50%;" alt="Your Image">
+        </div>
+        <p>原因是使用动态分配的char数组接收了超过len个数量的字符，虽然动态分配len个字符的数组，但是实际上超过了len</p>
+        <div class="sourceCode" id="cb3"><pre
+        class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="op">...</span> </span>
+        <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="op">(!</span>buffer<span class="op">.</span>empty<span class="op">())</span></span>
+        <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+        <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    len <span class="op">=</span> stoi<span class="op">(</span>buffer<span class="op">);</span></span>
+        <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">char</span><span class="op">*</span> buf <span class="op">=</span> <span class="kw">new</span> <span class="dt">char</span><span class="op">[</span>len<span class="op">];</span></span>
+        <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    ifs<span class="op">.</span>read<span class="op">(</span>buf<span class="op">,</span> len<span class="op">);</span></span>
+        <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    ifs<span class="op">.</span>read<span class="op">(&amp;</span>ch<span class="op">,</span> <span class="dv">1</span><span class="op">);</span></span>
+        <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    vsi<span class="op">.</span>push_back<span class="op">(</span>string<span class="op">(</span>buf<span class="op">));</span></span>
+        <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">delete</span><span class="op">[]</span> buf<span class="op">;</span></span>
+        <span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    buffer<span class="op">.</span>clear<span class="op">();</span></span>
+        <span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+        <span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="op">...</span></span></code></pre></div>
+        <p>debug发现动态数组buf出现了乱码</p>
+        <div class="center-image">
+            <img src="../md/关于使用二进制方式读写文本，写文件每行末尾出现一个空格的问题，以及读文本读到乱码问题\屏幕截图 2023-05-19 143702.png" style="zoom: 50%;" alt="Your Image">
+        </div>
+        <p>动态字符数组明明指定了大小，为何存储的字符超过了大小但是没有报错呢？</p>
+        <p>后来一想，C-style字符串必须有一个’\0’作为结束符，而我存取的的时候没有将’\0’存进去，所以buf此时不是一个C-style字符串，所以string(buf)不能转换成功，它会沿着最后一个字符一直找下去直到遇到’\0’，所以会读到脏数据。</p>
+        <p>解决办法：动态数组buf增加一位，手动在末尾添加一个’\0’作为字符串结束标识。</p>
+        <p>后来问了一下GPT机器人，机器人这样说：</p>
+        <blockquote>
+        <p>char* buf = new char[len + 1];</p>
+        <p>ifs.read(buf, len);</p>
+        <p>buf[len] = ‘\0’;</p>
+        <p>这波操作怎么样？</p>
+        </blockquote>
+        <blockquote>
+        <p>ChatGPT</p>
+        <p>是的，你的代码片段中的操作是正确的。在动态分配的字符数组
+        <code>buf</code> 中，读取 <code>len</code>
+        个字符后，你在最后添加了一个空字符 <code>'\0'</code>。这样可以确保
+        <code>buf</code>
+        数组中的字符被正确终止，以便后续以字符串形式使用时能够正确识别字符串的结尾。</p>
+        <p>通过在字符数组的最后位置添加空字符，可以保证字符串处理函数能够正确地识别字符串的结束。这是因为大多数字符串处理函数（如
+        <code>strlen</code>、<code>strcpy</code>、<code>strcmp</code>
+        等）会根据遇到的第一个空字符来确定字符串的长度和边界。</p>
+        <p>因此，在读取 <code>len</code>
+        个字符后，将字符数组的最后一个元素设置为空字符 <code>'\0'</code>
+        是一种常见的做法，以确保字符数组以 C
+        风格字符串的形式有效地表示字符串。这样做可以避免在后续字符串处理过程中出现问题。</p>
+        <p>所以，你的代码片段中的操作是正确的，可以保证读取到的字符存储在字符数组中，并以
+        C 风格字符串的形式表示。</p>
+        </blockquote>
+        <div class="sourceCode" id="cb4"><pre
+        class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="op">...</span></span>
+        <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="op">(!</span>buffer<span class="op">.</span>empty<span class="op">())</span></span>
+        <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+        <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    len <span class="op">=</span> stoi<span class="op">(</span>buffer<span class="op">);</span></span>
+        <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">char</span><span class="op">*</span> buf <span class="op">=</span> <span class="kw">new</span> <span class="dt">char</span><span class="op">[</span>len <span class="op">+</span> <span class="dv">1</span><span class="op">];</span></span>
+        <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    ifs<span class="op">.</span>read<span class="op">(</span>buf<span class="op">,</span> len<span class="op">);</span></span>
+        <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    buf<span class="op">[</span>len<span class="op">]</span> <span class="op">=</span> <span class="ch">&#39;</span><span class="sc">\0</span><span class="ch">&#39;</span><span class="op">;</span> <span class="co">//insert \0 to char[]</span></span>
+        <span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    ifs<span class="op">.</span>read<span class="op">(&amp;</span>ch<span class="op">,</span> <span class="dv">1</span><span class="op">);</span></span>
+        <span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    vsi<span class="op">.</span>push_back<span class="op">(</span>string<span class="op">(</span>buf<span class="op">));</span></span>
+        <span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">delete</span><span class="op">[]</span> buf<span class="op">;</span></span>
+        <span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    buffer<span class="op">.</span>clear<span class="op">();</span></span>
+        <span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+        <span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="op">...</span></span></code></pre></div>
+        <p>问题解决！</p>
+        <p>最后附上完整代码：</p>
+        <blockquote>
+        <div class="sourceCode" id="cb5"><pre
+        class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">/*func.h*/</span></span>
+        <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> testBinaryIO<span class="op">();</span></span>
+        <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> showStr<span class="op">(</span><span class="at">const</span> string<span class="op">&amp;</span> s<span class="op">);</span></span>
+        <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Store</span>
+        <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+        <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="kw">private</span><span class="op">:</span></span>
+        <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  ofstream<span class="op">&amp;</span> ofs<span class="op">;</span></span>
+        <span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span><span class="op">:</span></span>
+        <span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  Store<span class="op">(</span>ofstream<span class="op">&amp;</span> o<span class="op">)</span> <span class="op">:</span>ofs<span class="op">(</span>o<span class="op">)</span> <span class="op">{}</span></span>
+        <span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="dt">void</span> <span class="kw">operator</span><span class="op">()(</span><span class="at">const</span> string<span class="op">&amp;</span> s<span class="op">);</span></span>
+        <span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span>
+        <span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> getStrs<span class="op">(</span>ifstream<span class="op">&amp;</span> ifs<span class="op">,</span> vector<span class="op">&lt;</span>string<span class="op">&gt;&amp;</span> vsi<span class="op">);</span></span></code></pre></div>
+        </blockquote>
+        <blockquote>
+        <div class="sourceCode" id="cb6"><pre
+        class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">/*func.cpp*/</span></span>
+        <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> testBinaryIO<span class="op">()</span></span>
+        <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+        <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  vector<span class="op">&lt;</span>string<span class="op">&gt;</span> vso<span class="op">;</span></span>
+        <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  string temp<span class="op">;</span></span>
+        <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  cout <span class="op">&lt;&lt;</span> <span class="st">&quot;Enter strings(empty line to quit): </span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">;</span></span>
+        <span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">while</span> <span class="op">(</span>getline<span class="op">(</span>cin<span class="op">,</span> temp<span class="op">)</span> <span class="op">&amp;&amp;</span> temp<span class="op">[</span><span class="dv">0</span><span class="op">]</span> <span class="op">!=</span> <span class="ch">&#39;</span><span class="sc">\0</span><span class="ch">&#39;</span><span class="op">)</span></span>
+        <span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="op">{</span></span>
+        <span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>      vso<span class="op">.</span>push_back<span class="op">(</span>temp<span class="op">);</span></span>
+        <span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+        <span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  cout <span class="op">&lt;&lt;</span> <span class="st">&quot;Here is your input:</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">;</span></span>
+        <span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  for_each<span class="op">(</span>vso<span class="op">.</span>begin<span class="op">(),</span> vso<span class="op">.</span>end<span class="op">(),</span> showStr<span class="op">);</span></span>
+        <span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  <span class="co">//store in a file</span></span>
+        <span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  ofstream ofs<span class="op">(</span><span class="st">&quot;strings.dat&quot;</span><span class="op">,</span> ios<span class="op">::</span>out <span class="op">|</span> ios<span class="op">::</span>binary<span class="op">);</span></span>
+        <span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>  for_each<span class="op">(</span>vso<span class="op">.</span>begin<span class="op">(),</span> vso<span class="op">.</span>end<span class="op">(),</span> Store<span class="op">(</span>ofs<span class="op">));</span></span>
+        <span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>  ofs<span class="op">.</span>close<span class="op">();</span></span>
+        <span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>  <span class="co">//read from file</span></span>
+        <span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>  vector<span class="op">&lt;</span>string<span class="op">&gt;</span> vsi<span class="op">;</span></span>
+        <span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>  ifstream ifs<span class="op">(</span><span class="st">&quot;strings.dat&quot;</span><span class="op">,</span> ios<span class="op">::</span>in<span class="op">,</span> ios<span class="op">::</span>binary<span class="op">);</span></span>
+        <span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(!</span>ifs<span class="op">.</span>is_open<span class="op">())</span></span>
+        <span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>  <span class="op">{</span></span>
+        <span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>      cout <span class="op">&lt;&lt;</span> <span class="st">&quot;Open file failed.</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">;</span></span>
+        <span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>      exit<span class="op">(</span>EXIT_FAILURE<span class="op">);</span></span>
+        <span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+        <span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>  getStrs<span class="op">(</span>ifs<span class="op">,</span> vsi<span class="op">);</span></span>
+        <span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>  cout <span class="op">&lt;&lt;</span> <span class="st">&quot;strings in file: </span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">;</span></span>
+        <span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>  for_each<span class="op">(</span>vsi<span class="op">.</span>begin<span class="op">(),</span> vsi<span class="op">.</span>end<span class="op">(),</span> showStr<span class="op">);</span></span>
+        <span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>  ifs<span class="op">.</span>close<span class="op">();</span></span>
+        <span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a></span>
+        <span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a></span>
+        <span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+        <span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a></span>
+        <span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> showStr<span class="op">(</span><span class="at">const</span> string<span class="op">&amp;</span> s<span class="op">)</span></span>
+        <span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+        <span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>  cout <span class="op">&lt;&lt;</span> s <span class="op">&lt;&lt;</span> <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">;</span></span>
+        <span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+        <span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a></span>
+        <span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> getStrs<span class="op">(</span>ifstream<span class="op">&amp;</span> ifs<span class="op">,</span> vector<span class="op">&lt;</span>string<span class="op">&gt;&amp;</span> vsi<span class="op">)</span></span>
+        <span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+        <span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>  string buffer<span class="op">;</span></span>
+        <span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a>  <span class="dt">char</span> ch<span class="op">;</span></span>
+        <span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> len<span class="op">;</span></span>
+        <span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a>  <span class="cf">while</span> <span class="op">(</span><span class="dv">1</span><span class="op">)</span></span>
+        <span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a>  <span class="op">{</span></span>
+        <span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a>      <span class="cf">while</span> <span class="op">(</span>ifs<span class="op">.</span>read<span class="op">(&amp;</span>ch<span class="op">,</span> <span class="kw">sizeof</span><span class="op">(</span><span class="dt">char</span><span class="op">)))</span></span>
+        <span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a>      <span class="op">{</span></span>
+        <span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a>          <span class="cf">if</span> <span class="op">(</span>ch <span class="op">!=</span> <span class="ch">&#39;</span><span class="sc">\n</span><span class="ch">&#39;</span><span class="op">)</span></span>
+        <span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a>          <span class="op">{</span></span>
+        <span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a>              buffer <span class="op">+=</span> ch<span class="op">;</span></span>
+        <span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a>          <span class="op">}</span></span>
+        <span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a>          <span class="cf">else</span> <span class="cf">break</span><span class="op">;</span></span>
+        <span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a>      <span class="op">}</span></span>
+        <span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="op">(!</span>buffer<span class="op">.</span>empty<span class="op">())</span></span>
+        <span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a>      <span class="op">{</span></span>
+        <span id="cb6-55"><a href="#cb6-55" aria-hidden="true" tabindex="-1"></a>          len <span class="op">=</span> stoi<span class="op">(</span>buffer<span class="op">);</span></span>
+        <span id="cb6-56"><a href="#cb6-56" aria-hidden="true" tabindex="-1"></a>          <span class="dt">char</span><span class="op">*</span> buf <span class="op">=</span> <span class="kw">new</span> <span class="dt">char</span><span class="op">[</span>len <span class="op">+</span> <span class="dv">1</span><span class="op">];</span></span>
+        <span id="cb6-57"><a href="#cb6-57" aria-hidden="true" tabindex="-1"></a>          ifs<span class="op">.</span>read<span class="op">(</span>buf<span class="op">,</span> len<span class="op">);</span></span>
+        <span id="cb6-58"><a href="#cb6-58" aria-hidden="true" tabindex="-1"></a>          buf<span class="op">[</span>len<span class="op">]</span> <span class="op">=</span> <span class="ch">&#39;</span><span class="sc">\0</span><span class="ch">&#39;</span><span class="op">;</span></span>
+        <span id="cb6-59"><a href="#cb6-59" aria-hidden="true" tabindex="-1"></a>          ifs<span class="op">.</span>read<span class="op">(&amp;</span>ch<span class="op">,</span> <span class="dv">1</span><span class="op">);</span></span>
+        <span id="cb6-60"><a href="#cb6-60" aria-hidden="true" tabindex="-1"></a>          vsi<span class="op">.</span>push_back<span class="op">(</span>string<span class="op">(</span>buf<span class="op">));</span></span>
+        <span id="cb6-61"><a href="#cb6-61" aria-hidden="true" tabindex="-1"></a>          <span class="kw">delete</span><span class="op">[]</span> buf<span class="op">;</span></span>
+        <span id="cb6-62"><a href="#cb6-62" aria-hidden="true" tabindex="-1"></a>          buffer<span class="op">.</span>clear<span class="op">();</span></span>
+        <span id="cb6-63"><a href="#cb6-63" aria-hidden="true" tabindex="-1"></a>      <span class="op">}</span></span>
+        <span id="cb6-64"><a href="#cb6-64" aria-hidden="true" tabindex="-1"></a>      <span class="cf">else</span></span>
+        <span id="cb6-65"><a href="#cb6-65" aria-hidden="true" tabindex="-1"></a>      <span class="op">{</span></span>
+        <span id="cb6-66"><a href="#cb6-66" aria-hidden="true" tabindex="-1"></a>          <span class="cf">break</span><span class="op">;</span></span>
+        <span id="cb6-67"><a href="#cb6-67" aria-hidden="true" tabindex="-1"></a>      <span class="op">}</span></span>
+        <span id="cb6-68"><a href="#cb6-68" aria-hidden="true" tabindex="-1"></a></span>
+        <span id="cb6-69"><a href="#cb6-69" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+        <span id="cb6-70"><a href="#cb6-70" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+        <span id="cb6-71"><a href="#cb6-71" aria-hidden="true" tabindex="-1"></a></span>
+        <span id="cb6-72"><a href="#cb6-72" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> Store<span class="op">::</span><span class="kw">operator</span><span class="op">()(</span><span class="at">const</span> string<span class="op">&amp;</span> s<span class="op">)</span></span>
+        <span id="cb6-73"><a href="#cb6-73" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+        <span id="cb6-74"><a href="#cb6-74" aria-hidden="true" tabindex="-1"></a>  string len_s <span class="op">=</span> to_string<span class="op">(</span>s<span class="op">.</span>size<span class="op">());</span></span>
+        <span id="cb6-75"><a href="#cb6-75" aria-hidden="true" tabindex="-1"></a>  ofs<span class="op">.</span>write<span class="op">(</span>len_s<span class="op">.</span>data<span class="op">(),</span> len_s<span class="op">.</span>size<span class="op">());</span></span>
+        <span id="cb6-76"><a href="#cb6-76" aria-hidden="true" tabindex="-1"></a>  ofs<span class="op">.</span>put<span class="op">(</span><span class="ch">&#39;</span><span class="sc">\n</span><span class="ch">&#39;</span><span class="op">);</span></span>
+        <span id="cb6-77"><a href="#cb6-77" aria-hidden="true" tabindex="-1"></a>  ofs<span class="op">.</span>write<span class="op">(</span>s<span class="op">.</span>data<span class="op">(),</span> s<span class="op">.</span>size<span class="op">());</span></span>
+        <span id="cb6-78"><a href="#cb6-78" aria-hidden="true" tabindex="-1"></a>  ofs<span class="op">.</span>put<span class="op">(</span><span class="ch">&#39;</span><span class="sc">\n</span><span class="ch">&#39;</span><span class="op">);</span></span>
+        <span id="cb6-79"><a href="#cb6-79" aria-hidden="true" tabindex="-1"></a></span>
+        <span id="cb6-80"><a href="#cb6-80" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+        </blockquote>
+        <blockquote>
+        <div class="sourceCode" id="cb7"><pre
+        class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main<span class="op">(</span><span class="dt">int</span> argc<span class="op">,</span> <span class="dt">char</span><span class="op">*</span> argv<span class="op">[])</span></span>
+        <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+        <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  testBinaryIO<span class="op">();</span></span>
+        <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    </span>
+        <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">0</span><span class="op">;</span></span>
+        <span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+        </blockquote>
+	  </ul>	
+	  <br>
+	  </div>
+	</div>
+	
+  </body>
+  <!--明月浩空音乐播放器-->
+	  <script src="https://cdn.bootcdn.net/ajax/libs/jquery/1.10.0/jquery.min.js"></script>
+	  <script src="https://myhkw.cn/api/player/166175577147" id="myhk" key="166175577147" m="1"></script>
+	  <!-- <script src="../js/sakura.js"></script>
+	  <script src="../js/cursor-click.js"></script> -->
+  
+  </html>

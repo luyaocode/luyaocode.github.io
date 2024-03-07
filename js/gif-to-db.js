@@ -37,17 +37,17 @@
     };
 
     request.onsuccess = function (event) {
-        console.log("Success creating/accessing IndexedDB database");
+        // console.log("Success creating/accessing IndexedDB database");
         // 事务
         db=request.result;
         var query=db.transaction(["elephants"], "readwrite").objectStore("elephants").get("image");
         query.onsuccess=function(event){
             // 赋值
             if(event.target.result!==undefined){
-                console.log("太好了，找到一条记录");
+                // console.log("太好了，找到一条记录");
                 // alert("太好了，找到一条记录");
                 var imgFile = event.target.result;
-                console.log("Got elephant!" + imgFile);
+                // console.log("Got elephant!" + imgFile);
                 var reader = new window.FileReader();
                 // 为甚么入参写blob也行
                 reader.readAsDataURL(imgFile);
@@ -63,7 +63,7 @@
                 // alert("backurl=="+window.getComputedStyle(document.querySelector('.body-css',null)).backgroundImage);
                 }
             }else{
-                console.log("抱歉，没查到呢");
+                // console.log("抱歉，没查到呢");
                 // alert("抱歉，没查到呢");
                 var blob=null;
                 // createObjectStore = function (dataBase) {
@@ -94,7 +94,7 @@
 
     // For future use. Currently only in latest Firefox versions
     request.onupgradeneeded = function (event) {
-        console.log("Creating objectStore")
+        // console.log("Creating objectStore")
         event.target.result.createObjectStore("elephants");
     }
 })();
@@ -110,11 +110,11 @@ function getImageFile(db,blob){
 
     xhr.addEventListener("load", function () {
     if (xhr.status === 200) {
-        console.log("Image retrieved");
+        // console.log("Image retrieved");
 
         // Blob as response
         blob = xhr.response;
-        console.log("Blob:" + blob);
+        // console.log("Blob:" + blob);
 
         // Put the received blob into IndexedDB
         putElephantInDb(db,blob);
@@ -125,7 +125,7 @@ function getImageFile(db,blob){
 };
 
 function putElephantInDb (db,blob) {
-    console.log("Putting elephants in IndexedDB");
+    // console.log("Putting elephants in IndexedDB");
 
     // Open a transaction to the database
     var transaction = db.transaction(["elephants"], "readwrite");
@@ -136,7 +136,7 @@ function putElephantInDb (db,blob) {
     // Retrieve the file that was just stored
     transaction.objectStore("elephants").get("image").onsuccess = function (event) {
         var imgFile = event.target.result;
-        console.log("Got elephant!" + imgFile);
+        // console.log("Got elephant!" + imgFile);
         // Set img src to ObjectURL
         var imgElephant = document.getElementById("body");
         var backurl=window.getComputedStyle(document.querySelector('.body-css',null)).backgroundImage;
@@ -159,7 +159,7 @@ function putElephantInDb (db,blob) {
         //   imgElephant.setAttribute("src", reader.result+'');
             var url='url('+reader.result+')'
             document.querySelector(".body-css",null).style.backgroundImage=url;
-            console.log("backurl=="+window.getComputedStyle(document.querySelector('.body-css',null)).backgroundImage);
+            // console.log("backurl=="+window.getComputedStyle(document.querySelector('.body-css',null)).backgroundImage);
         }
     }
 };

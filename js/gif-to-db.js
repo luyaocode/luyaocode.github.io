@@ -21,8 +21,8 @@
         //     // 不支持
         //     console.log("不支持indexedDB...");
         //     alert("不支持");
-        // }  
-    } 
+        // }
+    }
     // IndexedDB
     var indexedDB = window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB || window.OIndexedDB || window.msIndexedDB,
     IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction || window.OIDBTransaction || window.msIDBTransaction,
@@ -30,7 +30,7 @@
 
     // Create/open database
     var request = indexedDB.open("elephantFiles", dbVersion);
-    var db; 
+    var db;
 
     request.onerror = function (event) {
         console.log("Error creating/accessing IndexedDB database");
@@ -41,7 +41,7 @@
         // 事务
         db=request.result;
         var query=db.transaction(["elephants"], "readwrite").objectStore("elephants").get("image");
-        query.onsuccess=function(event){  
+        query.onsuccess=function(event){
             // 赋值
             if(event.target.result!==undefined){
                 console.log("太好了，找到一条记录");
@@ -50,7 +50,7 @@
                 console.log("Got elephant!" + imgFile);
                 var reader = new window.FileReader();
                 // 为甚么入参写blob也行
-                reader.readAsDataURL(imgFile); 
+                reader.readAsDataURL(imgFile);
                 // 这段代码阻塞了一下
                 reader.onloadend = function() {
                 //   console.log("reader=="+reader.result);
@@ -59,7 +59,7 @@
                     var url='url('+reader.result+')';
                     // alert("url=="+url);
                     document.querySelector(".body-css",null).style.backgroundImage=url;
-                console.log("backurl=="+window.getComputedStyle(document.querySelector('.body-css',null)).backgroundImage);
+                // console.log("backurl=="+window.getComputedStyle(document.querySelector('.body-css',null)).backgroundImage);
                 // alert("backurl=="+window.getComputedStyle(document.querySelector('.body-css',null)).backgroundImage);
                 }
             }else{
@@ -91,7 +91,7 @@
     //         }
     //     }
     // }
-    
+
     // For future use. Currently only in latest Firefox versions
     request.onupgradeneeded = function (event) {
         console.log("Creating objectStore")
@@ -111,7 +111,7 @@ function getImageFile(db,blob){
     xhr.addEventListener("load", function () {
     if (xhr.status === 200) {
         console.log("Image retrieved");
-        
+
         // Blob as response
         blob = xhr.response;
         console.log("Blob:" + blob);
@@ -140,7 +140,7 @@ function putElephantInDb (db,blob) {
         // Set img src to ObjectURL
         var imgElephant = document.getElementById("body");
         var backurl=window.getComputedStyle(document.querySelector('.body-css',null)).backgroundImage;
-        // console.log("初始的backurl=="+backurl);               
+        // console.log("初始的backurl=="+backurl);
         // console.log(imgElephant.getAttribute("src"));//null
         // Get window.URL object
         // var URL = window.URL || window.webkitURL;
@@ -149,10 +149,10 @@ function putElephantInDb (db,blob) {
         // Create and revoke ObjectURL
         // var imgURL = URL.createObjectURL(imgFile);
         // console.log('imgURL=='+imgURL);
-        
+
         var reader = new window.FileReader();
         // 为甚么入参写blob也行
-        reader.readAsDataURL(imgFile); 
+        reader.readAsDataURL(imgFile);
         // 这段代码阻塞了一下
         reader.onloadend = function() {
         //   console.log("reader=="+reader.result);

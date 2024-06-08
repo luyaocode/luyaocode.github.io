@@ -11,6 +11,7 @@
 	<meta http-equiv="Cache-Control" content="no-siteapp" />
 	<link rel="icon" type="img/x-icon" href="../img/fav.png">
 	<script src="../js/util.js"></script>
+	<script src="../js/constDefine.js"></script>
 </head>
   <style>
 	  * {
@@ -134,7 +135,7 @@
 	</div>
 	<script src="https://cdn.bootcdn.net/ajax/libs/jquery/1.10.0/jquery.min.js"></script>
 	<script type="text/javascript">
-		var url="http://localhost:5001/blogs"
+		var url=backend_url+"/blogs";
 		$.ajax({
 			url: url,
 			type: "GET",

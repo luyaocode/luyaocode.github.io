@@ -159,6 +159,7 @@
             }
 
         </style>
+        <script src="../../js/constDefine.js"></script>
     </head>
     <body>
         <div style="
@@ -494,7 +495,7 @@
                 var title = document.getElementById('title').value;
                 var content=testEditor.getMarkdown();
                 // 发送 POST 请求到服务器
-                var url="http://localhost:5001/publish"
+                var url=backend_url+'/publish';
                 $.ajax({
                     url: url, // 服务器端接收请求的URL
                     type: "POST", // 请求类型为POST

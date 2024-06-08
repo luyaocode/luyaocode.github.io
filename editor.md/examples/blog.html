@@ -123,6 +123,7 @@
 
         </style>
         <script src="../../js/util.js"></script>
+        <script src="../../js/constDefine.js"></script>
     </head>
     <body>
         <div id="successInfoDialog" class="confirmation-dialog" style="display: none;">
@@ -293,7 +294,7 @@
             $(function() {
                 var testEditormdView, testEditormdView2;
                 // 发送 POST 请求到服务器
-                var url="http://localhost:5001/blog"
+                var url=backend_url+"/blog";
                 $.ajax({
                     url: url,
                     type: "GET",
@@ -409,7 +410,7 @@
                 passwdDialog.style.display = 'none';
             });
             const delBlog=(pwd,id)=>{
-                var url = `http://localhost:5001/delblog`;
+                var url =backend_url+ `/delblog`;
                 $.ajax({
                     url: url,
                     type: "POST",

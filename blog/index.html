@@ -16,6 +16,7 @@
 	  * {
 		  padding: 0px;
 		  margin: 0px;
+		  background-color: #9c9c9c;
 	  }
 	  .div1{
 		  /* background-image: url("../img/moon.jpg"); */
@@ -35,7 +36,7 @@
 	  }
 	  a{
 		text-decoration: none;
-		margin-left: 20px;
+		margin-left: 0px;
 		margin-bottom: 10px;
 		font-family: "隶书";
 		font-size: 30px;
@@ -115,12 +116,11 @@
 	  <div class="div2">
 		<div style="display: flex;flex-direction: row;
 		margin:0.1rem 1rem;
-		margin-left:0.5rem;
 		border-bottom: 2px solid rgb(109, 46, 46);
 		">
 			<a href="../index.html">返回</a>
 			<div style="margin-left: auto; margin-right: 20px;">
-				<a href="../editor.md/examples/full.html" id="blog-link">写博客</a>
+				<a href="../editor.md/examples/write-blog.html" id="blog-link">写博客</a>
 			</div>
 			<a href="/">首页</a>
 		</div>
@@ -153,7 +153,7 @@
 					spanEle.className="time";
 					spanEle.textContent=blog.time===''?'未知时间':formateDate(blog.time);
 					aElement.id=blog.id;
-					aElement.href="../editor.md/examples/html-preview-markdown-to-html-custom-toc-container.html?id="+blog.id;
+					aElement.href="../editor.md/examples/blog.html?id="+blog.id;
 					aElement.textContent = blog.title===''?'无标题':blog.title;
 					liElement.appendChild(aElement);
 					titleEle.appendChild(liElement);

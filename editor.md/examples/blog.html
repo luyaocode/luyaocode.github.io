@@ -7,7 +7,11 @@
         <link rel="stylesheet" href="../css/editormd.preview.css" />
         <link rel="shortcut icon" href="https://pandao.github.io/editor.md/favicon.ico" type="image/x-icon" />
         <style>
-            body {padding: 40px;padding-top:0}
+            body {
+                padding: 20px;
+                padding-top:0;
+        		background-color: #9c9c9c;
+            }
 
             #layout > header, .btns {
                 width: auto;
@@ -118,6 +122,7 @@
             }
 
         </style>
+        <script src="../../js/util.js"></script>
     </head>
     <body>
         <div id="successInfoDialog" class="confirmation-dialog" style="display: none;">
@@ -132,7 +137,7 @@
         </div>
         <div id='topBar' style="display: flex;flex-direction: row;
             position: fixed;
-            left:30px;
+            left:20px;
             top:0.5px;
             border-bottom: 2px solid rgb(109, 46, 46);
             width: 100%;
@@ -142,6 +147,7 @@
         </div>
         <div id="layout" style="
         margin-top:1.8rem;
+        background: transparent;
         ">
             <div id="passwdDialog" class="confirmation-dialog" style="display: none;">
                 <div class="dialog-content">
@@ -234,15 +240,26 @@
             <!-- <div class="btns">
                 <button onclick="location.href='./html-preview-markdown-to-html.html';">返回 Back</button>
             </div> -->
-            <div id="sidebar">
+            <div id="sidebar"  style="
+                background: transparent;
+            ">
                 <h1>目录</h1>
-                <div class="markdown-body editormd-preview-container" id="custom-toc-container">#custom-toc-container</div>
+                <div class="markdown-body editormd-preview-container" id="custom-toc-container"
+                style="background: transparent;
+                "
+                >#custom-toc-container</div>
             </div>
-            <div id="test-editormd-view">
+            <div id="test-editormd-view" style="
+                background: transparent;
+            ">
                 <div style="width:100%;
                 text-align: center;
                 ">
-                    <h1 id='title'></h1>
+                    <div style="display: flex;flex-direction: column;">
+                        <h1 id='title' style="border: none;"></h1>
+                        <span id="blog-info"></span>
+                    </div>
+
                 </div>
                 <textarea style="display:none;" name="test-editormd-markdown-doc"></textarea>
             </div>
@@ -290,7 +307,8 @@
                         const titleEle=document.getElementById('title');
                         titleEle.textContent=title;
                         const markdown=content===''?'无内容':'#'+content;
-
+                        const blogInfoEle=document.getElementById('blog-info');
+                        blogInfoEle.textContent=response.author+"\t\t"+formateDate(response.time);
                         testEditormdView = editormd.markdownToHTML("test-editormd-view", {
                             markdown        : markdown ,//+ "\r\n" + $("#append-test").text(),
                             //htmlDecode      : true,       // 开启 HTML 标签解析，为了安全性，默认不开启

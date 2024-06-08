@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh">
+    <head>
+        <meta charset="utf-8" />
+        <title>写博客</title>
+        <link rel="stylesheet" href="css/style.css" />
+        <link rel="stylesheet" href="../css/editormd.css" />
+        <link rel="shortcut icon" href="https://pandao.github.io/editor.md/favicon.ico" type="image/x-icon" />
+
+        <style>
+            textarea#title{
+                border:none;
+                border-bottom:1px solid black;
+                height: 1.5em; /* 设置高度为一行字的高度 */
+                resize: none; /* 禁止缩放 */
+                overflow: hidden; /* 禁止出现滚动条 */
+                white-space: nowrap; /* 禁止自动换行 */
+                font-size: 2em;
+                font-weight: bold;
+                line-height: 1.5em; /* 设置行高等于高度 */
+                vertical-align: bottom; /* 垂直靠底对齐 */
+                width: 50%;
+            }
+            textarea#title:focus{
+                outline: none; /* 移除聚焦时的轮廓 */
+            }
+
+        </style>
+
+    </head>
+    <body>
+        <div id="layout">
+            <header>
+                <textarea placeholder="标题" id="title"></textarea>
+            </header>
+            <div id="test-editormd">
+                <textarea style="display:none;"></textarea>
+            </div>
+        </div>
+        <script src="js/jquery.min.js"></script>
+        <script src="../editormd.min.js"></script>
+        <script type="text/javascript">
+			var testEditor;
+            $(function() {
+                testEditor = editormd("test-editormd", {
+                    width   : "90%",
+                    height  : 640,
+                    syncScrolling : "single",
+                    path    : "../lib/"
+                });
+
+                /*
+                // or
+                testEditor = editormd({
+                    id      : "test-editormd",
+                    width   : "90%",
+                    height  : 640,
+                    path    : "../lib/"
+                });
+                */
+            });
+        </script>
+    </body>
+</html>

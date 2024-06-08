@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="zh">
+    <head>
+        <meta charset="utf-8" />
+        <title>BLOG</title>
+        <link rel="stylesheet" href="css/style.css" />
+        <link rel="stylesheet" href="../css/editormd.preview.css" />
+        <link rel="shortcut icon" href="https://pandao.github.io/editor.md/favicon.ico" type="image/x-icon" />
+        <style>
+            body {padding: 40px;padding-top:0}
+
+            #layout > header, .btns {
+                width: auto;
+            }
+
+            #sidebar {
+                width: 400px;
+                height: 100%;
+                position: fixed;
+                top: 0;
+                right: 0;
+                overflow: hidden;
+                background: #fff;
+                z-index: 100;
+                padding: 18px;
+                border: 1px solid #ddd;
+                border-top: none;
+                border-bottom: none;
+            }
+
+            #sidebar:hover {
+                overflow: auto;
+            }
+
+            #sidebar h1 {
+                font-size: 16px;
+            }
+
+            #custom-toc-container {
+                padding-left: 0;
+            }
+
+            #test-editormd-view, #test-editormd-view2 {
+                padding-left: 0;
+                padding-right: 430px;
+                margin: 0;
+            }
+            #title{
+                display: inline-block;
+                margin: 0;
+            }
+            #topBar>a{
+                text-decoration: none;
+                margin-bottom: 10px;
+                font-family: "隶书";
+                font-size: 30px;
+                font-style: unset;
+                font-weight: bold;
+		        color:rgb(73, 73, 73);
+            }
+            #topBar>a:active{
+                color:red;
+            }
+            #topBar>button{
+                text-decoration: none;
+                margin-bottom: 10px;
+                font-family: "隶书";
+                font-size: 30px;
+                font-style: unset;
+                font-weight: bold;
+                border: none;
+                background:transparent;
+                cursor: pointer;
+                color:rgb(73, 73, 73);
+                margin-left: 20px;
+            }
+            #topBar>button:active{
+                color:red;
+            }
+
+            /* 我的弹窗 */
+            .confirmation-dialog {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.5); /* 半透明黑色背景 */
+                z-index: 999; /* 确保弹窗在最上层 */
+            }
+
+            .dialog-content {
+                background-color: #fff; /* 弹窗背景色 */
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* 阴影效果 */
+                text-align: center;
+            }
+
+            .buttons {
+                margin-top: 20px;
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+            }
+
+            .buttons>button {
+                padding: 8px 20px;
+                margin-right: 10px;
+                cursor: pointer;
+            }
+
+            textarea{
+                resize:none;
+            }
+
+        </style>
+    </head>
+    <body>
+        <div id="successInfoDialog" class="confirmation-dialog" style="display: none;">
+            <div class="dialog-content">
+                <p>删除成功</p>
+            </div>
+        </div>
+        <div id="failureInfoDialog" class="confirmation-dialog" style="display: none;">
+            <div class="dialog-content">
+                <p>删除失败：暗号错误</p>
+            </div>
+        </div>
+        <div id='topBar' style="display: flex;flex-direction: row;
+            position: fixed;
+            left:30px;
+            top:0.5px;
+            border-bottom: 2px solid rgb(109, 46, 46);
+            width: 100%;
+            ">
+                <a href="../../blog/index.html">返回</a>
+                <button id="del-blog-btn">删除</button>
+        </div>
+        <div id="layout" style="
+        margin-top:1.8rem;
+        ">
+            <div id="passwdDialog" class="confirmation-dialog" style="display: none;">
+                <div class="dialog-content">
+                    <p style="display: inline-block;">请输入暗号</p>
+                    <div style="
+                        display: flex;
+                        flex-direction: row;
+                        justify-content: center;
+                        margin-top:1rem;
+                    ">
+                        <textarea id='pw1' class="title"
+                        maxlength="1" rows="1" cols="1"
+                        style="
+                            border:1px solid black;
+                            color:black;
+                            margin-right:1rem;
+                            font-size: 26px;
+                            width: 50px;  /* 设置宽度 */
+                            text-align: center;
+                        "></textarea>
+                        <textarea id='pw2' class="title"
+                        maxlength="1" rows="1" cols="1"
+                        style="
+                            border:1px solid black;
+                            color:black;
+                            font-size: 26px;
+                            margin-right:1rem;
+                            text-align: center;
+                            width: 50px;  /* 设置宽度 */
+                        "></textarea>
+                        <textarea id='pw3' class="title"
+                        maxlength="1" rows="1" cols="1"
+                        style="
+                            border:1px solid black;
+                            color:black;
+                            font-size: 26px;
+                            margin-right:1rem;
+                            text-align: center;
+                            width: 50px;  /* 设置宽度 */
+                        "></textarea>
+                        <textarea id='pw4' class="title"
+                        maxlength="1" rows="1" cols="1"
+                        style="
+                            border:1px solid black;
+                            color:black;
+                            font-size: 26px;
+                            margin-right:1rem;
+                            text-align: center;
+                            width: 50px;  /* 设置宽度 */
+                        "></textarea>
+                        <textarea id='pw5' class="title"
+                        maxlength="1" rows="1" cols="1"
+                        style="
+                            border:1px solid black;
+                            color:black;
+                            font-size: 26px;
+                            margin-right:1rem;
+                            text-align: center;
+                            width: 50px;  /* 设置宽度 */
+                        "></textarea>
+                        <textarea id='pw6' class="title"
+                        maxlength="1" rows="1" cols="1"
+                        style="
+                            border:1px solid black;
+                            color:black;
+                            font-size: 26px;
+                            text-align: center;
+                            margin-right:1rem;
+                            width: 50px;  /* 设置宽度 */
+                        "></textarea>
+                        <textarea id='pw7' class="title"
+                        maxlength="1" rows="1" cols="1"
+                        style="
+                            border:1px solid black;
+                            color:black;
+                            font-size: 26px;
+                            text-align: center;
+                            width: 50px;  /* 设置宽度 */
+                        "></textarea>
+                    </div>
+                    <div class="buttons">
+                        <button id="pwd-ok-btn">确定</button>
+                        <button id="pwd-clean-btn">清空</button>
+                        <button id="pwd-cancel-btn">取消</button>
+                    </div>
+                </div>
+            </div>
+            <!-- <header>
+            </header> -->
+            <!-- <div class="btns">
+                <button onclick="location.href='./html-preview-markdown-to-html.html';">返回 Back</button>
+            </div> -->
+            <div id="sidebar">
+                <h1>目录</h1>
+                <div class="markdown-body editormd-preview-container" id="custom-toc-container">#custom-toc-container</div>
+            </div>
+            <div id="test-editormd-view">
+                <div style="width:100%;
+                text-align: center;
+                ">
+                    <h1 id='title'></h1>
+                </div>
+                <textarea style="display:none;" name="test-editormd-markdown-doc"></textarea>
+            </div>
+            <div id="test-editormd-view2">
+                <textarea id="append-test" style="display:none;"></textarea>
+            </div>
+        </div>
+        <!-- <script src="js/zepto.min.js"></script>
+		<script>
+			var jQuery = Zepto;  // 为了避免修改flowChart.js和sequence-diagram.js的源码，所以使用Zepto.js时想支持flowChart/sequenceDiagram就得加上这一句
+		</script> -->
+        <script src="js/jquery.min.js"></script>
+        <script src="../lib/marked.min.js"></script>
+        <script src="../lib/prettify.min.js"></script>
+
+        <script src="../lib/raphael.min.js"></script>
+        <script src="../lib/underscore.min.js"></script>
+        <script src="../lib/sequence-diagram.min.js"></script>
+        <script src="../lib/flowchart.min.js"></script>
+        <script src="../lib/jquery.flowchart.min.js"></script>
+
+        <script src="../editormd.js"></script>
+        <script type="text/javascript">
+            const parseQueryString = (url) => {
+            const queryString = url.split('?')[1];
+                return Object.fromEntries(new URLSearchParams(queryString).entries());
+            };
+
+            const params = parseQueryString(window.location.href);
+            var id = params.id;
+            $(function() {
+                var testEditormdView, testEditormdView2;
+                // 发送 POST 请求到服务器
+                var url="http://localhost:5001/blog"
+                $.ajax({
+                    url: url,
+                    type: "GET",
+                    data: {
+                        type:'blog',
+                        id:id,
+                    },
+                    success: function(response) {
+                        let {title,author,content,time,id}=response;
+                        title =title===''?'无标题':title;
+                        const titleEle=document.getElementById('title');
+                        titleEle.textContent=title;
+                        const markdown=content===''?'无内容':'#'+content;
+
+                        testEditormdView = editormd.markdownToHTML("test-editormd-view", {
+                            markdown        : markdown ,//+ "\r\n" + $("#append-test").text(),
+                            //htmlDecode      : true,       // 开启 HTML 标签解析，为了安全性，默认不开启
+                            htmlDecode      : "style,script,iframe",  // you can filter tags decode
+                            //toc             : false,
+                            tocm            : true,    // Using [TOCM]
+                            tocContainer    : "#custom-toc-container", // 自定义 ToC 容器层
+                            //gfm             : false,
+                            //tocDropdown     : true,
+                            // markdownSourceCode : true, // 是否保留 Markdown 源码，即是否删除保存源码的 Textarea 标签
+                            emoji           : true,
+                            taskList        : true,
+                            tex             : true,  // 默认不解析
+                            flowChart       : true,  // 默认不解析
+                            sequenceDiagram : true,  // 默认不解析
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error sending string:", error);
+                    }
+                });
+                //console.log("返回一个 jQuery 实例 =>", testEditormdView);
+
+                // 获取Markdown源码
+                //console.log(testEditormdView.getMarkdown());
+
+                //alert(testEditormdView.getMarkdown());
+            });
+
+            // testEditormdView2 = editormd.markdownToHTML("test-editormd-view2", {
+            //     htmlDecode      : "style,script,iframe",  // you can filter tags decode
+            //     emoji           : true,
+            //     taskList        : true,
+            //     tex             : true,  // 默认不解析
+            //     flowChart       : true,  // 默认不解析
+            //     sequenceDiagram : true,  // 默认不解析
+            // });
+
+            // 自定义事件
+            const passwdDialog = document.getElementById('passwdDialog');
+            const textareas = passwdDialog.querySelectorAll('textarea');
+            textareas.forEach((textarea, index) => {
+                textarea.addEventListener('input', (event) => {
+                    const value = event.target.value;
+                    if(value==='\n'||value==='\r'){
+                        event.target.value='';
+                        return;
+                    }
+                    if (value.length === 1 && index < textareas.length - 1) {
+                        setTimeout(() => textareas[index + 1].focus(), 100);
+                    }
+                });
+                // 确保每个 textarea 只能输入一个字符
+                // 监听键盘事件
+                textarea.addEventListener('keydown', (event) => {
+                if (event.key === 'Backspace') {
+                    // 如果按下的是退格键，并且当前 textarea 为空，则将焦点移到前一个 textarea
+                    if (textarea.value.length === 0 && index > 0) {
+                        setTimeout(() => textareas[index - 1].focus(), 100);
+                    }
+                } else if (textarea.value.length >= 1) {
+                    // 阻止输入超过1个字符
+                    event.preventDefault();
+                }
+                });
+            });
+            $("#pwd-ok-btn").click(function() {
+                let pwd=[];
+                for(let i=1;i<=7;i++){
+                    const id='pw'+i;
+                    const elem=document.getElementById(id);
+                    pwd.push(elem.value);
+                }
+                for(let i=1;i<=7;i++){
+                    const id='pw'+i;
+                    const elem=document.getElementById(id);
+                    elem.value='';
+                }
+                passwdDialog.style.display='none';
+                delBlog(pwd,id);
+            });
+
+            $("#pwd-clean-btn").click(function() {
+                for(let i=1;i<=7;i++){
+                    const id='pw'+i;
+                    const elem=document.getElementById(id);
+                    elem.value='';
+                }
+            });
+
+            $("#pwd-cancel-btn").click(function() {
+                const passwdDialog=document.getElementById("passwdDialog");
+                for(let i=1;i<=7;i++){
+                    const id='pw'+i;
+                    const elem=document.getElementById(id);
+                    elem.value='';
+                }
+                passwdDialog.style.display = 'none';
+            });
+            const delBlog=(pwd,id)=>{
+                var url = `http://localhost:5001/delblog`;
+                $.ajax({
+                    url: url,
+                    type: "POST",
+                    data: {
+                        type:'blog',
+                        id:id,
+                        pwd:pwd,
+                    },
+                    success: function(response) {
+                        if(response.code===0){
+                            const infoDialog=document.getElementById("successInfoDialog");
+                            infoDialog.style.display='flex';
+                            setTimeout(() => {
+                                window.location.href = "../../blog/index.html";
+                            },1000);
+                        }
+                        else if(response.code===-1){
+                            const infoDialog=document.getElementById("failureInfoDialog");
+                            infoDialog.style.display='flex';
+                            setTimeout(() => {
+                                infoDialog.style.display='none';
+                            },3000);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error sending string:", error);
+                    }
+                });
+            };
+
+            $("#del-blog-btn").click(function() {
+                passwdDialog.style.display='flex';
+            });
+
+        </script>
+        <script>
+            let lastScrollTop = 0;
+            const topBar = document.getElementById('topBar');
+
+            window.addEventListener('scroll', function() {
+                let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                if (scrollTop === 0) {
+                    topBar.style.display = 'flex'; // 显示 topBar
+                } else {
+                    topBar.style.display = 'none'; // 隐藏 topBar
+                }
+            }, false);
+        </script>
+    </body>
+</html>

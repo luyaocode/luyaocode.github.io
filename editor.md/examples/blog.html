@@ -2,15 +2,14 @@
 <html lang="zh">
     <head>
         <meta charset="utf-8" />
-        <title>BLOG</title>
+        <title>博客</title>
         <link rel="stylesheet" href="css/style.css" />
         <link rel="stylesheet" href="../css/editormd.preview.css" />
-        <link rel="shortcut icon" href="https://pandao.github.io/editor.md/favicon.ico" type="image/x-icon" />
+        <link rel="shortcut icon" href="../../img/fav.png" type="image/x-icon" />
         <style>
             body {
                 padding: 20px;
                 padding-top:0;
-        		background-color: #9c9c9c;
             }
 
             #layout > header, .btns {
@@ -148,7 +147,6 @@
         </div>
         <div id="layout" style="
         margin-top:1.8rem;
-        background: transparent;
         ">
             <div id="passwdDialog" class="confirmation-dialog" style="display: none;">
                 <div class="dialog-content">
@@ -305,6 +303,8 @@
                     success: function(response) {
                         let {title,author,content,time,id}=response;
                         title =title===''?'无标题':title;
+                        const headTitleEle=document.querySelector('title');
+                        headTitleEle.textContent=title;
                         const titleEle=document.getElementById('title');
                         titleEle.textContent=title;
                         const markdown=content===''?'无内容':'#'+content;

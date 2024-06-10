@@ -6,3 +6,12 @@ function formateDate(dateString) {
     const formattedDate = `${year}-${month}-${day}`;
     return formattedDate;
 }
+
+function isJSON(str) {
+    try {
+        JSON.parse(str);
+        return true;
+    } catch (e) {
+        return false;
+    }
+}

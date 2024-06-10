@@ -17,7 +17,6 @@
 	  * {
 		  padding: 0px;
 		  margin: 0px;
-		  background-color: #9c9c9c;
 	  }
 	  .div1{
 		  /* background-image: url("../img/moon.jpg"); */
@@ -135,37 +134,68 @@
 	</div>
 	<script src="https://cdn.bootcdn.net/ajax/libs/jquery/1.10.0/jquery.min.js"></script>
 	<script type="text/javascript">
-		var url=backend_url+"/blogs";
-		$.ajax({
-			url: url,
-			type: "GET",
-			success: function(response) {
-				// console.log("All blogs: ");
-				// response.forEach(element => {
-				// 	console.log(JSON.stringify(element));
-				// });
-				const blogsDiv=document.getElementById("blogs");
-				response.forEach(blog => {
-					const titleEle=document.createElement('div');
-					titleEle.className="title";
-					const liElement = document.createElement('li');
-					const aElement = document.createElement('a');
-					const spanEle= document.createElement('span');
-					spanEle.className="time";
-					spanEle.textContent=blog.time===''?'未知时间':formateDate(blog.time);
-					aElement.id=blog.id;
-					aElement.href="../editor.md/examples/blog.html?id="+blog.id;
-					aElement.textContent = blog.title===''?'无标题':blog.title;
-					liElement.appendChild(aElement);
-					titleEle.appendChild(liElement);
-					titleEle.appendChild(spanEle);
-					blogsDiv.appendChild(titleEle);
-				});
-			},
-			error: function(xhr, status, error) {
-				console.error("Error sending string:", error);
+		const renderBlogs=(blogs)=>{
+			if(!blogs) return;
+			const blogsDiv=document.getElementById("blogs");
+			if(isJSON(blogs)){
+				blogs=JSON.parse(blogs);
 			}
-		});
+			blogs.forEach(blog => {
+				const titleEle=document.createElement('div');
+				titleEle.className="title";
+				const liElement = document.createElement('li');
+				const aElement = document.createElement('a');
+				const spanEle= document.createElement('span');
+				spanEle.className="time";
+				spanEle.textContent=blog.time===''?'未知时间':formateDate(blog.time);
+				aElement.id=blog.id;
+				aElement.href="../editor.md/examples/blog.html?id="+blog.id;
+				aElement.textContent = blog.title===''?'无标题':blog.title;
+				liElement.appendChild(aElement);
+				titleEle.appendChild(liElement);
+				titleEle.appendChild(spanEle);
+				blogsDiv.appendChild(titleEle);
+			});
+		}
+
+		const updateBlogs=(latestUpdateTime)=>{
+			var url=backend_url+"/blogs";
+			$.ajax({
+				url: url,
+				type: "GET",
+				success: function(response) {
+					renderBlogs(response);
+					window.localStorage.setItem("latestUpdateTime",latestUpdateTime);
+					window.localStorage.setItem("blogs",JSON.stringify(response));
+				},
+				error: function(xhr, status, error) {
+					console.error("Error sending string:", error);
+				}
+			});
+		}
+		const getLastedUpdateTime=()=>{
+			var url=backend_url+"/blogs/get-latest-update-time";
+			$.ajax({
+				url: url,
+				type: "GET",
+				success: function(response) {
+					const clientLatestUpdateTime=window.localStorage.getItem("latestUpdateTime");
+					const blogs=window.localStorage.getItem("blogs");
+					if(clientLatestUpdateTime!==response||response===''||
+						clientLatestUpdateTime===undefined||!blogs){
+						updateBlogs(response);
+					}
+					else{
+						renderBlogs(blogs);
+					}
+				},
+				error: function(xhr, status, error) {
+					console.error("Error sending string:", error);
+				}
+			});
+		}
+
+		getLastedUpdateTime();
 	</script>
   </body>
   </html>

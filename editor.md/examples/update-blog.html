@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="zh">
+    <head>
+        <meta charset="utf-8" />
+        <title>修改博客</title>
+        <!-- 引入 uuid 库 -->
+        <script src="https://cdn.jsdelivr.net/npm/uuid/dist/umd/uuidv4.min.js"></script>
+
+        <link rel="stylesheet" href="css/style.css" />
+        <link rel="stylesheet" href="../css/editormd.css" />
+        <link rel="shortcut icon" href="../../img/fav.ico" type="image/x-icon" />
+        <style>
+            .title{
+                border:none;
+                border-bottom:1px solid rgb(255, 255, 255);
+                height: 1.5em; /* 设置高度为一行字的高度 */
+                resize: none; /* 禁止缩放 */
+                overflow: hidden; /* 禁止出现滚动条 */
+                white-space: nowrap; /* 禁止自动换行 */
+                font-size: 2em;
+                font-weight: bold;
+                line-height: 1.5em; /* 设置行高等于高度 */
+                vertical-align: bottom; /* 垂直靠底对齐 */
+                width: 80%;
+                background: transparent;
+                color: white;
+            }
+            .title:focus{
+                outline: none; /* 移除聚焦时的轮廓 */
+                border-bottom-color: rgb(0, 0, 0);
+            }
+            #publish-btn,#return-btn{
+                width: 8%;
+                margin-left: auto;
+                background-color: #2196F3;
+                border: none;
+                color:rgb(255, 255, 255);
+                font-size: 1.5rem;
+                padding: 2px;
+                cursor: pointer;
+            }
+
+            #publish-btn,#return-btn:hover{
+                background-color: #1696ff;
+            }
+
+            .editormd-preview-theme-dark {
+                color: #777;
+                background:#2C2827;
+            }
+
+            .editormd-preview-theme-dark .editormd-toc-menu > .markdown-toc {
+                background:#fff;
+                border:none;
+            }
+
+            .editormd-preview-theme-dark .editormd-toc-menu > .markdown-toc h1{
+                border-color:#ddd;
+            }
+
+            .editormd-preview-theme-dark .markdown-body h1,
+            .editormd-preview-theme-dark .markdown-body h2,
+            .editormd-preview-theme-dark .markdown-body hr {
+                border-color: #222;
+            }
+
+            .editormd-preview-theme-dark .editormd-preview-container  blockquote {
+                color: #555;
+                border-color: #333;
+                background: #222;
+                padding: 0.5em;
+            }
+
+            .editormd-preview-theme-dark .editormd-preview-container abbr {
+                background:#ff9900;
+                color: #fff;
+                padding: 1px 3px;
+                border-radius: 3px;
+            }
+
+            .editormd-preview-theme-dark .editormd-preview-container code {
+                background: #5A9600;
+                color: #fff;
+                border: none;
+                padding: 1px 3px;
+                border-radius: 3px;
+            }
+
+            .editormd-preview-theme-dark .editormd-preview-container table {
+                border: none;
+            }
+
+            .editormd-preview-theme-dark .editormd-preview-container .fa-emoji {
+                color: #B4BF42;
+            }
+
+            .editormd-preview-theme-dark .editormd-preview-container .katex {
+                color: #FEC93F;
+            }
+
+            .editormd-preview-theme-dark [class*=editormd-logo] {
+                color: #2196F3;
+            }
+
+            .editormd-preview-theme-dark .sequence-diagram text {
+                fill: #fff;
+            }
+
+            .editormd-preview-theme-dark .sequence-diagram rect,
+            .editormd-preview-theme-dark .sequence-diagram path {
+                color:#fff;
+                fill : #64D1CB;
+                stroke : #64D1CB;
+            }
+
+            .editormd-preview-theme-dark .flowchart rect,
+            .editormd-preview-theme-dark .flowchart path {
+                stroke : #A6C6FF;
+            }
+
+            .editormd-preview-theme-dark .flowchart rect {
+                fill: #A6C6FF;
+            }
+
+            .editormd-preview-theme-dark .flowchart text {
+                fill: #5879B4;
+            }
+
+
+            /* 我的弹窗 */
+            .confirmation-dialog {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.5); /* 半透明黑色背景 */
+                z-index: 999; /* 确保弹窗在最上层 */
+            }
+
+            .dialog-content {
+                background-color: #fff; /* 弹窗背景色 */
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* 阴影效果 */
+            }
+
+            .buttons {
+                margin-top: 20px;
+            }
+
+            button {
+                padding: 8px 20px;
+                margin-right: 10px;
+                cursor: pointer;
+            }
+
+        </style>
+        <script src="../../js/constDefine.js"></script>
+    </head>
+    <body>
+        <div style="
+        background-image: url('../../img/moon.jpg');
+        ">
+            <div id="layout" style="
+            background: transparent;
+            "
+            >
+                <header>
+                    <div style="display: flex;flex-direction: row;">
+                        <textarea maxlength="100" placeholder="标题" class="title" id="title"></textarea>
+                        <!-- 上传博客 -->
+                        <button id="publish-btn">修改</button>
+                        <button id="return-btn">放弃</button>
+                    </div>
+                </header>
+                <div class="btns">
+                    <!-- <button id="goto-line-btn">Goto line 90</button>
+                    <button id="show-btn">Show editor</button>
+                    <button id="hide-btn">Hide editor</button>
+                    <button id="get-md-btn">Get Markdown</button>
+                    <button id="get-html-btn">Get HTML</button>
+                    <button id="watch-btn">Watch</button>
+                    <button id="unwatch-btn">Unwatch</button>
+                    <button id="preview-btn">Preview HTML (Press Shift + ESC cancel)</button>
+                    <button id="fullscreen-btn">Fullscreen (Press ESC cancel)</button>
+                    <button id="show-toolbar-btn">Show toolbar</button>
+                    <button id="close-toolbar-btn">Hide toolbar</button>
+                    <button id="toc-menu-btn">ToC Dropdown menu</button>
+                    <button id="toc-default-btn">ToC default</button> -->
+                </div>
+                <div id="test-editormd"></div>
+            </div>
+            <div id="confirmationDialog" class="confirmation-dialog" style="display: none;">
+                <div class="dialog-content">
+                    <p>有正在编辑的内容，仍要返回吗？</p>
+                    <div class="buttons">
+                        <button id="return-confirm-btn">确定</button>
+                        <button id="return-cancel-btn">取消</button>
+                    </div>
+                </div>
+            </div>
+            <div id="successInfoDialog" class="confirmation-dialog" style="display: none;">
+                <div class="dialog-content">
+                    <p>修改成功</p>
+                </div>
+            </div>
+            <div id="failureInfoDialog" class="confirmation-dialog" style="display: none;">
+                <div class="dialog-content">
+                    <p>修改失败：暗号错误</p>
+                </div>
+            </div>
+            <div id="passwdDialog" class="confirmation-dialog" style="display: none;">
+                <div class="dialog-content">
+                    <p>请输入暗号</p>
+                    <div style="
+                        display: flex;
+                        flex-direction: row;
+                        justify-content: center;
+                        margin-top:1rem;
+                    ">
+                        <textarea id='pw1' class="title"
+                        maxlength="1" rows="1" cols="1"
+                        style="
+                            border:1px solid black;
+                            color:black;
+                            margin-right:1rem;
+                            font-size: 26px;
+                            width: 50px;  /* 设置宽度 */
+                            text-align: center;
+                        "></textarea>
+                        <textarea id='pw2' class="title"
+                        maxlength="1" rows="1" cols="1"
+                        style="
+                            border:1px solid black;
+                            color:black;
+                            font-size: 26px;
+                            margin-right:1rem;
+                            text-align: center;
+                            width: 50px;  /* 设置宽度 */
+                        "></textarea>
+                        <textarea id='pw3' class="title"
+                        maxlength="1" rows="1" cols="1"
+                        style="
+                            border:1px solid black;
+                            color:black;
+                            font-size: 26px;
+                            margin-right:1rem;
+                            text-align: center;
+                            width: 50px;  /* 设置宽度 */
+                        "></textarea>
+                        <textarea id='pw4' class="title"
+                        maxlength="1" rows="1" cols="1"
+                        style="
+                            border:1px solid black;
+                            color:black;
+                            font-size: 26px;
+                            margin-right:1rem;
+                            text-align: center;
+                            width: 50px;  /* 设置宽度 */
+                        "></textarea>
+                        <textarea id='pw5' class="title"
+                        maxlength="1" rows="1" cols="1"
+                        style="
+                            border:1px solid black;
+                            color:black;
+                            font-size: 26px;
+                            margin-right:1rem;
+                            text-align: center;
+                            width: 50px;  /* 设置宽度 */
+                        "></textarea>
+                        <textarea id='pw6' class="title"
+                        maxlength="1" rows="1" cols="1"
+                        style="
+                            border:1px solid black;
+                            color:black;
+                            font-size: 26px;
+                            text-align: center;
+                            margin-right:1rem;
+                            width: 50px;  /* 设置宽度 */
+                        "></textarea>
+                        <textarea id='pw7' class="title"
+                        maxlength="1" rows="1" cols="1"
+                        style="
+                            border:1px solid black;
+                            color:black;
+                            font-size: 26px;
+                            text-align: center;
+                            width: 50px;  /* 设置宽度 */
+                        "></textarea>
+                    </div>
+                    <div class="buttons">
+                        <button id="pwd-ok-btn">确定</button>
+                        <button id="pwd-clean-btn">清空</button>
+                        <button id="pwd-cancel-btn">取消</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="js/jquery.min.js"></script>
+        <script src="../editormd.min.js"></script>
+        <script type="text/javascript">
+            var testEditor;
+
+            const parseQueryString = (url) => {
+            const queryString = url.split('?')[1];
+                return Object.fromEntries(new URLSearchParams(queryString).entries());
+            };
+
+            const params = parseQueryString(window.location.href);
+            var id = params.id;
+            var markdown; // 初始内容
+            $(function() {
+                // 发送 POST 请求到服务器
+                var url=backend_url+"/blog";
+                $.ajax({
+                    url: url,
+                    type: "GET",
+                    data: {
+                        type:'blog',
+                        id:id,
+                    },
+                    success: function(response) {
+                        let {title,author,content,time,id}=response;
+                        title =title===''?'无标题':title;
+                        const headTitleEle=document.querySelector('title');
+                        headTitleEle.textContent=title;
+                        const titleEle=document.getElementById('title');
+                        titleEle.textContent=title;
+                        markdown=content===''?'无内容':'#'+content;
+                        $(function() {
+                            testEditor = editormd("test-editormd", {
+                                width: "90%",
+                                height: 740,
+                                path : '../lib/',
+                                theme : "3024-day",
+                                previewTheme : "3024-day",
+                                editorTheme : "3024-day",
+                                markdown : markdown,
+                                codeFold : true,
+                                //syncScrolling : false,
+                                saveHTMLToTextarea : true,    // 保存 HTML 到 Textarea
+                                searchReplace : true,
+                                //watch : false,                // 关闭实时预览
+                                htmlDecode : "style,script,iframe|on*",            // 开启 HTML 标签解析，为了安全性，默认不开启
+                                //toolbar  : false,             //关闭工具栏
+                                //previewCodeHighlight : false, // 关闭预览 HTML 的代码块高亮，默认开启
+                                emoji : true,
+                                taskList : true,
+                                tocm            : true,         // Using [TOCM]
+                                tex : true,                   // 开启科学公式TeX语言支持，默认关闭
+                                flowChart : true,             // 开启流程图支持，默认关闭
+                                sequenceDiagram : true,       // 开启时序/序列图支持，默认关闭,
+                                //dialogLockScreen : false,   // 设置弹出层对话框不锁屏，全局通用，默认为true
+                                //dialogShowMask : false,     // 设置弹出层对话框显示透明遮罩层，全局通用，默认为true
+                                //dialogDraggable : false,    // 设置弹出层对话框不可拖动，全局通用，默认为true
+                                //dialogMaskOpacity : 0.4,    // 设置透明遮罩层的透明度，全局通用，默认值为0.1
+                                //dialogMaskBgColor : "#000", // 设置透明遮罩层的背景颜色，全局通用，默认为#fff
+                                imageUpload : true,
+                                imageFormats : ["jpg", "jpeg", "gif", "png", "bmp", "webp"],
+                                imageUploadURL : "./php/upload.php",
+                                onload : function() {
+                                    console.log('onload', this);
+                                    //this.fullscreen();
+                                    //this.unwatch();
+                                    //this.watch().fullscreen();
+
+                                    //this.setMarkdown("#PHP");
+                                    //this.width("100%");
+                                    //this.height(480);
+                                    //this.resize("100%", 640);
+                                }
+                            });
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error sending string:", error);
+                    }
+                });
+            });
+
+            $("#goto-line-btn").bind("click", function(){
+                testEditor.gotoLine(90);
+            });
+
+            $("#show-btn").bind('click', function(){
+                testEditor.show();
+            });
+
+            $("#hide-btn").bind('click', function(){
+                testEditor.hide();
+            });
+
+            $("#get-md-btn").bind('click', function(){
+                alert(testEditor.getMarkdown());
+            });
+
+            $("#get-html-btn").bind('click', function() {
+                alert(testEditor.getHTML());
+            });
+
+            $("#watch-btn").bind('click', function() {
+                testEditor.watch();
+            });
+
+            $("#unwatch-btn").bind('click', function() {
+                testEditor.unwatch();
+            });
+
+            $("#preview-btn").bind('click', function() {
+                testEditor.previewing();
+            });
+
+            $("#fullscreen-btn").bind('click', function() {
+                testEditor.fullscreen();
+            });
+
+            $("#show-toolbar-btn").bind('click', function() {
+                testEditor.showToolbar();
+            });
+
+            $("#close-toolbar-btn").bind('click', function() {
+                testEditor.hideToolbar();
+            });
+
+            $("#toc-menu-btn").click(function(){
+                testEditor.config({
+                    tocDropdown   : true,
+                    tocTitle      : "目录 Table of Contents",
+                });
+            });
+
+            $("#toc-default-btn").click(function() {
+                testEditor.config("tocDropdown", false);
+            });
+
+
+            // 自定义按钮
+            $("#return-btn").click(function() {
+                var title = document.getElementById('title').value;
+                var content=testEditor.getMarkdown();
+                if(title!==''||content!==''){
+                    const confirmationDialog = document.getElementById('confirmationDialog');
+                    confirmationDialog.style.display = 'flex';
+                }
+                else{
+                    window.location.href = "../../blog/index.html";
+                }
+            });
+
+            $("#return-confirm-btn").click(function() {
+                window.location.href = "../../blog/index.html";
+            });
+
+            $("#return-cancel-btn").click(function() {
+                const confirmationDialog = document.getElementById('confirmationDialog');
+                confirmationDialog.style.display = 'none';
+            });
+
+            const passwdDialog = document.getElementById('passwdDialog');
+            const textareas = passwdDialog.querySelectorAll('textarea');
+            textareas.forEach((textarea, index) => {
+                textarea.addEventListener('input', (event) => {
+                    const value = event.target.value;
+                    if(value==='\n'||value==='\r'){
+                        event.target.value='';
+                        return;
+                    }
+                    if (value.length === 1 && index < textareas.length - 1) {
+                        setTimeout(() => textareas[index + 1].focus(), 100);
+                    }
+                });
+                // 确保每个 textarea 只能输入一个字符
+                // 监听键盘事件
+                textarea.addEventListener('keydown', (event) => {
+                if (event.key === 'Backspace') {
+                    // 如果按下的是退格键，并且当前 textarea 为空，则将焦点移到前一个 textarea
+                    if (textarea.value.length === 0 && index > 0) {
+                        setTimeout(() => textareas[index - 1].focus(), 100);
+                    }
+                } else if (textarea.value.length >= 1) {
+                    // 阻止输入超过1个字符
+                    event.preventDefault();
+                }
+                });
+            });
+            $("#pwd-ok-btn").click(function() {
+                let pwd=[];
+                for(let i=1;i<=7;i++){
+                    const id='pw'+i;
+                    const elem=document.getElementById(id);
+                    pwd.push(elem.value);
+                }
+                for(let i=1;i<=7;i++){
+                    const id='pw'+i;
+                    const elem=document.getElementById(id);
+                    elem.value='';
+                }
+                passwdDialog.style.display='none';
+                publish(pwd);
+            });
+
+            $("#pwd-clean-btn").click(function() {
+                for(let i=1;i<=7;i++){
+                    const id='pw'+i;
+                    const elem=document.getElementById(id);
+                    elem.value='';
+                }
+            });
+
+            $("#pwd-cancel-btn").click(function() {
+                const passwdDialog=document.getElementById("passwdDialog");
+                for(let i=1;i<=7;i++){
+                    const id='pw'+i;
+                    const elem=document.getElementById(id);
+                    elem.value='';
+                }
+                passwdDialog.style.display = 'none';
+            });
+
+            const publish=(pwdArr)=>{
+                // 生成一个新的 UUID
+                // const uuid = uuidv4();
+                var title = document.getElementById('title').value;
+                var content=testEditor.getMarkdown();
+                // 发送 POST 请求到服务器
+                var url=backend_url+'/update';
+                $.ajax({
+                    url: url, // 服务器端接收请求的URL
+                    type: "POST", // 请求类型为POST
+                    data: {
+                        type:'blog',
+                        uuid:id,
+                        title:title,
+                        content: content,
+                        pwd:pwdArr,
+                    }, // 发送的数据，这里是一个对象，包含你要发送的内容
+                    success: function(response) {
+                        if(response.code===0){
+                            const infoDialog=document.getElementById("successInfoDialog");
+                            infoDialog.style.display='flex';
+                            setTimeout(() => {
+                                window.location.href = "../../blog/index.html";
+                            },1000);
+                        }
+                        else if(response.code===-1){
+                            const infoDialog=document.getElementById("failureInfoDialog");
+                            infoDialog.style.display='flex';
+                            setTimeout(() => {
+                                infoDialog.style.display='none';
+                            },3000);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        // 请求失败的回调函数
+                        console.error("Error sending string:", error);
+                        alert("服务器连接失败！");
+                    }
+                });
+            };
+
+            $("#publish-btn").click(function() {
+                // 获取 textarea 元素
+                var title = document.getElementById('title').value;
+                if(title===''){
+                    alert('标题不能为空！');
+                    return;
+                }
+                var content=testEditor.getMarkdown();
+                if(content===''){
+                    alert('内容不能为空！');
+                    return;
+                }
+                const passwdDialog=document.getElementById("passwdDialog");
+                passwdDialog.style.display='flex';
+            });
+        </script>
+    </body>
+</html>

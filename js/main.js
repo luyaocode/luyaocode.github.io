@@ -15,6 +15,8 @@
         // script.setAttribute('src',url);
         document.getElementsByTagName('head')[0].appendChild(script);
         // document.write("<script src="+url+"></script>");
+        const element = document.getElementById('welcomeTitle');
+        element.remove();
     } else {
     }
 })();

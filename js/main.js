@@ -12,9 +12,9 @@
     if(bIsIpad || bIsIphoneOs || bIsMidp || bIsUc7 || bIsUc || bIsAndroid || bIsCE || bIsWM) {
         var script = document.createElement('script');
         script.setAttribute('type','text/javascript');
-        script.setAttribute('src',url);
+        // script.setAttribute('src',url);
         document.getElementsByTagName('head')[0].appendChild(script);
         // document.write("<script src="+url+"></script>");
     } else {
-    } 
+    }
 })();

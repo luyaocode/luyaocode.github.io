@@ -158,6 +158,73 @@
                 cursor: pointer;
             }
 
+            /* 标签 */
+            .tag-setting{
+                display: flex;
+                flex-direction: row;
+                max-width: 100%;
+                overflow-x: hidden;
+                margin-top: 10px;
+                color:white;
+            }
+            #addtag-btn{
+                height: 2rem;
+                margin: 5px; /* 每个方框之间的间距 */
+                cursor: pointer;
+                background-color: rgb(255, 255, 255);
+            }
+            .addtag-dialog{
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.5); /* 半透明黑色背景 */
+                z-index: 999; /* 确保弹窗在最上层 */
+            }
+
+            /* 输入框的样式 */
+        .input-box {
+            width: 300px; /* 输入框的宽度 */
+            padding: 10px; /* 内边距 */
+            border: 2px solid #ccc; /* 边框样式 */
+            border-radius: 4px; /* 边框圆角 */
+            font-size: 16px; /* 字体大小 */
+            transition: border-color 0.3s; /* 添加过渡效果 */
+        }
+
+        /* 输入框获得焦点时的样式 */
+        .input-box:focus {
+            border-color: #66afe9; /* 聚焦时边框颜色 */
+            outline: none; /* 去掉默认的轮廓 */
+        }
+
+        /* 设置方框的样式 */
+        .checkbox {
+            display: inline-flex;
+            align-items: center;
+            height: 2rem;
+            border: none;
+            padding: 4px;
+            margin: auto;
+            text-align: center;
+            line-height: 20px;
+            cursor: pointer;
+            color: rgb(64, 64, 64);
+            background-color: white;
+            font-size: 18px; /* 文本字体大小 */
+            transition: background-color 0.3s, color 0.3s; /* 添加平滑过渡效果 */
+            margin: 5px; /* 每个方框之间的间距 */
+        }
+
+        /* 当方框被选中时的样式 */
+        .checkbox.selected {
+            background-color: rgb(109, 218, 109);
+            color: white;
+        }
         </style>
         <script src="../../js/constDefine.js"></script>
     </head>
@@ -175,6 +242,14 @@
                         <!-- 上传博客 -->
                         <button id="publish-btn">发布</button>
                         <button id="return-btn">返回</button>
+                    </div>
+                    <div class="tag-setting">
+                        <span>标签</span>
+                        <button id="addtag-btn">+</button>
+                        <div id="tags">
+
+                        </div>
+
                     </div>
                 </header>
                 <div class="btns">
@@ -299,15 +374,59 @@
                     </div>
                 </div>
             </div>
+            <div id="addTagDialog" class="addtag-dialog" style="display: none;">
+                <div class="dialog-content">
+                    <p>输入新建标签，以空格隔开，回车确定</p>
+                    <input id="newTagInput" type="text" class="input-box" placeholder="在这里输入...">
+                    <div class="buttons">
+                        <button id="addtag-ok-btn">确定</button>
+                        <button id="addtag-cancel-btn">取消</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <script src="js/jquery.min.js"></script>
         <script src="../editormd.min.js"></script>
         <script src="js/util.js"></script>
+        <script src="../../js/constDefine.js"></script>
+        <script src="../../js/util.js"></script>
         <script type="text/javascript">
             var testEditor;
+
+            const getTags=()=>{
+                var url=backend_url+"/tags";
+                $.ajax({
+                    url: url,
+                    type: "GET",
+                    success: function(response) {
+                        renderTags(response);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error sending string:", error);
+                    }
+                });
+            }
+
+            const renderTags=(tags)=>{
+                const tagsDiv=document.getElementById("tags");
+                if(isJSON(tags)){
+                    tags=JSON.parse(tags);
+                }
+                tags.forEach(tag => {
+                    const checkbox = document.createElement('div');
+                    checkbox.className = 'checkbox';
+                    checkbox.textContent = tag.name;
+                    checkbox.addEventListener('click', function() {
+                        this.classList.toggle('selected');
+                    });
+                    tagsDiv.appendChild(checkbox);
+                });
+            }
+
             $(function() {
                 enableUnloadWarning("您确定要离开此页面吗？");
+                getTags();
                 testEditor = editormd("test-editormd", {
                     width: "90%",
                     height: 740,
@@ -409,6 +528,37 @@
 
 
             // 自定义按钮
+            $("#addtag-btn").click(function(){
+                const dlg = document.getElementById('addTagDialog');
+                document.getElementById('newTagInput').value = '';
+                dlg.style.display = 'flex';
+            });
+
+            $("#addtag-ok-btn").click(function(){
+                const tagsDiv=document.getElementById("tags");
+                const childNodes = tagsDiv.childNodes;
+                const texts = Array.from(childNodes).map(child => child.textContent);
+                const strtag=document.getElementById('newTagInput').value;
+                const newtags=[...new Set(strtag.split(" ").filter(
+                    tag => tag&&tag.length <= 50&&!texts.includes(tag)))];
+                newtags.forEach((tag)=>{
+                    const checkbox = document.createElement('div');
+                    checkbox.className = 'checkbox';
+                    checkbox.textContent = tag;
+                    checkbox.addEventListener('click', function() {
+                        this.classList.toggle('selected');
+                    });
+                    tagsDiv.appendChild(checkbox);
+                });
+                const dlg = document.getElementById('addTagDialog');
+                dlg.style.display = 'none';
+            });
+
+            $("#addtag-cancel-btn").click(function(){
+                const dlg = document.getElementById('addTagDialog');
+                dlg.style.display = 'none';
+            });
+
             $("#return-btn").click(function() {
                 var title = document.getElementById('title').value;
                 var content=testEditor.getMarkdown();
@@ -498,6 +648,9 @@
                 var content=testEditor.getMarkdown();
                 // 发送 POST 请求到服务器
                 var url=backend_url+'/publish';
+                // 标签
+                const selectedDivs = document.querySelectorAll('div.selected');
+                const selectedTexts = Array.from(selectedDivs).map(div => div.textContent);
                 $.ajax({
                     url: url, // 服务器端接收请求的URL
                     type: "POST", // 请求类型为POST
@@ -506,6 +659,7 @@
                         uuid:uuid,
                         title:title,
                         content: content,
+                        tags:selectedTexts,
                         pwd:pwdArr,
                     }, // 发送的数据，这里是一个对象，包含你要发送的内容
                     success: function(response) {

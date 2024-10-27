@@ -303,6 +303,7 @@
 
         <script src="js/jquery.min.js"></script>
         <script src="../editormd.min.js"></script>
+        <script src="js/util.js"></script>
         <script type="text/javascript">
             var testEditor;
 
@@ -315,6 +316,8 @@
             var id = params.id;
             var markdown; // 初始内容
             $(function() {
+                enableUnloadWarning("您确定要离开此页面吗？");
+
                 // 发送 POST 请求到服务器
                 var url=backend_url+"/blog";
                 $.ajax({

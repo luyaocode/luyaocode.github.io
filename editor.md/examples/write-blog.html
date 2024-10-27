@@ -303,9 +303,12 @@
 
         <script src="js/jquery.min.js"></script>
         <script src="../editormd.min.js"></script>
+        <script src="js/util.js"></script>
         <script type="text/javascript">
             var testEditor;
             $(function() {
+                enableUnloadWarning("您确定要离开此页面吗？");
+                enable
                 testEditor = editormd("test-editormd", {
                     width: "90%",
                     height: 740,
@@ -545,6 +548,7 @@
                 const passwdDialog=document.getElementById("passwdDialog");
                 passwdDialog.style.display='flex';
             });
+
         </script>
     </body>
 </html>

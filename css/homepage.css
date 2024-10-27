@@ -224,6 +224,7 @@ body {
     position: relative;
     transition: all 1s ease;
     width: 15rem;
+    cursor: pointer;
 }
 
 /* Flip card - covering both the front and inside front page */

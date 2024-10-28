@@ -311,6 +311,8 @@
 		}
         // 检查参数是否存在
         else if (code && state) {
+			const status=sessionStorage.getItem('blog_website_login');
+			if(status==='true') return; // 如果已授权就返回
             // 将参数发送给后端
             $.ajax({
 				url: backend_url + '/auth',

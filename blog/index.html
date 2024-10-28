@@ -160,7 +160,7 @@
 				<a href="../editor.md/examples/write-blog.html" id="blog-link">写博客</a>
 			</div>
 			<a href="/">首页</a>
-			<a onclick="openAuthPopup()">授权登录</a>
+			<a id='auth-btn' onclick="openAuthPopup()">授权登录</a>
 		</div>
 		<div class="container">
 			<ul id="tags">
@@ -321,6 +321,7 @@
 				success: function(data) {
 					const res=data?'true':'false';
 					sessionStorage.setItem('blog_website_login', res);
+					console.log('授权结果：'+res);
 				},
 				error: function(xhr, status, error) {
 					console.error('错误:', error);
@@ -329,13 +330,17 @@
         }
 	</script>
 	<script>
-		const d=document.getElementById("d-write-blog");
+		const d_write_blog=document.getElementById("d-write-blog");
+		const auth_btn=document.getElementById("auth-btn");
 		const status=sessionStorage.getItem('blog_website_login');
+
 		if(status==='true'){
-			d.style.display='block';
+			d_write_blog.style.display='block';
+			auth_btn.style.display='none';
 		}
 		else{
-			d.style.display='none';
+			d_write_blog.style.display='none';
+			auth_btn.style.display='block';
 		}
 	</script>
   </body>

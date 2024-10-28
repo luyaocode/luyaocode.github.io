@@ -12,6 +12,9 @@
 	<link rel="icon" type="img/x-icon" href="../img/fav.png">
 	<script src="../js/util.js"></script>
 	<script src="../js/constDefine.js"></script>
+	<!-- bootstrap -->
+	<!-- <link href="../css/bootstrap.min.css" rel="stylesheet">
+	<script src="../js/bootstrap.bundle.min.js"></script> -->
 </head>
   <style>
 	  * {
@@ -95,7 +98,7 @@
 	  .title{
 		display: flex;
 		flex-direction: row;
-		word-break: break-all;
+		white-space:nowrap;
 		justify-content: space-between; /* 使 li 和 span 分开并在两端对齐 */
 		align-items: center; /* 垂直居中对齐 */
 	  }
@@ -119,20 +122,22 @@
 
 	/* tags */
 	#tags{
-		flex: 1;
+		flex: 2;
+		min-width: 5rem;
 		margin-right: 20px;
 		box-sizing: border-box;
 		overflow-x: hidden;
-		border-right:1px solid black;
+		background-color:rgb(197, 196, 196,0.5);
 	}
 
 	/* blogs */
 	#blogs{
-		flex:9;
+		flex:8;
 		box-sizing: border-box;
 		margin-right: 20px;
 		display: flex;
 		flex-direction: column;
+		background-color:rgba(255, 255, 255, 0.5);
 	}
 	.login-btn{
 		text-decoration: none;
@@ -155,10 +160,11 @@
 		margin:0.1rem 1rem;
 		border-bottom: 2px solid rgb(109, 46, 46);
 		">
-			<a href="/">返回首页</a>
+			<a href="/">主页</a>
 			<div id='d-write-blog' style="margin-left: auto; margin-right: 20px;">
 				<a href="../editor.md/examples/write-blog.html" id="blog-link">写博客</a>
 			</div>
+			<a id='setting-btn' style="display: none;" href="setting/index.html">博客管理</a>
 			<a id='auth-btn' onclick="openAuthPopup()">登录</a>
 		</div>
 		<div class="container">
@@ -196,12 +202,40 @@
 			});
 		}
 
+		const renderAllBtn=()=>{
+			const tagsDiv=document.getElementById("tags");
+			const tagEle=document.createElement('div');
+			tagEle.className="tag";
+			const liElement = document.createElement('li');
+			const aElement = document.createElement('a');
+			aElement.href="#";
+			aElement.innerText = "全部";
+			aElement.addEventListener('click', function(event) {
+				event.preventDefault();
+				$.ajax({
+					url: backend_url+"/blogs",
+					type: "GET",
+					success: function(response) {
+						renderBlogs(response);
+					},
+					error: function(xhr, status, error) {
+						console.error("Error sending string:", error);
+					}
+				});
+			});
+
+			liElement.appendChild(aElement);
+			tagEle.appendChild(liElement);
+			tagsDiv.appendChild(tagEle);
+		};
+
 		const renderTags=(tags)=>{
 			const tagsDiv=document.getElementById("tags");
 			if(isJSON(tags)){
 				tags=JSON.parse(tags);
 			}
 			tagsDiv.innerHTML = '';
+			renderAllBtn();
 			tags.forEach(tag => {
 				const tagEle=document.createElement('div');
 				tagEle.className="tag";
@@ -303,17 +337,20 @@
 		const freshPage=()=>{
 			const d_write_blog=document.getElementById("d-write-blog");
 			const auth_btn=document.getElementById("auth-btn");
+			const setting_btn=document.getElementById("setting-btn");
 			const status=sessionStorage.getItem('blog_website_login');
 
-			if(status==='true'){
+			if(status==='true'){ // 登录成功
 				d_write_blog.style.opacity = 1;
 				d_write_blog.style.pointerEvents = 'auto';
 				auth_btn.style.display='none';
+				setting_btn.style.display='block';
 			}
 			else{
 				d_write_blog.style.opacity=0;
 				d_write_blog.style.pointerEvents='none';
 				auth_btn.style.display='block';
+				setting_btn.style.display='none';
 			}
 		}
 		const authorize=()=>{
@@ -347,6 +384,7 @@
 						console.error('错误:', error);
 					}
 				});
+
 			}
 		}
 		authorize();

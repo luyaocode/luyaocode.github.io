@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>博客管理</title>
+    <!-- Bootstrap CSS -->
+    <link href="../../css/bootstrap.min.css" rel="stylesheet">
+    <script src="../../js/bootstrap.bundle.min.js"></script>
+    <script src="../../js/jquery.min.js"></script>
+    <style>
+        /* 手动添加一些高亮样式，确保生效 */
+        .active {
+            font-weight: bold;
+            color: #007bff !important;
+            background-color: #e9ecef;
+        }
+
+        #toastContainer {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1050;
+        }
+
+        .toast {
+            max-width: 200px;
+            width: auto;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- 左侧导航栏 -->
+            <nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
+                <div class="sidebar-sticky pt-3">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#" id="tag-management">
+                                标签管理
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" id="article-management">
+                                文章管理
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- 右侧内容区 -->
+            <main class="col-md-9 ml-sm-auto col-lg-10 px-4">
+                <!-- 标签管理内容 -->
+                <div id="tag-content" class="pt-4">
+                    <h3>标签管理</h3>
+                    <p>这里是标签管理内容。</p>
+                    <button class="btn btn-primary">新增标签</button>
+                    <table class="table mt-3">
+                        <thead>
+                            <tr>
+                                <th>标签名称</th>
+                                <th>文章数量</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="t-tags">
+                            <tr>
+                                <td>标签1</td>
+                                <td>
+                                    <button class="btn btn-sm btn-warning">编辑</button>
+                                    <button class="btn btn-sm btn-danger">删除</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <nav>
+                        <ul class="pagination" id="tag-pagination">
+                            <!-- 标签分页按钮 -->
+                        </ul>
+                    </nav>
+                </div>
+
+                <!-- 文章管理内容 -->
+                <div id="article-content" class="pt-4" style="display: none;">
+                    <h3>文章管理</h3>
+                    <p>这里是文章管理内容。</p>
+                    <button class="btn btn-primary">新增文章</button>
+                    <table class="table mt-3">
+                        <thead>
+                            <tr>
+                                <th>标题</th>
+                                <th>标签</th>
+                                <th>标签个数</th>
+                                <th>创建时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="t-blogs">
+                            <tr>
+                                <td>文章1</td>
+                                <td>2024-10-28</td>
+                                <td>
+                                    <button class="btn btn-sm btn-warning">编辑</button>
+                                    <button class="btn btn-sm btn-danger">删除</button>
+                                </td>
+                            </tr>
+                            <!-- 更多文章行 -->
+                        </tbody>
+                    </table>
+                    <nav>
+                        <ul class="pagination" id="blog-pagination">
+                            <!-- 文章分页按钮 -->
+                        </ul>
+                    </nav>
+                </div>
+            </main>
+        </div>
+    </div>
+    <!-- 编辑标签的模态框 -->
+    <div class="modal fade" id="editTagModal" tabindex="-1" aria-labelledby="editTagModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editTagModalLabel">编辑标签</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" id="tagNameInput" class="form-control" placeholder="标签名称" maxlength="50">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="saveTagButton">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 删除标签确认模态框 -->
+    <div class="modal fade" id="deleteTagModal" tabindex="-1" aria-labelledby="deleteTagModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteTagModalLabel">确认删除标签</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    是否删除标签 <span id="tagNameToDelete"></span>？
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="../../js/constDefine.js"></script>
+    <script src="../../js/util.js"></script>
+
+    <script>
+        // 分页参数
+        let tags;
+        let blogs;
+        const itemsPerPage = 10;
+        let currentPage = 1;
+
+        function renderPagination(totalItems, itemsPerPage, paginationId, renderPageFunction) {
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+            const pagination = $(`#${paginationId}`);
+            pagination.empty();
+
+            for (let i = 1; i <= totalPages; i++) {
+                const pageItem = `<li class="page-item"><a class="page-link" href="#" onclick="${renderPageFunction}(${i})">${i}</a></li>`;
+                pagination.append(pageItem);
+            }
+        }
+
+        function showDeleteTagModal(tag) {
+            document.getElementById("tagNameToDelete").textContent = tag.name;
+
+            const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
+            confirmDeleteBtn.onclick = async function () {
+                await deleteTag(tag.id);
+                $('#deleteTagModal').modal('hide');
+            };
+            $('#deleteTagModal').modal('show');
+        }
+
+        // 删除标签
+        async function deleteTag(tagId) {
+            try {
+                const response = await $.ajax({
+                    url: `${backend_url}/tags/${tagId}`,
+                    type: 'GET',
+                });
+
+                if (response) {
+                    tags = tags.filter(tag => tag.id !== tagId);
+                    renderPagination(tags.length, itemsPerPage, 'tag-pagination', 'renderTags');
+                    renderTags(currentPage);
+                    showToast('标签删除成功！');
+                } else {
+                    showToast('删除标签失败！');
+                }
+            } catch (error) {
+                console.error('请求失败:', error);
+            }
+        }
+
+        // 渲染标签数据
+        function renderTags(page) {
+            currentPage = page;
+            const start = (page - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const pageTags = tags.slice(start, end);
+            const tbody = $('#t-tags');
+            tbody.empty();
+
+            pageTags.forEach(tag => {
+                const blogNum = tag.Blogs.length;
+                const row = `
+            <tr>
+            <td>${tag.name}</td>
+            <td>${blogNum}</td>
+            <td>
+                <button class="btn btn-sm btn-warning edit-tag" data-id="${tag.id}" data-name="${tag.name}">编辑</button>
+                <button class="btn btn-sm btn-danger delete-tag" data-id="${tag.id}">删除</button>
+            </td>
+            </tr>
+        `;
+                tbody.append(row);
+                // 绑定编辑按钮点击事件
+                $('.edit-tag').click(function () {
+                    const tagId = $(this).data('id');
+                    const tagName = $(this).data('name');
+                    $('#tagNameInput').val(tagName);
+                    $('#editTagModal').modal('show');
+
+                    $('#saveTagButton').off('click').on('click', function () {
+                        // 无效校验
+                        const newTagName = $('#tagNameInput').val();
+                        if (newTagName === tagName) {
+                            $('#editTagModal').modal('hide');
+                            return;
+                        }
+                        // 重复校验
+                        const isDuplicate = tags.some(t => t.name === newTagName && t.id !== tagId);
+                        if (isDuplicate) {
+                            showToast('该标签名称已存在，请选择其他名称。');
+                            return;
+                        }
+                        // TODO: 在这里添加代码，将更新后的标签名称发送到后端
+                        $.ajax({
+                            url: `${backend_url}\/tags\/${tagId}`,
+                            type: "POST",
+                            data: {
+                                name: newTagName
+                            },
+                            success: function (response) {
+                                if (response) {
+                                    const ret = updateTag(tagId, newTagName);
+                                    showToast("修改成功！");
+                                }
+                                else {
+                                    showToast("修改失败！");
+                                }
+                            },
+                            error: function (xhr, status, error) {
+                                console.error("Error sending string:", error);
+                            }
+                        });
+                        $('#editTagModal').modal('hide');
+                    });
+                });
+
+                $('.delete-tag').click(function () {
+                    const tagId = $(this).data('id'); // 获取按钮的 data-id 属性
+                    const tagName = tags.find(tag => tag.id === tagId).name; // 根据 id 获取标签名称
+                    showDeleteTagModal({ id: tagId, name: tagName }); // 显示模态框并传递标签信息
+                });
+
+            });
+        }
+        // 渲染文章数据
+        function renderBlogs(page) {
+            currentPage = page;
+            const renderLineTags = (tags) => {
+                return tags.map(tag =>
+                    `<span class="badge bg-primary me-1 tag" data-id="${tag.id}">${tag.name}</span>`
+                ).join("");
+            }
+
+            const start = (page - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const pageBlogs = blogs.slice(start, end);
+            const tbody = $('#t-blogs');
+            tbody.empty();
+
+            pageBlogs.forEach(blog => {
+                const time = formateDate(blog.time);
+                const tagNum = blog.Tags.length;
+                const row = `
+        <tr>
+          <td>${blog.title}</td>
+          <td>${renderLineTags(blog.Tags)}</td>
+          <td>${tagNum}</td>
+          <td>${time}</td>
+          <td>
+            <button class="btn btn-sm btn-warning" onclick="editBlog(${blog.id})">编辑</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteBlog(${blog.id})">删除</button>
+          </td>
+        </tr>
+      `;
+                tbody.append(row);
+            });
+        }
+
+
+        const requestTags = () => {
+            var url = backend_url + "/tags_blogs";
+            $.ajax({
+                url: url,
+                type: "GET",
+                success: function (response) {
+                    tags = response;
+                    renderPagination(tags.length, itemsPerPage, 'tag-pagination', 'renderTags');
+                    renderTags(1);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error sending string:", error);
+                }
+            });
+        };
+
+        const requestBlogs = () => {
+            var url = backend_url + "/blogs_tags";
+            $.ajax({
+                url: url,
+                type: "GET",
+                success: function (response) {
+                    blogs = response;
+                    renderPagination(blogs.length, itemsPerPage, 'blog-pagination', 'renderBlogs');
+                    renderBlogs(1);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error sending string:", error);
+                }
+            });
+        };
+
+        function updateTag(tagId, newName) {
+            const tag = tags.find(t => t.id === tagId);
+            if (tag) {
+                tag.name = newName;
+                renderTags(currentPage);
+            }
+        }
+
+        $(document).ready(function () {
+            requestTags();
+            // 点击标签管理显示标签内容，隐藏文章内容，并高亮当前导航项
+            $('#tag-management').click(function () {
+                $('#tag-content').show();
+                $('#article-content').hide();
+                $('.nav-link').removeClass('active');  // 移除所有的高亮
+                $(this).addClass('active');  // 给当前点击的项加上高亮
+                requestTags();
+            });
+
+            // 点击文章管理显示文章内容，隐藏标签内容，并高亮当前导航项
+            $('#article-management').click(function () {
+                $('#article-content').show();
+                $('#tag-content').hide();
+                $('.nav-link').removeClass('active');  // 移除所有的高亮
+                $(this).addClass('active');  // 给当前点击的项加上高亮
+                requestBlogs();
+            });
+        });
+    </script>
+
+</body>
+<div id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+<script>
+    function showToast(message) {
+        const toastId = `toast-${new Date().getTime()}`;
+        const toastHtml = `
+            <div class="toast fade show" role="alert" aria-live="assertive" aria-atomic="true" id="${toastId}">
+                <div class="toast-body">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            </div>
+        `;
+
+        $('#toastContainer').append(toastHtml);
+        // 使用 Bootstrap 的 Toast 实例来处理自动隐藏
+        const toastElement = document.getElementById(toastId);
+        const toast = new bootstrap.Toast(toastElement);
+
+        toast.show();
+
+        setTimeout(() => {
+            toast.hide();
+            setTimeout(() => $(toast._element).remove(), 500); // 从 DOM 移除
+        }, 3000);
+    }
+</script>
+
+</html>

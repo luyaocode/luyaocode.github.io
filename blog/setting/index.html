@@ -104,6 +104,7 @@
                         <tbody id="t-blogs">
                             <tr>
                                 <td>
+                                    <button class="btn btn-sm btn-warning">标签</button>
                                     <button class="btn btn-sm btn-warning">编辑</button>
                                     <button class="btn btn-sm btn-danger">删除</button>
                                 </td>
@@ -191,6 +192,26 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
                     <button type="button" class="btn btn-danger" id="confirmDeleteBlogBtn">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 编辑博客标签的模态框 -->
+    <div class="modal fade" id="editBlogTagsModal" tabindex="-1" aria-labelledby="editBlogTagsModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editBlogTagsModalLabel">为博客设置标签</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="blogTagsContainer"></div> <!-- 用于渲染标签 -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="saveBlogTagsButton">确定</button>
                 </div>
             </div>
         </div>
@@ -351,6 +372,7 @@
           <td>${tagNum}</td>
           <td>${time}</td>
           <td>
+            <button class="btn btn-sm btn-info edit-blog-tags" data-id="${blog.id}">编辑标签</button>
             <button class="btn btn-sm btn-warning edit-blog" data-id="${blog.id}">编辑</button>
             <button class="btn btn-sm btn-danger delete-blog" data-id="${blog.id}" data-title="${blog.title}">删除</button>
           </td>
@@ -369,6 +391,86 @@
                     const blogId = $(this).data('id');
                     const blogTitle = $(this).data('title');
                     showDeleteBlogModal({ id: blogId, title: blogTitle });
+                });
+
+                // 显示标签编辑模态框
+                $('.edit-blog-tags').click(async function () {
+                    const blogId = $(this).data('id');
+                    const tags = await getAllTags(); // 获取所有标签
+                    const blogTags = await getBlogTags(blogId); // 获取该博客的标签
+
+                    // 清空标签容器
+                    const blogTagsContainer = $('#blogTagsContainer');
+                    blogTagsContainer.empty();
+
+                    // 渲染所有标签
+                    tags.forEach(tag => {
+                        const isActive = blogTags.some(blogTag => blogTag.id === tag.id);
+                        const buttonClass = isActive ? 'btn btn-success' : 'btn btn-outline-secondary';
+                        blogTagsContainer.append(`
+            <button class="${buttonClass} tag-button" data-id="${tag.id}">${tag.name}</button>
+        `);
+                    });
+
+                    // 显示模态框
+                    $('#editBlogTagsModal').modal('show');
+
+                    // 标签按钮点击事件
+                    $('.tag-button').click(function () {
+                        $(this).toggleClass('btn-success btn-outline-secondary');
+                    });
+
+                    // 确定按钮点击事件
+                    $('#saveBlogTagsButton').off('click').on('click', async function () {
+                        const selectedTags = $('.tag-button.btn-success').map(function () {
+                            return $(this).data('id');
+                        }).get();
+
+                        // 向服务器提交变更
+                        const response = await updateBlogTags(blogId, selectedTags);
+                        if (response && response.length > 0) {
+                            blogs = response;
+                            renderPagination(blogs.length, itemsPerPage, 'blog-pagination', 'renderBlogs');
+                            renderBlogs(currentPage);
+                        }
+                        $('#editBlogTagsModal').modal('hide');
+                    });
+                });
+            });
+        }
+
+        // 获取所有标签
+        async function getAllTags() {
+            const response = await fetch(`${backend_url}/tags`);
+            return await response.json();
+        }
+
+        // 获取该博客的标签
+        async function getBlogTags(blogId) {
+            const response = await fetch(`${backend_url}/blogs/${blogId}/tags`);
+            return await response.json();
+        }
+
+        // 更新博客的标签
+        async function updateBlogTags(blogId, tagIds) {
+            return new Promise((resolve, reject) => {
+                $.ajax({
+                    url: `${backend_url}/blogs/${blogId}/tags`,
+                    type: 'PUT',
+                    data: { tagIds: tagIds },
+                    success: function (response) {
+                        resolve(response);
+                    },
+                    error: function (xhr, status, error) {
+                        if (xhr.status === 401) {
+                            console.error("未授权访问:", xhr.responseText);
+                            sessionStorage.setItem('blog_website_login', "false");
+                            alert("未授权，请登录后再试。");
+                            window.location.href = '../index.html';
+                        } else {
+                            console.error("Error sending string:", error);
+                        }
+                    }
                 });
             });
         }

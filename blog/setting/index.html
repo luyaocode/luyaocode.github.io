@@ -213,6 +213,7 @@
             } catch (error) {
                 if (xhr.status === 401) {
                     console.error("未授权访问:", xhr.responseText);
+                    sessionStorage.setItem('blog_website_login', "false");
                     alert("未授权，请登录后再试。");
                     window.location.href = '../index.html';
                 } else {
@@ -288,6 +289,7 @@
                             error: function (xhr, status, error) {
                                 if (xhr.status === 401) {
                                     console.error("未授权访问:", xhr.responseText);
+                                    sessionStorage.setItem('blog_website_login', "false");
                                     alert("未授权，请登录后再试。");
                                     window.location.href = '../index.html';
                                 } else {
@@ -358,6 +360,7 @@
                 error: function (xhr, status, error) {
                     if (xhr.status === 401) {
                         console.error("未授权访问:", xhr.responseText);
+                        sessionStorage.setItem('blog_website_login', "false");
                         alert("未授权，请登录后再试。");
                         window.location.href = '../index.html';
                     } else {
@@ -383,6 +386,7 @@
                 error: function (xhr, status, error) {
                     if (xhr.status === 401) {
                         console.error("未授权访问:", xhr.responseText);
+                        sessionStorage.setItem('blog_website_login', "false");
                         alert("未授权，请登录后再试。");
                         window.location.href = '../index.html';
                     } else {

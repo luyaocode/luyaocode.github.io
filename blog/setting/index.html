@@ -72,7 +72,6 @@
                         </thead>
                         <tbody id="t-tags">
                             <tr>
-                                <td>标签1</td>
                                 <td>
                                     <button class="btn btn-sm btn-warning">编辑</button>
                                     <button class="btn btn-sm btn-danger">删除</button>
@@ -91,7 +90,7 @@
                 <div id="article-content" class="pt-4" style="display: none;">
                     <h3>文章管理</h3>
                     <p>这里是文章管理内容。</p>
-                    <button class="btn btn-primary">新增文章</button>
+                    <button id="create-blog-btn" class="btn btn-primary">新增文章</button>
                     <table class="table mt-3">
                         <thead>
                             <tr>
@@ -104,8 +103,6 @@
                         </thead>
                         <tbody id="t-blogs">
                             <tr>
-                                <td>文章1</td>
-                                <td>2024-10-28</td>
                                 <td>
                                     <button class="btn btn-sm btn-warning">编辑</button>
                                     <button class="btn btn-sm btn-danger">删除</button>
@@ -179,6 +176,25 @@
         </div>
     </div>
 
+    <!-- 删除博客确认模态框 -->
+    <div class="modal fade" id="deleteBlogModal" tabindex="-1" aria-labelledby="deleteBlogModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteBlogModalLabel">确认删除博客</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    是否删除博客 <span id="blogTitleToDelete"></span>？
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBlogBtn">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="../../js/constDefine.js"></script>
     <script src="../../js/util.js"></script>
@@ -201,9 +217,9 @@
             }
         }
 
+        // 弹窗：确认删除标签
         function showDeleteTagModal(tag) {
             document.getElementById("tagNameToDelete").textContent = tag.name;
-
             const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
             confirmDeleteBtn.onclick = async function () {
                 await deleteTag(tag.id);
@@ -212,37 +228,17 @@
             $('#deleteTagModal').modal('show');
         }
 
-        // 删除标签
-        async function deleteTag(tagId) {
-            try {
-                const response = await $.ajax({
-                    url: `${backend_url}/tags/${tagId}`,
-                    type: 'GET',
-                    xhrFields: {
-                        withCredentials: true // 允许发送 cookie
-                    },
-                });
+        // 弹窗：确认删除博客
+        function showDeleteBlogModal(blog) {
+            document.getElementById("blogTitleToDelete").textContent = blog.title;
+            const confirmDeleteBlogBtn = document.getElementById("confirmDeleteBlogBtn");
 
-                if (response) {
-                    tags = tags.filter(tag => tag.id !== tagId);
-                    renderPagination(tags.length, itemsPerPage, 'tag-pagination', 'renderTags');
-                    renderTags(currentPage);
-                    showToast('标签删除成功！');
-                } else {
-                    showToast('删除标签失败！');
-                }
-            } catch (error) {
-                if (xhr.status === 401) {
-                    console.error("未授权访问:", xhr.responseText);
-                    sessionStorage.setItem('blog_website_login', "false");
-                    alert("未授权，请登录后再试。");
-                    window.location.href = '../index.html';
-                } else {
-                    console.error("Error sending string:", error);
-                }
-            }
+            confirmDeleteBlogBtn.onclick = async function () {
+                await deleteBlog(blog.id);
+                $('#deleteBlogModal').modal('hide');
+            };
+            $('#deleteBlogModal').modal('show');
         }
-
         // 渲染标签数据
         function renderTags(page) {
             currentPage = page;
@@ -288,7 +284,7 @@
                         // TODO: 在这里添加代码，将更新后的标签名称发送到后端
                         $.ajax({
                             url: `${backend_url}\/tags\/${tagId}`,
-                            type: "POST",
+                            type: "PUT",
                             xhrFields: {
                                 withCredentials: true // 允许发送 cookie
                             },
@@ -355,16 +351,29 @@
           <td>${tagNum}</td>
           <td>${time}</td>
           <td>
-            <button class="btn btn-sm btn-warning" onclick="editBlog(${blog.id})">编辑</button>
-            <button class="btn btn-sm btn-danger" onclick="deleteBlog(${blog.id})">删除</button>
+            <button class="btn btn-sm btn-warning edit-blog" data-id="${blog.id}">编辑</button>
+            <button class="btn btn-sm btn-danger delete-blog" data-id="${blog.id}" data-title="${blog.title}">删除</button>
           </td>
         </tr>
       `;
                 tbody.append(row);
+
+                // 绑定编辑按钮点击事件
+                $('.edit-blog').click(function () {
+                    const blogId = $(this).data('id');
+                    window.open(`../../editor.md/examples/update-blog.html?id=${blogId}`, '_blank');
+                });
+
+                // 绑定删除按钮点击事件
+                $('.delete-blog').click(function () {
+                    const blogId = $(this).data('id');
+                    const blogTitle = $(this).data('title');
+                    showDeleteBlogModal({ id: blogId, title: blogTitle });
+                });
             });
         }
 
-
+        // 请求标签
         const requestTags = () => {
             var url = backend_url + "/tags_blogs";
             $.ajax({
@@ -374,9 +383,11 @@
                     withCredentials: true // 允许发送 cookie
                 },
                 success: function (response) {
-                    tags = response;
-                    renderPagination(tags.length, itemsPerPage, 'tag-pagination', 'renderTags');
-                    renderTags(1);
+                    if (response) {
+                        tags = response;
+                        renderPagination(tags.length, itemsPerPage, 'tag-pagination', 'renderTags');
+                        renderTags(1);
+                    }
                 },
                 error: function (xhr, status, error) {
                     if (xhr.status === 401) {
@@ -391,6 +402,7 @@
             });
         };
 
+        // 请求博客
         const requestBlogs = () => {
             var url = backend_url + "/blogs_tags";
             $.ajax({
@@ -419,6 +431,7 @@
             });
         };
 
+        // 修改标签
         function updateTag(tagId, newName) {
             const tag = tags.find(t => t.id === tagId);
             if (tag) {
@@ -427,6 +440,7 @@
             }
         }
 
+        // 添加标签
         function addTag(tagName) {
             const exists = tags.some(tag => tag.name === tagName);
             if (exists) {
@@ -434,7 +448,7 @@
                 return;
             }
             $.ajax({
-                url: backend_url + "/tags/add",
+                url: backend_url + "/tags",
                 type: "POST",
                 xhrFields: {
                     withCredentials: true
@@ -444,9 +458,9 @@
                 },
                 success: function (response) {
                     if (response) {
-                        blogs = response;
+                        tags = response;
                         // 按照 name === tagName 的条件将元素排序
-                        blogs.sort((a, b) => {
+                        tags.sort((a, b) => {
                             if (a.name === tagName && b.name !== tagName) {
                                 return -1; // a 在前
                             } else if (a.name !== tagName && b.name === tagName) {
@@ -454,8 +468,8 @@
                             }
                             return 0; // 两者相等，不变
                         });
-                        renderPagination(blogs.length, itemsPerPage, 'blog-pagination', 'renderBlogs');
-                        renderBlogs(1);
+                        renderPagination(tags.length, itemsPerPage, 'tag-pagination', 'renderTags');
+                        renderTags(1);
                     }
                 },
                 error: function (xhr, status, error) {
@@ -473,6 +487,71 @@
                     }
                 }
             });
+        }
+
+        // 删除标签
+        async function deleteTag(tagId) {
+            try {
+                const response = await $.ajax({
+                    url: `${backend_url}/tags/${tagId}`,
+                    type: 'DELETE',
+                    xhrFields: {
+                        withCredentials: true // 允许发送 cookie
+                    },
+                });
+
+                if (response) {
+                    tags = response;
+                    renderPagination(tags.length, itemsPerPage, 'tag-pagination', 'renderTags');
+                    renderTags(currentPage);
+                    showToast('标签删除成功！');
+                } else {
+                    showToast('删除标签失败！');
+                }
+            } catch (error) {
+                if (xhr.status === 401) {
+                    console.error("未授权访问:", xhr.responseText);
+                    sessionStorage.setItem('blog_website_login', "false");
+                    alert("未授权，请登录后再试。");
+                    window.location.href = '../index.html';
+                } else {
+                    console.error("Error sending string:", error);
+                }
+            }
+        }
+
+        // 删除博客
+        async function deleteBlog(blogId) {
+            try {
+                const response = await $.ajax({
+                    url: `${backend_url}/blogs/${blogId}`,
+                    type: 'DELETE',
+                    data: {
+                        id: blogId
+                    },
+                    xhrFields: {
+                        withCredentials: true
+                    },
+                });
+
+                if (response) {
+                    blogs = response;
+                    renderPagination(blogs.length, itemsPerPage, 'blog-pagination', 'renderBlogs');
+                    renderBlogs(currentPage);
+                    showToast('博客删除成功！');
+                } else {
+                    showToast('删除博客失败！');
+                }
+            } catch (error) {
+                if (xhr.status === 401) {
+                    console.error("未授权访问:", xhr.responseText);
+                    sessionStorage.setItem('blog_website_login', "false");
+                    alert("未授权，请登录后再试。");
+                    window.location.href = '../index.html';
+                } else {
+                    console.error("Error sending string:", error);
+                }
+            }
         }
 
         $(document).ready(function () {
@@ -495,24 +574,21 @@
                 requestBlogs();
             });
 
+            $("#create-blog-btn").click(() => {
+                window.open("../../editor.md/examples/write-blog.html", '_blank');
+            });
+
             // 新增标签模态框的逻辑
             document.getElementById('addTagButton').addEventListener('click', function () {
                 const tagName = document.getElementById('newTagNameInput').value.trim();
-
-                // 验证标签名称是否为空
                 if (tagName === '') {
                     alert('标签名称不能为空！');
                     return;
                 }
-
-                // 在这里处理新增标签的逻辑，例如发送到服务器
+                // 发送到服务器
                 addTag(tagName);
-
-                // 关闭模态框
                 const modal = bootstrap.Modal.getInstance(document.getElementById('addTagModal'));
                 modal.hide();
-
-                // 清空输入框
                 document.getElementById('newTagNameInput').value = '';
             });
 

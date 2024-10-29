@@ -156,7 +156,7 @@
             ">
         <a href="../../blog/index.html">返回</a>
         <button id="del-blog-btn">删除</button>
-        <button id="update-blog-btn">修改</button>
+        <button id="update-blog-btn">编辑</button>
     </div>
     <div id="layout" style="
         margin-top:1.8rem;
@@ -446,10 +446,7 @@
         });
 
         $("#update-blog-btn").click(function () {
-            const title = "Sample Title"; // 其他你想传递的参数，例如标题
-            // 构造跳转的 URL，带上参数
             const url = `./update-blog.html?id=${id}`;
-            // 跳转到新的页面
             window.location.href = url;
         });
 

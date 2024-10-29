@@ -208,7 +208,13 @@
                     showToast('删除标签失败！');
                 }
             } catch (error) {
-                console.error('请求失败:', error);
+                if (xhr.status === 401) {
+                    console.error("未授权访问:", xhr.responseText);
+                    alert("未授权，请登录后再试。");
+                    window.location.href = '../index.html';
+                } else {
+                    console.error("Error sending string:", error);
+                }
             }
         }
 
@@ -271,7 +277,13 @@
                                 }
                             },
                             error: function (xhr, status, error) {
-                                console.error("Error sending string:", error);
+                                if (xhr.status === 401) {
+                                    console.error("未授权访问:", xhr.responseText);
+                                    alert("未授权，请登录后再试。");
+                                    window.location.href = '../index.html';
+                                } else {
+                                    console.error("Error sending string:", error);
+                                }
                             }
                         });
                         $('#editTagModal').modal('hide');
@@ -332,7 +344,13 @@
                     renderTags(1);
                 },
                 error: function (xhr, status, error) {
-                    console.error("Error sending string:", error);
+                    if (xhr.status === 401) {
+                        console.error("未授权访问:", xhr.responseText);
+                        alert("未授权，请登录后再试。");
+                        window.location.href = '../index.html';
+                    } else {
+                        console.error("Error sending string:", error);
+                    }
                 }
             });
         };
@@ -348,7 +366,13 @@
                     renderBlogs(1);
                 },
                 error: function (xhr, status, error) {
-                    console.error("Error sending string:", error);
+                    if (xhr.status === 401) {
+                        console.error("未授权访问:", xhr.responseText);
+                        alert("未授权，请登录后再试。");
+                        window.location.href = '../index.html';
+                    } else {
+                        console.error("Error sending string:", error);
+                    }
                 }
             });
         };

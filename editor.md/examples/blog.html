@@ -411,6 +411,9 @@
             $.ajax({
                 url: url,
                 type: "POST",
+                xhrFields: {
+                    withCredentials: true // 允许发送 cookie
+                },
                 data: {
                     type: 'blog',
                     id: id,

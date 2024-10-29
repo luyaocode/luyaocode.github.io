@@ -197,6 +197,9 @@
                 const response = await $.ajax({
                     url: `${backend_url}/tags/${tagId}`,
                     type: 'GET',
+                    xhrFields: {
+                        withCredentials: true // 允许发送 cookie
+                    },
                 });
 
                 if (response) {
@@ -266,6 +269,9 @@
                             type: "POST",
                             data: {
                                 name: newTagName
+                            },
+                            xhrFields: {
+                                withCredentials: true // 允许发送 cookie
                             },
                             success: function (response) {
                                 if (response) {
@@ -338,6 +344,9 @@
             $.ajax({
                 url: url,
                 type: "GET",
+                xhrFields: {
+                    withCredentials: true // 允许发送 cookie
+                },
                 success: function (response) {
                     tags = response;
                     renderPagination(tags.length, itemsPerPage, 'tag-pagination', 'renderTags');
@@ -360,6 +369,9 @@
             $.ajax({
                 url: url,
                 type: "GET",
+                xhrFields: {
+                    withCredentials: true // 允许发送 cookie
+                },
                 success: function (response) {
                     blogs = response;
                     renderPagination(blogs.length, itemsPerPage, 'blog-pagination', 'renderBlogs');

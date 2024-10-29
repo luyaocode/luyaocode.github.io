@@ -458,6 +458,9 @@
                     url: `${backend_url}/blogs/${blogId}/tags`,
                     type: 'PUT',
                     data: { tagIds: tagIds },
+                    xhrFields: {
+                        withCredentials: true // 允许发送 cookie
+                    },
                     success: function (response) {
                         resolve(response);
                     },

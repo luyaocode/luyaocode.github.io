@@ -130,7 +130,8 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <input type="text" id="tagNameInput" class="form-control" placeholder="标签名称" maxlength="50">
+                    <input type="text" id="tagNameInput" class="form-control" placeholder="标签名称" maxlength="50"
+                        data-bs-toggle="tooltip" data-bs-placement="right" title="标签不能为空">
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
@@ -148,7 +149,8 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <input type="text" id="newTagNameInput" class="form-control" placeholder="标签名称" maxlength="50">
+                    <input type="text" id="newTagNameInput" class="form-control" placeholder="标签名称" maxlength="50"
+                        data-bs-toggle="tooltip" data-bs-placement="right" title="标签不能为空">
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
@@ -217,6 +219,28 @@
         </div>
     </div>
 
+    <!-- 编辑博客标题模态框 -->
+    <div class="modal fade" id="editBlogTitleModal" tabindex="1" aria-labelledby="editBlogTitleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editBlogTitleModalLabel">编辑博客标题</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" class="form-control" id="newBlogTitle" placeholder="输入新的博客标题"
+                        data-bs-toggle="tooltip" data-bs-placement="right" title="标题不能为空">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="confirmEditBlogTitleBtn">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <script src="../../js/constDefine.js"></script>
     <script src="../../js/util.js"></script>
 
@@ -260,6 +284,14 @@
             };
             $('#deleteBlogModal').modal('show');
         }
+
+        // 打开编辑标题模态框时，设置当前博客的标题
+        function openEditBlogTitleModal(blogId, currentTitle) {
+            $('#editBlogTitleModal').modal('show');
+            $('#newBlogTitle').val(currentTitle);
+            $('#confirmEditBlogTitleBtn').data('blog-id', blogId);
+        }
+
         // 渲染标签数据
         function renderTags(page) {
             currentPage = page;
@@ -290,8 +322,12 @@
                     $('#editTagModal').modal('show');
 
                     $('#saveTagButton').off('click').on('click', function () {
-                        // 无效校验
                         const newTagName = $('#tagNameInput').val();
+                        // 合法性校验
+                        if (newTagName.trim() === '') {
+                            alert("标签不能为空");
+                            return;
+                        }
                         if (newTagName === tagName) {
                             $('#editTagModal').modal('hide');
                             return;
@@ -372,6 +408,7 @@
           <td>${tagNum}</td>
           <td>${time}</td>
           <td>
+            <button class="btn btn-sm btn-primary edit-blog-title" data-id="${blog.id}" data-title="${blog.title}">编辑标题</button>
             <button class="btn btn-sm btn-info edit-blog-tags" data-id="${blog.id}">编辑标签</button>
             <button class="btn btn-sm btn-warning edit-blog" data-id="${blog.id}">编辑</button>
             <button class="btn btn-sm btn-danger delete-blog" data-id="${blog.id}" data-title="${blog.title}">删除</button>
@@ -436,6 +473,48 @@
                         $('#editBlogTagsModal').modal('hide');
                     });
                 });
+
+                $('.edit-blog-title').off('click').on('click', (async function () {
+                    const blogId = $(this).data('id');
+                    const blogTitle = $(this).data('title');
+                    openEditBlogTitleModal(blogId, blogTitle);
+
+                    // 绑定确定按钮事件，点击后发送修改请求
+                    $('#confirmEditBlogTitleBtn').on('click', async function () {
+                        const blogId = $(this).data('blog-id');
+                        const newTitle = $('#newBlogTitle').val();
+                        if (newTitle.trim() === '') {
+                            showToast('标题不能为空');
+                            return;
+                        }
+                        $('#editBlogTitleModal').modal('hide');
+                        $.ajax({
+                            url: `${backend_url}/blogs/${blogId}/title`,
+                            type: "PUT",
+                            data: { title: newTitle },
+                            xhrFields: {
+                                withCredentials: true
+                            },
+                            success: function (response) {
+                                if (response) {
+                                    blogs = response;
+                                    renderPagination(blogs.length, itemsPerPage, 'blog-pagination', 'renderBlogs');
+                                    renderBlogs(currentPage);
+                                }
+                            },
+                            error: function (xhr, status, error) {
+                                if (xhr.status === 401) {
+                                    console.error("未授权访问:", xhr.responseText);
+                                    sessionStorage.setItem('blog_website_login', "false");
+                                    alert("未授权，请登录后再试。");
+                                    window.location.href = '../index.html';
+                                } else {
+                                    console.error("Error sending string:", error);
+                                }
+                            }
+                        });
+                    });
+                }))
             });
         }
 
@@ -697,6 +776,27 @@
                 document.getElementById('newTagNameInput').value = '';
             });
 
+        });
+
+        const setToolTip = (input) => {
+            const tooltip = new bootstrap.Tooltip(input, {
+                trigger: 'manual'
+            });
+            input.addEventListener('input', function () {
+                if (input.value.trim() === '') {
+                    tooltip.show();
+                } else {
+                    tooltip.hide();
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const newBlogTitleInput = document.getElementById('newBlogTitle');
+            const tagNameInput = document.getElementById('tagNameInput');
+            setToolTip(newBlogTitleInput);
+            setToolTip(tagNameInput);
+            setToolTip(newTagNameInput);
         });
     </script>
 

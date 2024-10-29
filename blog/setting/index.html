@@ -59,7 +59,9 @@
                 <div id="tag-content" class="pt-4">
                     <h3>标签管理</h3>
                     <p>这里是标签管理内容。</p>
-                    <button class="btn btn-primary">新增标签</button>
+                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addTagModal">
+                        新增标签
+                    </button>
                     <table class="table mt-3">
                         <thead>
                             <tr>
@@ -139,6 +141,25 @@
             </div>
         </div>
     </div>
+    <!-- 新增标签的模态框 -->
+    <div class="modal fade" id="addTagModal" tabindex="-1" aria-labelledby="addTagModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addTagModalLabel">新增标签</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" id="newTagNameInput" class="form-control" placeholder="标签名称" maxlength="50">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="addTagButton">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- 删除标签确认模态框 -->
     <div class="modal fade" id="deleteTagModal" tabindex="-1" aria-labelledby="deleteTagModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -379,9 +400,11 @@
                     withCredentials: true // 允许发送 cookie
                 },
                 success: function (response) {
-                    blogs = response;
-                    renderPagination(blogs.length, itemsPerPage, 'blog-pagination', 'renderBlogs');
-                    renderBlogs(1);
+                    if (response) {
+                        blogs = response;
+                        renderPagination(blogs.length, itemsPerPage, 'blog-pagination', 'renderBlogs');
+                        renderBlogs(1);
+                    }
                 },
                 error: function (xhr, status, error) {
                     if (xhr.status === 401) {
@@ -404,6 +427,54 @@
             }
         }
 
+        function addTag(tagName) {
+            const exists = tags.some(tag => tag.name === tagName);
+            if (exists) {
+                showToast('该标签名称已存在，请选择其他名称。');
+                return;
+            }
+            $.ajax({
+                url: backend_url + "/tags/add",
+                type: "POST",
+                xhrFields: {
+                    withCredentials: true
+                },
+                data: {
+                    name: tagName
+                },
+                success: function (response) {
+                    if (response) {
+                        blogs = response;
+                        // 按照 name === tagName 的条件将元素排序
+                        blogs.sort((a, b) => {
+                            if (a.name === tagName && b.name !== tagName) {
+                                return -1; // a 在前
+                            } else if (a.name !== tagName && b.name === tagName) {
+                                return 1; // b 在前
+                            }
+                            return 0; // 两者相等，不变
+                        });
+                        renderPagination(blogs.length, itemsPerPage, 'blog-pagination', 'renderBlogs');
+                        renderBlogs(1);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    if (xhr.status === 401) {
+                        console.error("未授权访问:", xhr.responseText);
+                        sessionStorage.setItem('blog_website_login', "false");
+                        alert("未授权，请登录后再试。");
+                        window.location.href = '../index.html';
+                    }
+                    else if (xhr.status === 500) {
+                        showToast(xhr.responseText);
+                    }
+                    else {
+                        console.error("Error sending string:", error);
+                    }
+                }
+            });
+        }
+
         $(document).ready(function () {
             requestTags();
             // 点击标签管理显示标签内容，隐藏文章内容，并高亮当前导航项
@@ -423,6 +494,28 @@
                 $(this).addClass('active');  // 给当前点击的项加上高亮
                 requestBlogs();
             });
+
+            // 新增标签模态框的逻辑
+            document.getElementById('addTagButton').addEventListener('click', function () {
+                const tagName = document.getElementById('newTagNameInput').value.trim();
+
+                // 验证标签名称是否为空
+                if (tagName === '') {
+                    alert('标签名称不能为空！');
+                    return;
+                }
+
+                // 在这里处理新增标签的逻辑，例如发送到服务器
+                addTag(tagName);
+
+                // 关闭模态框
+                const modal = bootstrap.Modal.getInstance(document.getElementById('addTagModal'));
+                modal.hide();
+
+                // 清空输入框
+                document.getElementById('newTagNameInput').value = '';
+            });
+
         });
     </script>
 

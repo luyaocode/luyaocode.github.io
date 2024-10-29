@@ -406,6 +406,9 @@
 				$.ajax({
 					url: backend_url + '/auth',
 					type: 'POST',
+					xhrFields: {
+						withCredentials: true
+					},
 					data: {
 						code
 					},

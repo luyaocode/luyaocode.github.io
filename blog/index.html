@@ -12,11 +12,13 @@
 		content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=1, target-densitydpi=low-dpi" />
 	<meta http-equiv="Cache-Control" content="no-siteapp" />
 	<link rel="icon" type="img/x-icon" href="../img/fav.png">
+	<script src="../js/jquery.min.js"></script>
 	<script src="../js/util.js"></script>
 	<script src="../js/constDefine.js"></script>
 	<!-- bootstrap -->
-	<!-- <link href="../css/bootstrap.min.css" rel="stylesheet">
-	<script src="../js/bootstrap.bundle.min.js"></script> -->
+	<link href="../css/bootstrap.min.css" rel="stylesheet">
+	<script src="../js/bootstrap.bundle.min.js"></script>
+	<link href="../css/all.min.css" rel="stylesheet">
 </head>
 <style>
 	* {
@@ -45,7 +47,7 @@
 	a {
 		text-decoration: none;
 		margin-left: 10px;
-		margin-bottom: 10px;
+		margin-bottom: 6px;
 		font-family: "隶书";
 		font-size: 30px;
 		font-style: unset;
@@ -142,7 +144,7 @@
 	.container {
 		display: flex;
 		flex-direction: row;
-		margin-left: 20px;
+		margin-left: 0;
 		width: auto;
 		overflow-x: hidden;
 	}
@@ -155,6 +157,7 @@
 		box-sizing: border-box;
 		overflow-x: hidden;
 		background-color: rgb(197, 196, 196, 0.5);
+		height: 50vh;
 	}
 
 	/* blogs */
@@ -182,9 +185,41 @@
 	/* 禁用所有交互的样式 */
 	.disabled {
 		pointer-events: none;
-		/* 禁止鼠标事件 */
 		opacity: 0.5;
-		/* 降低透明度以示区别 */
+	}
+
+	#loadingModal {
+		display: none;
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background: rgba(0, 0, 0, 0.7);
+		color: white;
+		text-align: center;
+		line-height: 100vh;
+		font-size: 1.5rem;
+		z-index: 9999;
+		user-select: none;
+	}
+
+	.loading-spinner {
+		margin-bottom: 20px;
+	}
+
+	#auth-btn {
+		text-decoration: none;
+		color: #ffffff;
+		background-color: #333;
+		padding: 8px 4px;
+		border-radius: 5px;
+		transition: background-color 0.3s;
+		font-size: 20px;
+	}
+
+	#auth-btn:hover {
+		background-color: #555;
 	}
 </style>
 
@@ -201,7 +236,9 @@
 					<a href="../editor.md/examples/write-blog.html" id="blog-link">创建博客</a>
 				</div>
 				<a id='setting-btn' style="display: none;" href="setting/index.html">博客管理</a>
-				<a id='auth-btn' onclick="openAuthPopup()">登录</a>
+				<a id="auth-btn" onclick="openAuthPopup()">
+					<i class="fab fa-github"></i> 登录
+				</a>
 			</div>
 			<div class="container">
 				<ul id="tags">
@@ -212,11 +249,13 @@
 		</div>
 	</div>
 	<!-- 加载弹窗的HTML -->
-	<div id="loadingModal"
-		style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); color: white; text-align: center; line-height: 100vh;">
-		正在登录，请稍候...
+	<div id="loadingModal">
+		<div class="loading-spinner">
+			<div class="spinner-border" role="status">
+				<span class="sr-only"></span>
+			</div>
+		</div>
 	</div>
-	<script src="../js/jquery.min.js"></script>
 	<script type="text/javascript">
 		const renderBlogs = (blogs) => {
 			if (!blogs) return;
@@ -409,7 +448,7 @@
 				const status = sessionStorage.getItem('blog_website_login');
 				if (status === 'true') return; // 如果已授权就返回
 				// 显示加载弹窗
-				document.getElementById('loadingModal').style.display = 'flex';
+				document.getElementById('loadingModal').style.display = 'block';
 				// 将参数发送给后端
 				$.ajax({
 					url: backend_url + '/auth',

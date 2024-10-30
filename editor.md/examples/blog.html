@@ -7,10 +7,40 @@
     <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="../css/editormd.preview.css" />
     <link rel="shortcut icon" href="../../img/fav.png" type="image/x-icon" />
+    <script src="js/jquery.min.js"></script>
+
+    <!-- Bootstrap CSS -->
+    <link href="../../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../css/bootstrap-icons.css" rel="stylesheet">
+    <script src="../../js/bootstrap.bundle.min.js"></script>
     <style>
+        html,
+        body {
+            scroll-behavior: smooth;
+        }
+
         body {
             padding: 20px;
             padding-top: 0;
+            background-color: white;
+            color: black;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .night-mode {
+            background-color: #000000;
+            color: white;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .btn-night-mode {
+            background-color: rgb(255, 255, 255);
+            color: black;
+        }
+
+        .btn-night-mode:hover {
+            background-color: rgb(213, 213, 213);
+            color: black;
         }
 
         #layout>header,
@@ -31,6 +61,12 @@
             border: 1px solid #ddd;
             border-top: none;
             border-bottom: none;
+            transition: opacity 0.6s ease, visibility 0.6s ease;
+        }
+
+        .hidden {
+            opacity: 0;
+            visibility: hidden;
         }
 
         #sidebar:hover {
@@ -50,6 +86,14 @@
             padding-left: 0;
             padding-right: 430px;
             margin: 0;
+            transition: padding-right 0.3s;
+            transition: font-size 0.3s;
+
+        }
+
+        #test-editormd-view.expand {
+            padding-right: 0;
+            transition: padding-right 0.3s;
         }
 
         #title {
@@ -64,7 +108,6 @@
             font-size: 30px;
             font-style: unset;
             font-weight: bold;
-            color: rgb(73, 73, 73);
         }
 
         #topBar>a:active {
@@ -131,6 +174,34 @@
         textarea {
             resize: none;
         }
+
+        /* 便捷栏 */
+        .card {
+            background-color: rgba(255, 255, 255, 0.5);
+            transition: background-color 0.3s;
+        }
+
+        .card.collapsed {
+            display: none;
+        }
+
+        #floatingSidebar {
+            transition: width 0.3s, height 0.3s;
+        }
+
+        #toggleButton {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .no-focus:active,
+        .no-focus:focus {
+            box-shadow: none;
+            /* 移除阴影效果 */
+            outline: none;
+            /* 移除焦点轮廓 */
+        }
     </style>
     <script src="../../js/util.js"></script>
     <script src="../../js/constDefine.js"></script>
@@ -151,12 +222,12 @@
             position: fixed;
             left:20px;
             top:0.5px;
-            border-bottom: 2px solid rgb(109, 46, 46);
             width: 100%;
+            z-index: 1200;
             ">
         <a href="../../blog/index.html">返回</a>
-        <button id="del-blog-btn">删除</button>
-        <button id="update-blog-btn">编辑</button>
+        <button id="del-blog-btn" style="display: none;">删除</button>
+        <button id="update-blog-btn" style="display: none;">编辑</button>
     </div>
     <div id="layout" style="
         margin-top:1.8rem;
@@ -245,14 +316,12 @@
             <div class="markdown-body editormd-preview-container" id="custom-toc-container" style="background: transparent;
                 ">#custom-toc-container</div>
         </div>
-        <div id="test-editormd-view" style="
-                background: transparent;
-            ">
+        <div id="test-editormd-view">
             <div style="width:100%;
                 text-align: center;
                 ">
-                <div style="display: flex;flex-direction: column;">
-                    <h1 id='title' style="border: none;"></h1>
+                <div id="title-container" style="display: flex;flex-direction: column;">
+                    <h1 id='title' style="border: bold;"></h1>
                     <span id="blog-info"></span>
                 </div>
 
@@ -263,11 +332,44 @@
             <textarea id="append-test" style="display:none;"></textarea>
         </div>
     </div>
+    <div id="floatingSidebar" class="card"
+        style="position: fixed; right: 10px; bottom: 20px; width: 82px; z-index: 1000;">
+        <div class="card-body">
+            <button id="toggleDirectory" class="btn btn-primary btn-block mb-2 no-focus" data-toggle="tooltip"
+                title="折叠目录" data-placement="left">
+                <i class="bi bi-x"></i>
+            </button>
+            <button id="increaseFont" class="btn btn-secondary btn-block mb-2 no-focus" data-toggle="tooltip"
+                title="增大字体" data-placement="left">
+                <i class="bi bi-plus"></i>
+            </button>
+            <button id="decreaseFont" class="btn btn-secondary btn-block mb-2 no-focus" data-toggle="tooltip"
+                title="减小字体" data-placement="left">
+                <i class="bi bi-dash"></i>
+            </button>
+            <button id="toggleNightMode" class="btn btn-dark btn-block mb-2 no-focus" data-toggle="tooltip" title="夜间模式"
+                data-placement="left">
+                <i class="bi bi-moon"></i>
+            </button>
+            <button id="scrollToTop" class="btn btn-success btn-block mb-2 no-focus" data-toggle="tooltip" title="回到顶部"
+                data-placement="left">
+                <i class="bi bi-arrow-up-circle"></i>
+            </button>
+            <button id="toggleSidebar" class="btn btn-info btn-block mb-2 no-focus" data-toggle="tooltip" title="隐藏操作栏"
+                data-placement="left">
+                <i class="bi bi-arrows-collapse"></i>
+            </button>
+        </div>
+    </div>
+    <!-- 隐藏操作栏之后的小球 -->
+    <div id="toggleButton" class="btn btn-warning"
+        style="position: fixed; right: 10px; bottom: 50px; z-index: 1001; border-radius: 50%; width: 40px; height: 40px; display: none;"
+        data-toggle="tooltip" title="展开操作栏" data-placement="left">
+        ⇆</div>
     <!-- <script src="js/zepto.min.js"></script>
 		<script>
 			var jQuery = Zepto;  // 为了避免修改flowChart.js和sequence-diagram.js的源码，所以使用Zepto.js时想支持flowChart/sequenceDiagram就得加上这一句
 		</script> -->
-    <script src="js/jquery.min.js"></script>
     <script src="../lib/marked.min.js"></script>
     <script src="../lib/prettify.min.js"></script>
 
@@ -298,6 +400,7 @@
                     id: id,
                 },
                 success: function (response) {
+                    // document.getElementById("sidebar").style.display = 'none';
                     let { title, author, content, time, id } = response;
                     title = title === '' ? '无标题' : title;
                     const headTitleEle = document.querySelector('title');
@@ -466,6 +569,7 @@
     </script>
 </body>
 <script>
+    // 刷新状态
     const freshPage = () => {
         const update_blog_btn = document.getElementById("update-blog-btn");
         const del_blog_btn = document.getElementById("del-blog-btn");
@@ -480,9 +584,117 @@
             del_blog_btn.style.display = 'none';
         }
     }
+
     $(document).ready(function () {
         freshPage();
+
+        // 初始化工具提示，设置延时
+        $('[data-toggle="tooltip"]').tooltip({
+            delay: { "show": 0, "hide": 0 }
+        });
+
+        let isSidebarVisible = true; // 用于跟踪侧边栏的状态
+        let fontSize = 16;
+        const content = document.getElementById('test-editormd-view');
+        const sidebar = document.getElementById('floatingSidebar');
+        const toggleButton = document.getElementById('toggleButton');
+
+        $('#toggleDirectory').click(function () {
+            if (isSidebarVisible) {
+                $("#sidebar").addClass("hidden");
+                $("#test-editormd-view").addClass("expand");
+            }
+            else {
+                $("#sidebar").removeClass("hidden");
+                $("#test-editormd-view").removeClass("expand");
+            }
+            isSidebarVisible = !isSidebarVisible;
+            $(this).find('i').toggleClass('bi-x bi-list');
+        });
+
+        $('#toggleDirectory').on('mouseenter', function () {
+            $(this).tooltip('show'); // 显示 tooltip
+        }).on('mouseleave', function () {
+            $(this).tooltip('hide'); // 隐藏 tooltip
+        });
+
+        document.getElementById('increaseFont').addEventListener('click', function () {
+            fontSize += 2;
+            content.style.fontSize = fontSize + 'px';
+        });
+
+        $('#increaseFont').on('mouseenter', function () {
+            $(this).tooltip('show');
+        }).on('mouseleave', function () {
+            $(this).tooltip('hide');
+        });
+
+        document.getElementById('decreaseFont').addEventListener('click', function () {
+            fontSize = Math.max(10, fontSize - 2); // 最小字体大小限制
+            content.style.fontSize = fontSize + 'px';
+        });
+        $('#decreaseFont').on('mouseenter', function () {
+            $(this).tooltip('show'); // 显示 tooltip
+        }).on('mouseleave', function () {
+            $(this).tooltip('hide'); // 隐藏 tooltip
+        });
+
+        document.getElementById('toggleNightMode').addEventListener('click', function () {
+            $('body').toggleClass('night-mode'); // 切换 class
+            $('#test-editormd-view').toggleClass('night-mode'); // 切换 class
+            $('#title-container').toggleClass('night-mode'); // 切换 class
+
+            const isNightMode = $('#test-editormd-view').hasClass('night-mode');
+
+            // 根据模式更新按钮图标
+            $(this).find('i').toggleClass('bi-moon bi-sun');
+
+            // 切换按钮背景色
+            if (isNightMode) {
+                $(this).addClass('btn-night-mode'); // 添加夜间模式按钮样式
+            } else {
+                $(this).removeClass('btn-night-mode'); // 移除夜间模式按钮样式
+            }
+        });
+        $('#toggleNightMode').on('mouseenter', function () {
+            $(this).tooltip('show'); // 显示 tooltip
+        }).on('mouseleave', function () {
+            $(this).tooltip('hide'); // 隐藏 tooltip
+        });
+
+
+        document.getElementById('toggleSidebar').addEventListener('click', function () {
+            sidebar.classList.toggle('collapsed'); // 切换折叠状态
+            toggleButton.style.display = sidebar.classList.contains('collapsed') ? 'flex' : 'none'; // 根据状态显示或隐藏按钮
+        });
+        $('#toggleSidebar').on('mouseenter', function () {
+            $(this).tooltip('show'); // 显示 tooltip
+        }).on('mouseleave', function () {
+            $(this).tooltip('hide'); // 隐藏 tooltip
+        });
+
+        // 隐藏操作栏按钮
+        toggleButton.addEventListener('click', function () {
+            sidebar.classList.toggle('collapsed'); // 再次切换状态
+            toggleButton.style.display = sidebar.classList.contains('collapsed') ? 'flex' : 'none'; // 更新按钮显示
+        });
+        $('#toggleButton').on('mouseenter', function () {
+            $(this).tooltip('show'); // 显示 tooltip
+        }).on('mouseleave', function () {
+            $(this).tooltip('hide'); // 隐藏 tooltip
+        });
+
+        // 回到顶部
+        document.getElementById('scrollToTop').addEventListener('click', function () {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+        $('#scrollToTop').on('mouseenter', function () {
+            $(this).tooltip('show'); // 显示 tooltip
+        }).on('mouseleave', function () {
+            $(this).tooltip('hide'); // 隐藏 tooltip
+        });
     });
+
 </script>
 
 </html>

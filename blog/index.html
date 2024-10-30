@@ -414,6 +414,12 @@
 	</script>
 
 	<script>
+
+		function logout() {
+			sessionStorage.setItem('blog_website_login', 'false');
+			updateAuthButton();
+		}
+
 		const freshPage = () => {
 			const d_write_blog = document.getElementById("d-write-blog");
 			const auth_btn = document.getElementById("auth-btn");
@@ -423,16 +429,21 @@
 			if (status === 'true') { // 登录成功
 				d_write_blog.style.opacity = 1;
 				d_write_blog.style.pointerEvents = 'auto';
-				auth_btn.style.display = 'none';
+				// auth_btn.style.display = 'none';
+				authBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> 退出登录'; // 更改为退出登录
+				authBtn.onclick = logout;
 				setting_btn.style.display = 'block';
 			}
 			else {
 				d_write_blog.style.opacity = 0;
 				d_write_blog.style.pointerEvents = 'none';
-				auth_btn.style.display = 'block';
+				// auth_btn.style.display = 'block';
+				authBtn.innerHTML = '<i class="fab fa-github"></i> 登录';
+				authBtn.onclick = openAuthPopup;
 				setting_btn.style.display = 'none';
 			}
 		}
+
 		const authorize = () => {
 			freshPage();
 			// 获取 URL 参数

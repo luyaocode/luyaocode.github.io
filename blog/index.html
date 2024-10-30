@@ -210,6 +210,11 @@
 			</div>
 		</div>
 	</div>
+	<!-- 加载弹窗的HTML -->
+	<div id="loadingModal"
+		style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); color: white; text-align: center; line-height: 100vh;">
+		正在登录，请稍候...
+	</div>
 	<script src="../js/jquery.min.js"></script>
 	<script type="text/javascript">
 		const renderBlogs = (blogs) => {
@@ -402,6 +407,8 @@
 			else if (code && state) {
 				const status = sessionStorage.getItem('blog_website_login');
 				if (status === 'true') return; // 如果已授权就返回
+				// 显示加载弹窗
+				document.getElementById('loadingModal').style.display = 'flex';
 				// 将参数发送给后端
 				$.ajax({
 					url: backend_url + '/auth',
@@ -419,12 +426,21 @@
 						document.body.classList.add('disabled');
 						freshPage();
 						document.body.classList.remove('disabled');
+
+						// 隐藏加载弹窗
+						document.getElementById('loadingModal').style.display = 'none';
 						if (!data) { // 授权失败
 							alert("您不在白名单当中，请联系网站管理员");
 						}
 					},
 					error: function (xhr, status, error) {
-						console.error('错误:', error);
+						// 隐藏加载弹窗
+						document.getElementById('loadingModal').style.display = 'none';
+						if (xhr.status === 500) {
+							console.error("服务器异常：", xhr.responseText);
+						} else {
+							console.error("Error sending string:", error);
+						}
 					}
 				});
 

@@ -513,13 +513,14 @@
 				tagItem.className = "tag-item";
 				tagItem.setAttribute('data-tag-id', tag.id);
 				tagItem.setAttribute('data-tag-name', tag.name);
+				const originBackColor = colors[index % colors.length];
+				tagItem.setAttribute('data-tag-backcolor', originBackColor);
 
 				const tagText = document.createElement('span');
 				const displayText = tag.name.length > 8 ? tag.name.slice(0, 8) + '...' : tag.name;
 				tagText.innerText = displayText;
 				tagText.className = "tag-label";
 
-				const originBackColor = colors[index % colors.length];
 				tagItem.style.backgroundColor = originBackColor;
 				tagItem.style.color = '#fff';
 				tagItem.style.padding = '5px 10px';
@@ -576,10 +577,21 @@
 			});
 		};
 
+
+		const clearSelectedTags = () => {
+			document.getElementById("selected-tags").innerHTML = ''; // 清空已选标签区域
+			const selectedTags = document.querySelectorAll('.tag-item.tag-selected');
+			// 清除 .tag-selected 样式
+			selectedTags.forEach(tag => {
+				tag.classList.remove('tag-selected');
+				tag.style.backgroundColor = tag.getAttribute("data-tag-backcolor");
+				tag.style.color = '#fff';
+			});
+		}
+
 		const updateSelectedTags = (selectedTags) => {
 			const selectedTagsDiv = document.getElementById("selected-tags");
 			selectedTagsDiv.innerHTML = ''; // 清空已选标签区域
-
 			if (!selectedTags) return;
 			selectedTags.forEach(tag => {
 				const tagItem = document.createElement('div');
@@ -759,11 +771,7 @@
 	<script>
 		document.getElementById('clear-filters').addEventListener('click', () => {
 			// 移除所有选中的标签
-			document.querySelectorAll('.tag-item.tag-selected').forEach(item => {
-				item.classList.remove('tag-selected');
-			});
-
-			updateSelectedTags();
+			clearSelectedTags();
 
 			// 重新加载所有博客
 			$.ajax({

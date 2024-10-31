@@ -10,6 +10,11 @@
     <link href="../../css/bootstrap.min.css" rel="stylesheet">
     <script src="../../js/bootstrap.bundle.min.js"></script>
     <style>
+        #main-content {
+            display: none;
+            /* 初始隐藏主要内容 */
+        }
+
         /* 手动添加一些高亮样式，确保生效 */
         .active {
             font-weight: bold;
@@ -32,225 +37,227 @@
 </head>
 
 <body>
-
-    <div class="container-fluid">
-        <!-- 工具栏 -->
-        <div class="row">
-            <div class="col-12">
-                <div class="d-flex align-items-center bg-light p-2">
-                    <button id="back-btn" class="btn btn-secondary me-2">
-                        返回
-                    </button>
-                    <h5 class="mb-0">工具栏</h5>
+    <div id="main-content">
+        <div class="container-fluid">
+            <!-- 工具栏 -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="d-flex align-items-center bg-light p-2">
+                        <button id="back-btn" class="btn btn-secondary me-2">
+                            返回
+                        </button>
+                        <h5 class="mb-0">工具栏</h5>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="row">
-            <!-- 左侧导航栏 -->
-            <nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
-                <div class="sidebar-sticky pt-3">
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link active" href="#" id="tag-management">
-                                标签管理
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#" id="article-management">
-                                文章管理
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
-
-            <!-- 右侧内容区 -->
-            <main class="col-md-9 ml-sm-auto col-lg-10 px-4">
-                <!-- 标签管理内容 -->
-                <div id="tag-content" class="pt-4">
-                    <h3>标签管理</h3>
-                    <p>这里是标签管理内容。</p>
-                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addTagModal">
-                        新增标签
-                    </button>
-                    <table class="table mt-3">
-                        <thead>
-                            <tr>
-                                <th>标签名称</th>
-                                <th>文章数量</th>
-                                <th>操作</th>
-                            </tr>
-                        </thead>
-                        <tbody id="t-tags">
-                            <tr>
-                                <td>
-                                    <button class="btn btn-sm btn-warning">编辑</button>
-                                    <button class="btn btn-sm btn-danger">删除</button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <nav>
-                        <ul class="pagination" id="tag-pagination">
-                            <!-- 标签分页按钮 -->
+            <div class="row">
+                <!-- 左侧导航栏 -->
+                <nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
+                    <div class="sidebar-sticky pt-3">
+                        <ul class="nav flex-column">
+                            <li class="nav-item">
+                                <a class="nav-link active" href="#" id="tag-management">
+                                    标签管理
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" id="article-management">
+                                    文章管理
+                                </a>
+                            </li>
                         </ul>
-                    </nav>
-                </div>
+                    </div>
+                </nav>
 
-                <!-- 文章管理内容 -->
-                <div id="article-content" class="pt-4" style="display: none;">
-                    <h3>文章管理</h3>
-                    <p>这里是文章管理内容。</p>
-                    <button id="create-blog-btn" class="btn btn-primary">新增文章</button>
-                    <table class="table mt-3">
-                        <thead>
-                            <tr>
-                                <th>标题</th>
-                                <th>标签</th>
-                                <th>标签个数</th>
-                                <th>创建时间</th>
-                                <th>操作</th>
-                            </tr>
-                        </thead>
-                        <tbody id="t-blogs">
-                            <tr>
-                                <td>
-                                    <button class="btn btn-sm btn-warning">标签</button>
-                                    <button class="btn btn-sm btn-warning">编辑</button>
-                                    <button class="btn btn-sm btn-danger">删除</button>
-                                </td>
-                            </tr>
-                            <!-- 更多文章行 -->
-                        </tbody>
-                    </table>
-                    <nav>
-                        <ul class="pagination" id="blog-pagination">
-                            <!-- 文章分页按钮 -->
-                        </ul>
-                    </nav>
-                </div>
-            </main>
+                <!-- 右侧内容区 -->
+                <main class="col-md-9 ml-sm-auto col-lg-10 px-4">
+                    <!-- 标签管理内容 -->
+                    <div id="tag-content" class="pt-4">
+                        <h3>标签管理</h3>
+                        <p>这里是标签管理内容。</p>
+                        <button type="button" class="btn btn-success" data-bs-toggle="modal"
+                            data-bs-target="#addTagModal">
+                            新增标签
+                        </button>
+                        <table class="table mt-3">
+                            <thead>
+                                <tr>
+                                    <th>标签名称</th>
+                                    <th>文章数量</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="t-tags">
+                                <tr>
+                                    <td>
+                                        <button class="btn btn-sm btn-warning">编辑</button>
+                                        <button class="btn btn-sm btn-danger">删除</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <nav>
+                            <ul class="pagination" id="tag-pagination">
+                                <!-- 标签分页按钮 -->
+                            </ul>
+                        </nav>
+                    </div>
+
+                    <!-- 文章管理内容 -->
+                    <div id="article-content" class="pt-4" style="display: none;">
+                        <h3>文章管理</h3>
+                        <p>这里是文章管理内容。</p>
+                        <button id="create-blog-btn" class="btn btn-primary">新增文章</button>
+                        <table class="table mt-3">
+                            <thead>
+                                <tr>
+                                    <th>标题</th>
+                                    <th>标签</th>
+                                    <th>标签个数</th>
+                                    <th>创建时间</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="t-blogs">
+                                <tr>
+                                    <td>
+                                        <button class="btn btn-sm btn-warning">标签</button>
+                                        <button class="btn btn-sm btn-warning">编辑</button>
+                                        <button class="btn btn-sm btn-danger">删除</button>
+                                    </td>
+                                </tr>
+                                <!-- 更多文章行 -->
+                            </tbody>
+                        </table>
+                        <nav>
+                            <ul class="pagination" id="blog-pagination">
+                                <!-- 文章分页按钮 -->
+                            </ul>
+                        </nav>
+                    </div>
+                </main>
+            </div>
         </div>
-    </div>
-    <!-- 编辑标签的模态框 -->
-    <div class="modal fade" id="editTagModal" tabindex="-1" aria-labelledby="editTagModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editTagModalLabel">编辑标签</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <!-- 编辑标签的模态框 -->
+        <div class="modal fade" id="editTagModal" tabindex="-1" aria-labelledby="editTagModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editTagModalLabel">编辑标签</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="text" id="tagNameInput" class="form-control" placeholder="标签名称" maxlength="50"
+                            data-bs-toggle="tooltip" data-bs-placement="right" title="标签不能为空">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                        <button type="button" class="btn btn-primary" id="saveTagButton">确定</button>
+                    </div>
                 </div>
-                <div class="modal-body">
-                    <input type="text" id="tagNameInput" class="form-control" placeholder="标签名称" maxlength="50"
-                        data-bs-toggle="tooltip" data-bs-placement="right" title="标签不能为空">
+            </div>
+        </div>
+        <!-- 新增标签的模态框 -->
+        <div class="modal fade" id="addTagModal" tabindex="-1" aria-labelledby="addTagModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addTagModalLabel">新增标签</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="text" id="newTagNameInput" class="form-control" placeholder="标签名称" maxlength="50"
+                            data-bs-toggle="tooltip" data-bs-placement="right" title="标签不能为空">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                        <button type="button" class="btn btn-primary" id="addTagButton">确定</button>
+                    </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                    <button type="button" class="btn btn-primary" id="saveTagButton">确定</button>
+            </div>
+        </div>
+
+        <!-- 删除标签确认模态框 -->
+        <div class="modal fade" id="deleteTagModal" tabindex="-1" aria-labelledby="deleteTagModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteTagModalLabel">确认删除标签</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        是否删除标签 <span id="tagNameToDelete"></span>？
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">确定</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 删除博客确认模态框 -->
+        <div class="modal fade" id="deleteBlogModal" tabindex="-1" aria-labelledby="deleteBlogModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteBlogModalLabel">确认删除博客</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        是否删除博客 <span id="blogTitleToDelete"></span>？
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                        <button type="button" class="btn btn-danger" id="confirmDeleteBlogBtn">确定</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 编辑博客标签的模态框 -->
+        <div class="modal fade" id="editBlogTagsModal" tabindex="-1" aria-labelledby="editBlogTagsModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editBlogTagsModalLabel">为博客设置标签</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="blogTagsContainer"></div> <!-- 用于渲染标签 -->
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                        <button type="button" class="btn btn-primary" id="saveBlogTagsButton">确定</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 编辑博客标题模态框 -->
+        <div class="modal fade" id="editBlogTitleModal" tabindex="1" aria-labelledby="editBlogTitleModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editBlogTitleModalLabel">编辑博客标题</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="text" class="form-control" id="newBlogTitle" placeholder="输入新的博客标题"
+                            data-bs-toggle="tooltip" data-bs-placement="right" title="标题不能为空">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                        <button type="button" class="btn btn-primary" id="confirmEditBlogTitleBtn">确定</button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    <!-- 新增标签的模态框 -->
-    <div class="modal fade" id="addTagModal" tabindex="-1" aria-labelledby="addTagModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addTagModalLabel">新增标签</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <input type="text" id="newTagNameInput" class="form-control" placeholder="标签名称" maxlength="50"
-                        data-bs-toggle="tooltip" data-bs-placement="right" title="标签不能为空">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                    <button type="button" class="btn btn-primary" id="addTagButton">确定</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 删除标签确认模态框 -->
-    <div class="modal fade" id="deleteTagModal" tabindex="-1" aria-labelledby="deleteTagModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deleteTagModalLabel">确认删除标签</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    是否删除标签 <span id="tagNameToDelete"></span>？
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">确定</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 删除博客确认模态框 -->
-    <div class="modal fade" id="deleteBlogModal" tabindex="-1" aria-labelledby="deleteBlogModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deleteBlogModalLabel">确认删除博客</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    是否删除博客 <span id="blogTitleToDelete"></span>？
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                    <button type="button" class="btn btn-danger" id="confirmDeleteBlogBtn">确定</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 编辑博客标签的模态框 -->
-    <div class="modal fade" id="editBlogTagsModal" tabindex="-1" aria-labelledby="editBlogTagsModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editBlogTagsModalLabel">为博客设置标签</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div id="blogTagsContainer"></div> <!-- 用于渲染标签 -->
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                    <button type="button" class="btn btn-primary" id="saveBlogTagsButton">确定</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 编辑博客标题模态框 -->
-    <div class="modal fade" id="editBlogTitleModal" tabindex="1" aria-labelledby="editBlogTitleModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editBlogTitleModalLabel">编辑博客标题</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <input type="text" class="form-control" id="newBlogTitle" placeholder="输入新的博客标题"
-                        data-bs-toggle="tooltip" data-bs-placement="right" title="标题不能为空">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                    <button type="button" class="btn btn-primary" id="confirmEditBlogTitleBtn">确定</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
 
     <script src="../../js/constDefine.js"></script>
     <script src="../../js/util.js"></script>
@@ -575,7 +582,7 @@
                 url: url,
                 type: "GET",
                 xhrFields: {
-                    withCredentials: true // 允许发送 cookie
+                    withCredentials: true
                 },
                 success: function (response) {
                     if (response) {
@@ -704,8 +711,8 @@
                     showToast('删除标签失败！');
                 }
             } catch (error) {
-                if (xhr.status === 401) {
-                    console.error("未授权访问:", xhr.responseText);
+                if (error.status === 401) {
+                    console.error("未授权访问:");
                     sessionStorage.setItem('blog_website_login', "false");
                     alert("未授权，请登录后再试。");
                     window.location.href = '../index.html';
@@ -738,8 +745,8 @@
                     showToast('删除博客失败！');
                 }
             } catch (error) {
-                if (xhr.status === 401) {
-                    console.error("未授权访问:", xhr.responseText);
+                if (error.status === 401) {
+                    console.error("未授权访问:");
                     sessionStorage.setItem('blog_website_login', "false");
                     alert("未授权，请登录后再试。");
                     window.location.href = '../index.html';
@@ -749,9 +756,54 @@
             }
         }
 
-        $(document).ready(function () {
-            requestTags();
+        const authorize = async () => {
+            const status = sessionStorage.getItem('blog_website_login');
+            if (status !== 'true') {
+                return false;
+            }
+            try {
+                const response = await $.ajax({
+                    url: backend_url + '/blogs_man',
+                    type: 'GET',
+                    xhrFields: {
+                        withCredentials: true
+                    },
+                });
+                if (response) {
+                    tags = response;
+                    renderPagination(tags.length, itemsPerPage, 'tag-pagination', 'renderTags');
+                    renderTags(1);
+                    return true;
+                }
+                else {
+                    console.error("未授权访问");
+                    sessionStorage.setItem('blog_website_login', "false");
+                    return false;
+                }
+            } catch (error) {
+                if (error.status === 401) {
+                    console.error("未授权访问:");
+                    sessionStorage.setItem('blog_website_login', "false");
+                    return false;
+                } else {
+                    console.error("Error sending string:", error);
+                    return false;
+                }
+            }
+        };
 
+        authorize().then((res) => {
+            if (!res) {
+                alert("未授权访问，请重新登录.");
+                window.location.href = "../index.html";
+                return;
+            }
+            document.getElementById('main-content').style.display = 'block'; // 显示主要内容
+        }).catch(err => {
+            console.error("授权处理失败:", err);
+        });
+
+        $(document).ready(function () {
             // 绑定返回按钮的点击事件
             $('#back-btn').click(function () {
                 window.location.href = "../index.html";
@@ -791,7 +843,6 @@
                 modal.hide();
                 document.getElementById('newTagNameInput').value = '';
             });
-
         });
 
         const setToolTip = (input) => {

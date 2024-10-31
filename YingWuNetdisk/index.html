@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>鹦鹉网盘</title>
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
+    <link rel="stylesheet" href="../css/all.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-size: 16px;
+        }
+
+        .navbar {
+            background-color: transparent;
+        }
+
+        .navbar .btn {
+            color: blue;
+            background-color: transparent;
+            /* 统一按钮颜色 */
+            margin-right: 15px;
+            font-size: large;
+        }
+
+        #dropZone {
+            border: 2px dashed #007bff;
+            border-radius: 5px;
+            padding: 50px 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            position: relative;
+            transition: background-color 0.3s;
+            background-color: #e9f7ff;
+        }
+
+        #dropZone.dragover {
+            background-color: #b3e0ff;
+        }
+
+        #uploadButton {
+            font-size: 30px;
+            background: transparent;
+            border: none;
+            color: #007bff;
+            cursor: text;
+        }
+
+        .file-list {
+            max-height: 150px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            background-color: #ffffff;
+            border-radius: 5px;
+            padding: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .file-list ul {
+            padding-left: 0;
+        }
+
+        .file-list li {
+            list-style-type: none;
+            border-bottom: 1px solid #f1f1f1;
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.2s;
+        }
+
+        .file-list li:hover {
+            background-color: #f1f1f1;
+        }
+
+        .remove-file {
+            cursor: pointer;
+            color: red;
+            margin-left: 10px;
+            font-weight: bold;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .col {
+            flex: 1;
+            margin: 0 10px;
+        }
+
+        .upload-area {
+            background-color: #e9f7ff;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .download-area {
+            background-color: #f0f8ff;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <nav class="navbar">
+            <button class="btn" onclick="goBack()">返回</button>
+        </nav>
+
+        <h1 class="mt-5">鹦鹉网盘</h1>
+        <!-- 文件上传区域 -->
+        <div id="dropZone" class="text-center">
+            <button id="uploadButton">
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            <div style="margin-bottom: 10px;">将文件拖拽到这里上传</div>
+            <input type="file" id="fileInput" class="form-control-file mb-3" multiple style="display: none;" />
+            <label for="fileInput" class="btn btn-primary">选择文件上传</label>
+        </div>
+
+
+        <div class="row">
+            <!-- 上传文件列表 -->
+            <div class="col upload-area">
+                <h6 class="mt-5">待上传文件列表</h6>
+                <div class="file-list">
+                    <ul id="uploadFileList" class="list-group"></ul>
+                </div>
+                <div class="text-right">
+                    <button id="uploadFileButton" class="btn btn-success">上传文件</button>
+                </div>
+                <h6 class="mt-5">已上传文件列表</h6>
+                <div class="file-list">
+                    <ul id="uploadedFileList" class="list-group"></ul>
+                </div>
+            </div>
+
+            <!-- 下载文件区域 -->
+            <div class="col download-area">
+                <h6 class="mt-5">下载文件</h6>
+                <div class="input-group mb-3">
+                    <input type="text" id="fileId" class="form-control" placeholder="输入文件标识" required>
+                    <div class="input-group-append">
+                        <button id="downloadButton" class="btn btn-success">下载</button>
+                    </div>
+                </div>
+
+                <h6 class="mt-5">下载文件列表</h6>
+                <div class="file-list">
+                    <ul id="downloadFileList" class="list-group"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const uploadFileList = document.getElementById('uploadFileList');
+        const uploadedFileList = document.getElementById('uploadedFileList');
+        const downloadFileList = document.getElementById('downloadFileList');
+        const maxFileSize = 10 * 1024 * 1024; // 10MB
+        let selectedFiles = [];
+
+        function goBack() {
+            window.history.back();
+        }
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+
+        function handleFiles(files) {
+            for (let i = 0; i < files.length; i++) {
+                if (files[i].size > maxFileSize) {
+                    alert(`${files[i].name} 超过最大上传限制 (10MB)`);
+                    continue;
+                }
+                selectedFiles.push(files[i]);
+                const listItem = document.createElement('li');
+                listItem.className = 'list-group-item';
+                listItem.innerHTML = `${files[i].name} - ${(files[i].size / 1024).toFixed(2)} KB <span class="remove-file" onclick="removeFile(this)">✖</span>`;
+                uploadFileList.appendChild(listItem);
+            }
+        }
+
+        function removeFile(element) {
+            const listItem = element.parentNode;
+            const fileName = listItem.firstChild.textContent.split(' - ')[0];
+            selectedFiles = selectedFiles.filter(file => file.name !== fileName);
+            listItem.remove();
+        }
+
+        document.getElementById('uploadFileButton').onclick = async function () {
+            if (selectedFiles.length === 0) {
+                alert("请拖拽或选择文件上传");
+                return;
+            }
+            const formData = new FormData();
+            selectedFiles.forEach(file => formData.append('files', file));
+            await fetch('/upload', {
+                method: 'POST',
+                body: formData
+            });
+            loadFiles();
+            selectedFiles = []; // 重置选择
+            uploadFileList.innerHTML = ''; // 清空待上传文件列表
+            dropZone.textContent = '将文件拖拽到这里上传';
+            fileInput.value = ''; // 重置文件输入
+        };
+
+        document.getElementById('downloadButton').onclick = async function () {
+            const fileId = document.getElementById('fileId').value;
+            if (!fileId) {
+                alert("请输入文件标识");
+                return;
+            }
+            window.location.href = `/download/${fileId}`;
+        };
+
+        async function loadFiles() {
+            const uploadResponse = await fetch('/uploaded_files');
+            const uploads = await uploadResponse.json();
+            uploadFileList.innerHTML = '';
+            uploads.forEach(file => {
+                const listItem = document.createElement('li');
+                listItem.className = 'list-group-item';
+                listItem.innerHTML = `${file.name} - ${file.size} KB <span class="remove-file" onclick="removeUploadedFile(this)">✖</span>`;
+                uploadedFileList.appendChild(listItem);
+            });
+
+            const downloadResponse = await fetch('/downloadable_files');
+            const downloads = await downloadResponse.json();
+            downloadFileList.innerHTML = '';
+            downloads.forEach(file => {
+                const listItem = document.createElement('li');
+                listItem.className = 'list-group-item';
+                listItem.innerHTML = `${file.name} - ${file.size} KB`;
+                downloadFileList.appendChild(listItem);
+            });
+        }
+
+        async function removeUploadedFile(element) {
+            const listItem = element.parentNode;
+            const fileName = listItem.firstChild.textContent.split(' - ')[0];
+            await fetch(`/remove/${fileName}`, { method: 'DELETE' });
+            listItem.remove();
+        }
+
+        loadFiles();
+    </script>
+</body>
+
+</html>

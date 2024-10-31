@@ -43,83 +43,6 @@
 		background: rgba(255, 255, 255, 0.3);
 	}
 
-	a {
-		text-decoration: none;
-		margin-left: 10px;
-		margin-bottom: 6px;
-		font-family: "隶书";
-		font-size: 30px;
-		font-style: unset;
-		font-weight: bold;
-		color: rgb(73, 73, 73);
-		cursor: pointer;
-	}
-
-	a:active {
-		color: red;
-	}
-
-	p {
-		text-decoration: underline;
-		margin-bottom: 10px;
-		font-family: "隶书";
-		font-size: 24px;
-		font-style: normal;
-		font-weight: bold;
-		color: #A7535A;
-		/*满江红*/
-		/* background-color: #CFCCC9; */
-		/* opacity: 0.6; */
-	}
-
-	ul {
-		list-style-type: none;
-		padding: 0;
-		margin: 0;
-	}
-
-	li {
-		color: #0F1423;
-		/*钢蓝*/
-		list-style-type: inherit;
-	}
-
-	li>a {
-		text-decoration: none;
-		margin-bottom: 10px;
-		font-family: Consolas, Menlo, Ubuntu Mono, monospace;
-		font-size: 24px;
-		font-style: unset;
-		font-weight: bold;
-		cursor: pointer;
-	}
-
-	li>a:visited {
-		color: #404030;
-		/*淡松烟*/
-
-	}
-
-	/*指已经访问过的链接*/
-	li>a:link {
-		color: #57C3C2;
-		/*美蝶绿*/
-	}
-
-	/*未访问的链接*/
-	li>a:hover {
-		color: #2BAE85;
-		/*铜绿*/
-	}
-
-	/*鼠标悬停在上面的状态*/
-	li>a:active {
-		color: #F28E16;
-		/*杏黄*/
-	}
-
-	/*鼠标点击没有释放的状态颜色*/
-
 	.title {
 		display: flex;
 		flex-direction: row;
@@ -133,7 +56,6 @@
 	.time {
 		margin-left: auto;
 		color: rgb(0, 0, 0);
-		font-size: medium;
 		/* margin-right:1rem; */
 		white-space: nowrap;
 		background-color: white;
@@ -146,28 +68,66 @@
 		margin-left: 0;
 		width: auto;
 		overflow-x: hidden;
+		margin-left: 10px;
+		margin-top: 10px;
+		max-width: 100%;
 	}
 
 	/* tags */
 	#tags {
-		flex: 2;
 		min-width: 5rem;
-		margin-right: 20px;
 		box-sizing: border-box;
 		overflow-x: hidden;
+		overflow-y: auto;
 		background-color: rgb(197, 196, 196, 0.5);
-		height: 50vh;
+		font-size: 12px;
 	}
 
 	/* blogs */
 	#blogs {
-		flex: 8;
 		box-sizing: border-box;
-		margin-right: 20px;
 		display: flex;
 		flex-direction: column;
 		background-color: rgba(255, 255, 255, 0.5);
 	}
+
+	.list-group-item {
+		border: 1px solid #ddd;
+		padding: 0;
+		/* 添加边框 */
+		border-radius: 5px;
+		/* 圆角边框 */
+		margin-bottom: 10px;
+		/* 添加底部间距 */
+		transition: background-color 0.3s, transform 0.3s;
+		/* 动效 */
+	}
+
+	.list-group-item:hover {
+		background-color: #f7f7f7;
+		/* 鼠标悬浮时背景颜色 */
+		transform: translateY(-2px);
+		/* 鼠标悬浮时上移效果 */
+	}
+
+	.list-group-item a {
+		color: #000000;
+		/* 链接颜色 */
+		text-decoration: none;
+		/* 去掉下划线 */
+		display: block;
+		/* 使整个区域可点击 */
+		padding: 10px;
+		/* 添加内边距 */
+	}
+
+	.list-group-item a:hover {
+		color: #0056b3;
+		/* 鼠标悬浮时链接颜色 */
+		text-decoration: underline;
+		/* 鼠标悬浮时添加下划线 */
+	}
+
 
 	.login-btn {
 		text-decoration: none;
@@ -214,36 +174,205 @@
 		padding: 8px 4px;
 		border-radius: 5px;
 		transition: background-color 0.3s;
-		font-size: 20px;
+		cursor: pointer;
 	}
 
 	#auth-btn:hover {
 		background-color: #555;
+	}
+
+	.tag-container {
+		display: flex;
+		flex-wrap: wrap;
+		/* 允许换行 */
+		gap: 10px;
+		/* 标签间距 */
+		max-height: 60vh;
+		/* 设置最大高度 */
+		overflow-y: auto;
+		/* 启用垂直滚动 */
+		padding: 10px;
+	}
+
+	/* 滑条的轨道样式 */
+	.tag-container::-webkit-scrollbar {
+		width: 8px;
+		/* 滑条宽度 */
+	}
+
+	/* 滑条的轨道背景 */
+	.tag-container::-webkit-scrollbar-track {
+		background: #f1f1f1;
+		/* 轨道背景颜色 */
+	}
+
+	/* 滑条的滑块样式 */
+	.tag-container::-webkit-scrollbar-thumb {
+		background: #888;
+		/* 滑块颜色 */
+		border-radius: 5px;
+		/* 圆角 */
+	}
+
+	/* 滑块悬停时的样式 */
+	.tag-container::-webkit-scrollbar-thumb:hover {
+		background: #555;
+		/* 悬停时的滑块颜色 */
+	}
+
+
+	#clear-filters {
+		font-size: 0.8rem;
+		/* 调整字体大小 */
+		padding: 0.25rem 0.5rem;
+		/* 调整内边距 */
+	}
+
+	.tag-item {
+		background-color: #007bff;
+		/* 标签背景颜色 */
+		color: rgb(237, 237, 237);
+		/* 标签字体颜色 */
+		border-radius: 4px;
+		/* 圆角 */
+		padding: 4px 8px;
+		/* 内边距 */
+		cursor: pointer;
+		/* 鼠标悬停时显示为指针 */
+		max-width: 100px;
+		/* 最大宽度 */
+		white-space: nowrap;
+		/* 不换行 */
+		overflow: hidden;
+		/* 隐藏超出部分 */
+		text-overflow: ellipsis;
+		/* 使用...表示超出部分 */
+		transition: background-color 0.3s, color 0.3s;
+		user-select: none;
+		/* 动效 */
+	}
+
+	.tag-item.tag-selected {
+		background-color: #ffffff;
+		color: #000000;
+	}
+
+
+	.navbar-brand {
+		font-weight: bold;
+		margin-left: 10px;
+		/* 加粗字体 */
+		color: #007bff;
+		/* 自定义颜色 */
+		transition: color 0.3s;
+		/* 添加过渡效果 */
+	}
+
+	.navbar-brand:hover {
+		color: #0056b3;
+		/* 悬停时颜色变化 */
+		text-decoration: underline;
+		/* 悬停时添加下划线 */
+	}
+
+	.selected-tags {
+		max-width: 100%;
+		/* 可调整为具体的值，例如 300px */
+		display: flex;
+		flex-wrap: wrap;
+		gap: 5px;
+		/* 标签之间的间隔 */
+		padding: 5px;
+		/* 内边距，可根据需要调整 */
+		border: 1px solid #ccc;
+		/* 可选：边框样式 */
+		border-radius: 5px;
+		/* 可选：圆角样式 */
+		background-color: #f9f9f9;
+		/* 可选：背景颜色 */
+		font-size: 12px;
+	}
+
+	.selected-tags:hover {
+		background-color: #e7f1ff;
+		/* 悬停时的背景颜色 */
+	}
+
+	.selected-tag-item {
+		display: inline-block;
+		/* 使标签以块元素的形式排列 */
+		padding: 4px 8px;
+		/* 添加内边距 */
+		border-radius: 4px;
+		/* 圆角 */
+		margin-right: 4px;
+		/* 标签之间的间距 */
+		max-width: 100%;
+		/* 设置最大宽度 */
+		overflow: hidden;
+		/* 超出部分隐藏 */
+		text-overflow: ellipsis;
+		/* 超出文本显示省略号 */
+		white-space: nowrap;
+		/* 不换行 */
+		color: #fff;
+		/* 字体颜色 */
+	}
+
+	#setting-btn {
+		margin-right: 10px;
 	}
 </style>
 
 <body>
 	<div class="div1">
 		<div class="div2">
-			<div style="display: flex;flex-direction: row;
-		margin:0.1rem 1rem;
-		border-bottom: 2px solid rgb(109, 46, 46);
-		">
-				<a href="/">主页</a>
-				<div id='d-write-blog' style="margin-left: auto; margin-right: 20px;
-				opacity: 0;pointer-events: none;">
-					<a href="../editor.md/examples/write-blog.html" id="blog-link">创建博客</a>
+
+			<!-- 导航栏 -->
+			<!-- 导航栏 -->
+			<nav class="navbar navbar-expand-lg navbar-light bg-light">
+				<div class="container-fluid">
+					<a class="navbar-brand" href="/">主页</a>
+					<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+						aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+						<span class="navbar-toggler-icon"></span>
+					</button>
+					<div class="collapse navbar-collapse" id="navbarNav">
+						<ul class="navbar-nav ms-auto">
+							<li class="nav-item">
+								<a class="nav-link" id="d-write-blog"
+									href="../editor.md/examples/write-blog.html">创作</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" id="setting-btn" href="setting/index.html">管理</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" id="auth-btn" onclick="openAuthPopup()">
+									<i class="fab fa-github"></i> 登录
+								</a>
+							</li>
+						</ul>
+					</div>
 				</div>
-				<a id='setting-btn' style="display: none;" href="setting/index.html">博客管理</a>
-				<a id="auth-btn" onclick="openAuthPopup()">
-					<i class="fab fa-github"></i> 登录
-				</a>
-			</div>
+			</nav>
 			<div class="container">
-				<ul id="tags">
-				</ul>
-				<ul id="blogs">
-				</ul>
+				<div class="row">
+					<div class="col-md-2 col-12">
+						<div id="tags" class="tag-container mb-4">
+						</div>
+					</div>
+					<div class="col-md-10 col-12">
+						<div class="d-flex align-items-center mb-2">
+							<button id="clear-filters" class="btn btn-secondary me-2">清空筛选</button> <!-- 添加按钮 -->
+							<div id="selected-tags" class="selected-tags d-flex align-items-center"></div>
+							<!-- 用于显示当前选中的标签 -->
+						</div>
+						<ul id="blogs" class="list-group">
+							<!-- Blogs will be rendered here -->
+						</ul>
+						<div id="blog-pagination" class="pagination"></div>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -256,30 +385,98 @@
 		</div>
 	</div>
 	<script type="text/javascript">
-		const renderBlogs = (blogs) => {
-			if (!blogs) return;
+		const colors = [
+			'#A8D5E2', // 浅蓝
+			'#7FB3C0', // 冷蓝
+			'#A3D5E8', // 浅青
+			'#64B6B0', // 冷青
+			'#B2E1E6', // 浅绿
+			'#4DAEAD', // 冷绿
+			'#B7E0E6', // 冷灰
+			'#2A9D8F', // 深绿
+			'#FFB3BA', // 浅粉
+			'#FF677D',  // 樱桃红
+			'#D4A5A5', // 浅红
+			'#FF9A8B', // 浅橙
+			'#FF6F61'  // 珊瑚色
+		];
+
+		const getDarkerColor = (color, factor) => {
+			// 将颜色转换为 RGB
+			const rgb = color.match(/\w\w/g).map(x => parseInt(x, 16));
+			// 计算更深的颜色
+			const darkerColor = rgb.map(value => Math.max(0, Math.floor(value * (1 - factor)))).map(value => value.toString(16).padStart(2, '0')).join('');
+			return `#${darkerColor}`;
+		};
+
+		// 辅助函数：将 RGB 转换为 Hex
+		const rgbToHex = (rgb) => {
+			const match = rgb.match(/\d+/g);
+			if (!match) return '#000';
+			return `#${match.map(value => (+value).toString(16).padStart(2, '0')).join('')}`;
+		};
+
+		let currentPage = 1;
+		const itemsPerPage = 10; // 每页显示的博客数量
+		let blogs = [];
+
+		const renderBlogs = (allBlogs) => {
+			if (!allBlogs) return;
+
 			const blogsDiv = document.getElementById("blogs");
-			if (isJSON(blogs)) {
-				blogs = JSON.parse(blogs);
-			}
 			blogsDiv.innerHTML = '';
-			blogs.forEach(blog => {
-				const titleEle = document.createElement('div');
-				titleEle.className = "title";
-				const liElement = document.createElement('li');
+
+			const totalPages = Math.ceil(allBlogs.length / itemsPerPage);
+
+			// 获取当前页的博客
+			const startIndex = (currentPage - 1) * itemsPerPage;
+			const endIndex = startIndex + itemsPerPage;
+			const currentBlogs = allBlogs.slice(startIndex, endIndex);
+
+			currentBlogs.forEach(blog => {
+				const blogItem = document.createElement('li');
+				blogItem.className = "list-group-item d-flex justify-content-between align-items-center";
+
 				const aElement = document.createElement('a');
-				const spanEle = document.createElement('span');
-				spanEle.className = "time";
-				spanEle.textContent = blog.time === '' ? '未知时间' : formateDate(blog.time);
 				aElement.id = blog.id;
 				aElement.href = "../editor.md/examples/blog.html?id=" + blog.id;
 				aElement.textContent = blog.title === '' ? '无标题' : blog.title;
-				liElement.appendChild(aElement);
-				titleEle.appendChild(liElement);
-				titleEle.appendChild(spanEle);
-				blogsDiv.appendChild(titleEle);
+				aElement.className = "text-decoration-none";
+
+				const timeSpan = document.createElement('span');
+				timeSpan.className = "badge bg-secondary";
+				timeSpan.textContent = blog.time === '' ? '未知时间' : formateDate(blog.time);
+
+				blogItem.appendChild(aElement);
+				blogItem.appendChild(timeSpan);
+				blogsDiv.appendChild(blogItem);
 			});
-		}
+
+			renderPagination(totalPages);
+		};
+
+
+		const renderPagination = (totalPages) => {
+			const paginationDiv = document.getElementById("blog-pagination");
+			paginationDiv.innerHTML = '';
+
+			for (let i = 1; i <= totalPages; i++) {
+				const pageLink = document.createElement('a');
+				pageLink.className = "page-link";
+				pageLink.textContent = i;
+				pageLink.href = "#";
+				pageLink.addEventListener('click', (event) => {
+					event.preventDefault();
+					currentPage = i;
+					renderBlogs(blogs); // 重新渲染博客
+				});
+
+				const li = document.createElement('li');
+				li.className = "page-item";
+				li.appendChild(pageLink);
+				paginationDiv.appendChild(li);
+			}
+		};
 
 		const renderAllBtn = () => {
 			const tagsDiv = document.getElementById("tags");
@@ -308,32 +505,71 @@
 			tagsDiv.appendChild(tagEle);
 		};
 
+		// 修改后的 renderTags 函数
 		const renderTags = (tags) => {
 			const tagsDiv = document.getElementById("tags");
+			tagsDiv.innerHTML = '';
+
 			if (isJSON(tags)) {
 				tags = JSON.parse(tags);
 			}
-			tagsDiv.innerHTML = '';
-			renderAllBtn();
-			tags.forEach(tag => {
-				const tagEle = document.createElement('div');
-				tagEle.className = "tag";
-				const liElement = document.createElement('li');
-				const aElement = document.createElement('a');
-				aElement.href = "#" + tag.name;
-				aElement.innerText = tag.name;
-				aElement.setAttribute("tag-id", tag.id);
-				aElement.addEventListener('click', function (event) {
-					event.preventDefault();
-					const tagId = this.getAttribute('tag-id');
+
+			tags.forEach((tag, index) => {
+				const tagItem = document.createElement('div');
+				tagItem.className = "tag-item";
+				tagItem.setAttribute('data-tag-id', tag.id);
+				tagItem.setAttribute('data-tag-name', tag.name);
+
+				const tagText = document.createElement('span');
+				const displayText = tag.name.length > 8 ? tag.name.slice(0, 8) + '...' : tag.name;
+				tagText.innerText = displayText;
+				tagText.className = "tag-label";
+
+				const originBackColor = colors[index % colors.length];
+				tagItem.style.backgroundColor = originBackColor;
+				tagItem.style.color = '#fff';
+				tagItem.style.padding = '5px 10px';
+				tagItem.style.borderRadius = '5px';
+
+				if (tag.name.length > 8) {
+					tagItem.setAttribute('data-bs-toggle', 'tooltip');
+					tagItem.setAttribute('data-bs-placement', 'right');
+					tagItem.setAttribute('title', tag.name);
+					$(tagItem).tooltip();
+				}
+
+				tagItem.addEventListener('click', function () {
+					const isSelected = this.classList.toggle('tag-selected'); // 切换选中状态并获取当前状态
+
+					if (isSelected) {
+						// 获取原背景色
+						const originHex = originBackColor.startsWith('#') ? originBackColor : rgbToHex(originBackColor); // 使用原色或转换
+						tagItem.style.backgroundColor = getDarkerColor(originHex.slice(1), 0.2); // 更深的颜色;
+						tagItem.style.color = '#000';
+					} else {
+						tagItem.style.backgroundColor = originBackColor;
+						tagItem.style.color = '#fff';
+					}
+					const selectedTags = Array.from(document.querySelectorAll('.tag-item.tag-selected'))
+						.map(item => ({
+							id: item.getAttribute('data-tag-id'),
+							name: item.getAttribute('data-tag-name')
+						}));
+					updateSelectedTags(selectedTags);
+
+					// 提取 ID 数组
+					const selectedIds = selectedTags.map(tag => tag.id);
 					$.ajax({
 						url: backend_url + "/blogs",
 						type: "GET",
 						data: {
-							tags: [tagId],
+							tags: selectedIds,
 						},
 						success: function (response) {
-							renderBlogs(response);
+							if (response) {
+								blogs = response;
+								renderBlogs(response);
+							}
 						},
 						error: function (xhr, status, error) {
 							console.error("Error sending string:", error);
@@ -341,11 +577,33 @@
 					});
 				});
 
-				liElement.appendChild(aElement);
-				tagEle.appendChild(liElement);
-				tagsDiv.appendChild(tagEle);
+				tagItem.appendChild(tagText);
+				tagsDiv.appendChild(tagItem);
 			});
-		}
+		};
+
+		const updateSelectedTags = (selectedTags) => {
+			const selectedTagsDiv = document.getElementById("selected-tags");
+			selectedTagsDiv.innerHTML = ''; // 清空已选标签区域
+
+			if (!selectedTags) return;
+			selectedTags.forEach(tag => {
+				const tagItem = document.createElement('div');
+				tagItem.className = "selected-tag-item"; // 应用选中标签样式
+				tagItem.innerText = tag.name; // 显示标签名称
+
+				// 获取原标签的颜色
+				const originalTag = document.querySelector(`.tag-item[data-tag-id='${tag.id}']`);
+				if (originalTag) {
+					const backgroundColor = originalTag.style.backgroundColor;
+					tagItem.style.backgroundColor = backgroundColor; // 设置背景颜色
+				}
+
+				// 添加标签到已选标签区域
+				selectedTagsDiv.appendChild(tagItem);
+			});
+		};
+
 
 		const updateBlogs = (latestUpdateTime) => {
 			var url = backend_url + "/blogs";
@@ -353,9 +611,12 @@
 				url: url,
 				type: "GET",
 				success: function (response) {
-					renderBlogs(response);
-					window.localStorage.setItem("latestUpdateTime", latestUpdateTime);
-					window.localStorage.setItem("blogs", JSON.stringify(response));
+					if (response) {
+						blogs = response;
+						renderBlogs(response);
+						window.localStorage.setItem("latestUpdateTime", latestUpdateTime);
+						window.localStorage.setItem("blogs", JSON.stringify(response));
+					}
 				},
 				error: function (xhr, status, error) {
 					console.error("Error sending string:", error);
@@ -369,7 +630,10 @@
 				url: url,
 				type: "GET",
 				success: function (response) {
-					renderTags(response);
+					if (response) {
+						tags = response;
+						renderTags(response);
+					}
 				},
 				error: function (xhr, status, error) {
 					console.error("Error sending string:", error);
@@ -429,7 +693,7 @@
 				d_write_blog.style.opacity = 1;
 				d_write_blog.style.pointerEvents = 'auto';
 				// auth_btn.style.display = 'none';
-				authBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> 退出登录'; // 更改为退出登录
+				authBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> 注销'; // 更改为退出登录
 				authBtn.onclick = logout;
 				setting_btn.style.display = 'block';
 			}
@@ -497,6 +761,32 @@
 			}
 		}
 		authorize();
+	</script>
+	<script>
+		document.getElementById('clear-filters').addEventListener('click', () => {
+			// 移除所有选中的标签
+			document.querySelectorAll('.tag-item.tag-selected').forEach(item => {
+				item.classList.remove('tag-selected');
+			});
+
+			updateSelectedTags();
+
+			// 重新加载所有博客
+			$.ajax({
+				url: backend_url + "/blogs",
+				type: "GET",
+				success: function (response) {
+					if (response) {
+						blogs = response;
+						renderBlogs(response);
+					}
+				},
+				error: function (xhr, status, error) {
+					console.error("Error fetching blogs:", error);
+				}
+			});
+		});
+
 	</script>
 </body>
 

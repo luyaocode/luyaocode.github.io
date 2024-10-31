@@ -25,6 +25,10 @@
 		margin: 0px;
 	}
 
+	body {
+		background-color: #fcfcfc;
+	}
+
 	.div1 {
 		/* background-image: url("../img/moon.jpg"); */
 		position: absolute;
@@ -122,6 +126,22 @@
 		/* 鼠标悬浮时添加下划线 */
 	}
 
+	.list-group-item a:active {
+		color: #ffaa00;
+	}
+
+	.blog-span-container {
+		display: flex;
+		justify-content: flex-end;
+		flex-wrap: wrap;
+		gap: 2px;
+		max-width: 60%;
+	}
+
+	.blog-span-container span {
+		white-space: nowrap;
+		max-width: 100%;
+	}
 
 	.login-btn {
 		text-decoration: none;
@@ -324,7 +344,7 @@
 
 			<!-- 导航栏 -->
 			<!-- 导航栏 -->
-			<nav class="navbar navbar-expand-lg navbar-light bg-light">
+			<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 				<div class="container-fluid">
 					<a class="navbar-brand" href="/">主页</a>
 					<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
@@ -411,7 +431,7 @@
 		};
 
 		let currentPage = 1;
-		const itemsPerPage = 10; // 每页显示的博客数量
+		const itemsPerPage = 11; // 每页显示的博客数量
 		let blogs = [];
 
 		const renderBlogs = (allBlogs) => {
@@ -436,12 +456,27 @@
 				aElement.href = "../editor.md/examples/blog.html?id=" + blog.id;
 				aElement.textContent = blog.title === '' ? '无标题' : blog.title;
 				aElement.className = "text-decoration-none";
+				blogItem.appendChild(aElement);
 
+				// 标签
+				if (blog.Tags && blog.Tags.length > 0) {
+					const tagContainer = document.createElement('div');
+					tagContainer.className = "blog-span-container"; // 添加包裹的 div
+					blog.Tags.forEach((tag) => {
+						const tagspan = document.createElement('span');
+						tagspan.className = "badge bg-primary";
+						tagspan.textContent = tag.name;
+						// tagspan.textContent = tag.name.length > 8 ? tag.name.slice(0, 8) + '...' : tag.name;
+						tagContainer.appendChild(tagspan); // 添加到包裹的 div 中
+					});
+					blogItem.appendChild(tagContainer);
+				}
+
+				// 日期
 				const timeSpan = document.createElement('span');
 				timeSpan.className = "badge bg-secondary";
 				timeSpan.textContent = blog.time === '' ? '未知时间' : formateDate(blog.time);
 
-				blogItem.appendChild(aElement);
 				blogItem.appendChild(timeSpan);
 				blogsDiv.appendChild(blogItem);
 			});
@@ -612,7 +647,7 @@
 
 
 		const updateBlogs = (latestUpdateTime) => {
-			var url = backend_url + "/blogs";
+			var url = backend_url + "/blogs_tags";
 			$.ajax({
 				url: url,
 				type: "GET",
@@ -775,7 +810,7 @@
 
 			// 重新加载所有博客
 			$.ajax({
-				url: backend_url + "/blogs",
+				url: backend_url + "/blogs_tags",
 				type: "GET",
 				success: function (response) {
 					if (response) {

@@ -130,6 +130,10 @@
 		color: #ffaa00;
 	}
 
+	.list-group-item span {
+		margin-right: 20px;
+	}
+
 	.blog-span-container {
 		display: flex;
 		justify-content: flex-end;
@@ -141,6 +145,7 @@
 	.blog-span-container span {
 		white-space: nowrap;
 		max-width: 100%;
+		margin-right: 40px;
 	}
 
 	.login-btn {
@@ -450,13 +455,14 @@
 			currentBlogs.forEach(blog => {
 				const blogItem = document.createElement('li');
 				blogItem.className = "list-group-item d-flex justify-content-between align-items-center";
+				const container = document.createElement('div');
+				container.className = "d-flex justify-content-end align-items-center";
 
 				const aElement = document.createElement('a');
 				aElement.id = blog.id;
 				aElement.href = "../editor.md/examples/blog.html?id=" + blog.id;
 				aElement.textContent = blog.title === '' ? '无标题' : blog.title;
 				aElement.className = "text-decoration-none";
-				blogItem.appendChild(aElement);
 
 				// 标签
 				if (blog.Tags && blog.Tags.length > 0) {
@@ -469,18 +475,19 @@
 						// tagspan.textContent = tag.name.length > 8 ? tag.name.slice(0, 8) + '...' : tag.name;
 						tagContainer.appendChild(tagspan); // 添加到包裹的 div 中
 					});
-					blogItem.appendChild(tagContainer);
+					container.appendChild(tagContainer);
 				}
 
 				// 日期
 				const timeSpan = document.createElement('span');
 				timeSpan.className = "badge bg-secondary";
 				timeSpan.textContent = blog.time === '' ? '未知时间' : formateDate(blog.time);
+				container.appendChild(timeSpan);
 
-				blogItem.appendChild(timeSpan);
+				blogItem.appendChild(aElement);
+				blogItem.appendChild(container);
 				blogsDiv.appendChild(blogItem);
 			});
-
 			renderPagination(totalPages);
 		};
 
@@ -574,8 +581,8 @@
 					if (isSelected) {
 						// 获取原背景色
 						const originHex = originBackColor.startsWith('#') ? originBackColor : rgbToHex(originBackColor); // 使用原色或转换
-						tagItem.style.backgroundColor = getDarkerColor(originHex.slice(1), 0.2); // 更深的颜色;
-						tagItem.style.color = '#000';
+						tagItem.style.backgroundColor = getDarkerColor(originHex.slice(1), 0.4); // 更深的颜色;
+						tagItem.style.fontWeight = 'bolder';
 					} else {
 						tagItem.style.backgroundColor = originBackColor;
 						tagItem.style.color = '#fff';
@@ -630,6 +637,7 @@
 			if (!selectedTags) return;
 			selectedTags.forEach(tag => {
 				const tagItem = document.createElement('div');
+				tagItem.style.userSelect = "none";
 				tagItem.className = "selected-tag-item"; // 应用选中标签样式
 				tagItem.innerText = tag.name; // 显示标签名称
 

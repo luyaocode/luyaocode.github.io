@@ -8,8 +8,8 @@
 	<!-- 设置手机和电脑背景图自适应 -->
 	<meta name="renderer" content="webkit|ie-comp|ie-stand">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-	<meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=1 />
-	<meta http-equiv=" Cache-Control" content="no-siteapp" />
+	<meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=1">
+	<meta http-equiv="Cache-Control" content="no-siteapp">
 	<link rel="icon" type="img/x-icon" href="../img/fav.ico">
 	<script src="../js/jquery.min.js"></script>
 	<script src="../js/util.js"></script>
@@ -438,12 +438,17 @@
 		let currentPage = 1;
 		const itemsPerPage = 11; // 每页显示的博客数量
 		let blogs = [];
+		let tags = [];
 
 		const renderBlogs = (allBlogs) => {
 			if (!allBlogs) return;
 
 			const blogsDiv = document.getElementById("blogs");
 			blogsDiv.innerHTML = '';
+
+			if (isJSON(allBlogs)) {
+				allBlogs = JSON.parse(allBlogs);
+			}
 
 			const totalPages = Math.ceil(allBlogs.length / itemsPerPage);
 
@@ -543,6 +548,8 @@
 
 		// 修改后的 renderTags 函数
 		const renderTags = (tags) => {
+			if (!tags) return;
+
 			const tagsDiv = document.getElementById("tags");
 			tagsDiv.innerHTML = '';
 
@@ -653,59 +660,31 @@
 			});
 		};
 
-
-		const updateBlogs = (latestUpdateTime) => {
-			var url = backend_url + "/blogs_tags";
-			$.ajax({
-				url: url,
-				type: "GET",
-				success: function (response) {
-					if (response) {
-						blogs = response;
-						renderBlogs(response);
-						window.localStorage.setItem("latestUpdateTime", latestUpdateTime);
-						window.localStorage.setItem("blogs", JSON.stringify(response));
-					}
-				},
-				error: function (xhr, status, error) {
-					console.error("Error sending string:", error);
-				}
-			});
-		}
-
-		const updateTags = () => {
-			var url = backend_url + "/tags";
-			$.ajax({
-				url: url,
-				type: "GET",
-				success: function (response) {
-					if (response) {
-						tags = response;
-						renderTags(response);
-					}
-				},
-				error: function (xhr, status, error) {
-					console.error("Error sending string:", error);
-				}
-			});
-		}
-
-		const getLastedUpdateTime = () => {
+		const begin = () => {
 			var url = backend_url + "/blogs/get-latest-update-time";
+			let latestUpdateTime = window.localStorage.getItem("latestUpdateTime");
+			let history_blogs = window.localStorage.getItem("history_blogs");
+			let history_tags = window.localStorage.getItem("history_tags");
+			latestUpdateTime = latestUpdateTime ? latestUpdateTime : 0;
 			$.ajax({
 				url: url,
 				type: "GET",
+				data: { latestUpdateTime },
 				success: function (response) {
-					const clientLatestUpdateTime = window.localStorage.getItem("latestUpdateTime");
-					const blogs = window.localStorage.getItem("blogs");
-					if (clientLatestUpdateTime !== response || response === '' ||
-						clientLatestUpdateTime === undefined || !blogs) {
-						updateBlogs(response);
+					if (response || !history_blogs) {
+						const { timestamp } = response;
+						blogs = response.blogs;
+						tags = response.tags;
+						window.localStorage.setItem("latestUpdateTime", timestamp);
+						window.localStorage.setItem("history_blogs", JSON.stringify(blogs));
+						window.localStorage.setItem("history_tags", JSON.stringify(tags));
 					}
 					else {
-						renderBlogs(blogs);
+						blogs = JSON.parse(history_blogs);
+						tags = JSON.parse(history_tags);
 					}
-					updateTags();
+					renderBlogs(blogs);
+					renderTags(tags);
 				},
 				error: function (xhr, status, error) {
 					console.error("Error sending string:", error);
@@ -713,7 +692,7 @@
 			});
 		}
 
-		getLastedUpdateTime();
+		begin();
 	</script>
 
 	<script>

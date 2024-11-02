@@ -106,6 +106,7 @@
         #custom-toc-container {
             padding-left: 0;
             font-size: 16px;
+            margin-bottom: 60px;
         }
 
         #custom-toc-container a {
@@ -153,6 +154,7 @@
             transition: background-color 0.3s, color 0.3s;
         }
 
+        /* 在 Bootstrap 的栅格系统中，768 像素通常是切换到小屏幕（如手机）布局的临界点。 */
         @media (max-width: 768px) {
             #sidebar {
                 opacity: 0;
@@ -506,6 +508,9 @@
                         flowChart: true,  // 默认不解析
                         sequenceDiagram: true,  // 默认不解析
                     });
+
+                    // 为 sidebar 中所有的 a 标签绑定点击事件
+                    $('#sidebar a').on('click', onTopToggleDirectoryBtnClick);
                 },
                 error: function (xhr, status, error) {
                     console.error("Error sending string:", error);
@@ -656,15 +661,34 @@
         }
     }
 
+    const onTopToggleDirectoryBtnClick = () => {
+        if ($(window).width() > 768) { // 非移动端不切换目录状态
+            return;
+        }
+        const isSidebarVisible = $("#sidebar").hasClass("expand");
+        if (isSidebarVisible) {
+            $("#sidebar").removeClass("expand");
+            $('#btnToggleDirectory').find('i').toggleClass('bi-x bi-list');
+        }
+        else {
+            $("#sidebar").addClass("expand");
+            $('#btnToggleDirectory').find('i').toggleClass('bi-list bi-x');
+        }
+    }
+
+    const closeDirectory = () => {
+        if ($(window).width() > 768) {
+            return;
+        }
+        const isSidebarVisible = $("#sidebar").hasClass("expand");
+        if (isSidebarVisible) {
+            $("#sidebar").removeClass("expand");
+            $('#btnToggleDirectory').find('i').toggleClass('bi-x bi-list');
+        }
+    }
+
     $(document).ready(function () {
         freshPage();
-
-        let isSidebarVisible = true; // 用于跟踪侧边栏的状态
-
-        if ($(window).width() < 768) {
-            isSidebarVisible = false;
-        }
-
         // 初始化工具提示，设置延时
         $('[data-toggle="tooltip"]').tooltip({
             delay: { "show": 0, "hide": 0 }
@@ -676,6 +700,7 @@
         const toggleButton = document.getElementById('toggleButton');
 
         $('#toggleDirectory').click(function () {
+            const isSidebarVisible = !$("#sidebar").hasClass("hidden");
             if (isSidebarVisible) {
                 $("#sidebar").addClass("hidden");
                 $("#test-editormd-view").addClass("expand");
@@ -687,20 +712,10 @@
                 $(this).attr('data-original-title', '折叠目录');
             }
             $(this).tooltip('hide').tooltip('show'); // 重新显示 tooltip
-            isSidebarVisible = !isSidebarVisible;
             $(this).find('i').toggleClass('bi-x bi-list');
         });
 
-        $('#btnToggleDirectory').click(function () {
-            if (isSidebarVisible) {
-                $("#sidebar").removeClass("expand");
-            }
-            else {
-                $("#sidebar").addClass("expand");
-            }
-            isSidebarVisible = !isSidebarVisible;
-            $(this).find('i').toggleClass('bi-x bi-list');
-        });
+        $('#btnToggleDirectory').click(onTopToggleDirectoryBtnClick);
 
         $('#toggleDirectory').on('mouseenter', function () {
             $(this).tooltip('show'); // 显示 tooltip
@@ -834,6 +849,13 @@
             $(this).tooltip('show'); // 显示 tooltip
         }).on('mouseleave', function () {
             $(this).tooltip('hide'); // 隐藏 tooltip
+        });
+
+        $(document).on('click', function (event) {
+            // 检查点击是否在 sidebar 内部
+            if ($(event.target).closest('#test-editormd-view').length) {
+                closeDirectory();
+            }
         });
     });
 

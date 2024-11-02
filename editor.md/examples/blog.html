@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>博客</title>
     <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="../css/editormd.preview.css" />
@@ -13,6 +14,7 @@
     <link href="../../css/bootstrap-4.5.2.min.css" rel="stylesheet">
     <link href="../../css/bootstrap-icons.css" rel="stylesheet">
     <script src="../../js/bootstrap.bundle-4.5.2.min.js"></script>
+
     <style>
         html,
         body {
@@ -20,10 +22,11 @@
         }
 
         body {
-            padding: 20px;
+            margin: 0;
             padding-top: 0;
             background-color: white;
             color: black;
+            overflow-x: hidden;
             transition: background-color 0.3s, color 0.3s;
         }
 
@@ -49,24 +52,47 @@
         }
 
         #sidebar {
-            width: 400px;
+            width: 60%;
+            max-width: 320px;
             height: 100%;
             position: fixed;
-            top: 0;
-            right: 0;
+            top: 60px;
+            left: 0;
             overflow: hidden;
-            background: #fff;
+            background-color: #fff;
             z-index: 100;
-            padding: 18px;
+            padding-left: 20px;
+            padding-top: 20px;
             border: 1px solid #ddd;
             border-top: none;
             border-bottom: none;
             transition: opacity 0.6s ease, visibility 0.6s ease;
         }
 
-        .hidden {
+        #sidebar.night-mode {
+            background-color: #000000;
+            color: rgb(215, 215, 215);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        #sidebar.night-mode a {
+            color: rgb(215, 215, 215);
+        }
+
+        #sidebar.night-mode li::marker {
+            color: rgb(215, 215, 215);
+        }
+
+        #sidebar.hidden {
             opacity: 0;
             visibility: hidden;
+            transition: opacity 1s ease, visibility 1s ease;
+        }
+
+        #sidebar.expand {
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 1s ease, visibility 1s ease;
         }
 
         #sidebar:hover {
@@ -79,57 +105,73 @@
 
         #custom-toc-container {
             padding-left: 0;
+            font-size: 16px;
+        }
+
+        #custom-toc-container a {
+            text-decoration: none;
+            color: black;
+            font-weight: bold;
+        }
+
+        #custom-toc-container a:hover {
+            color: rgb(95, 95, 218);
+        }
+
+        #custom-toc-container a:active {
+            text-decoration: underline;
+        }
+
+        #custom-toc-container li {
+            padding: 4px;
         }
 
         #test-editormd-view,
         #test-editormd-view2 {
-            padding-left: 0;
-            padding-right: 430px;
-            margin: 0;
-            transition: padding-right 0.3s;
+            padding-left: 320px;
+            margin: 60px 20px;
+            transition: padding-left 0.3s;
             transition: font-size 0.3s;
+            color: #585252;
+            font-size: 16px;
+        }
 
+        #test-editormd-view.night-mode {
+            background-color: #000000;
+            color: rgb(215, 215, 215);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        #test-editormd-view.night-mode pre.prettyprint {
+            background-color: #9d9d9d;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        #test-editormd-view.night-mode pre.prettyprint li {
+            background-color: #9d9d9d;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        @media (max-width: 768px) {
+            #sidebar {
+                opacity: 0;
+                visibility: hidden;
+            }
+
+            #test-editormd-view,
+            #test-editormd-view2 {
+                padding-left: 0;
+            }
         }
 
         #test-editormd-view.expand {
-            padding-right: 0;
-            transition: padding-right 0.3s;
+            padding-left: 0;
+            transition: padding-left 0.3s;
         }
 
         #title {
             display: inline-block;
             margin: 0;
-        }
-
-        #topBar>a {
-            text-decoration: none;
-            margin-bottom: 10px;
-            font-family: "隶书";
-            font-size: 30px;
-            font-style: unset;
-            font-weight: bold;
-        }
-
-        #topBar>a:active {
-            color: red;
-        }
-
-        #topBar>button {
-            text-decoration: none;
-            margin-bottom: 10px;
-            font-family: "隶书";
-            font-size: 30px;
-            font-style: unset;
-            font-weight: bold;
-            border: none;
-            background: transparent;
-            cursor: pointer;
-            color: rgb(73, 73, 73);
-            margin-left: 20px;
-        }
-
-        #topBar>button:active {
-            color: red;
         }
 
         /* 我的弹窗 */
@@ -150,13 +192,15 @@
 
         .dialog-content {
             background-color: #fff;
-            /* 弹窗背景色 */
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-            /* 阴影效果 */
             text-align: center;
+            margin-left: 24px;
+            margin-right: 24px;
+            max-width: calc(100% - 48px);
         }
+
 
         .buttons {
             margin-top: 20px;
@@ -202,6 +246,26 @@
             outline: none;
             /* 移除焦点轮廓 */
         }
+
+        .navbar {
+            height: 60px;
+            margin: 0;
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            margin-left: 0;
+            /* 加粗字体 */
+            color: #007bff;
+            /* 自定义颜色 */
+            transition: color 0.3s;
+            /* 添加过渡效果 */
+        }
+
+        .navbar-brand:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
     </style>
     <script src="../../js/util.js"></script>
     <script src="../../js/constDefine.js"></script>
@@ -218,17 +282,41 @@
             <p>删除失败：暗号错误</p>
         </div>
     </div>
-    <div id='topBar' style="display: flex;flex-direction: row;
-            position: fixed;
-            left:20px;
-            top:0.5px;
-            width: 100%;
-            z-index: 1200;
-            ">
-        <a href="../../blog/index.html">返回</a>
-        <button id="del-blog-btn" style="display: none;">删除</button>
-        <button id="update-blog-btn" style="display: none;">编辑</button>
-    </div>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">主页</a>
+            <div class="ml-auto d-flex"> <!-- 靠右排列按钮 -->
+                <button id="btnToggleDirectory" class="btn btn-outline-light mx-1 no-focus d-block d-md-none"
+                    data-toggle="tooltip" title="目录" data-placement="bottom">
+                    <i class="bi bi-list"></i>
+                </button>
+
+                <button id="btnIncreaseFont" class="btn btn-outline-light mx-1 no-focus" data-toggle="tooltip"
+                    title="增大字体" data-placement="bottom">
+                    <i class="bi bi-plus"></i>
+                </button>
+                <button id="btnDecreaseFont" class="btn btn-outline-light mx-1 no-focus" data-toggle="tooltip"
+                    title="减小字体" data-placement="bottom">
+                    <i class="bi bi-dash"></i>
+                </button>
+                <button id="btnToggleNightMode" class="btn btn-outline-light mx-1 no-focus" data-toggle="tooltip"
+                    title="夜间模式" data-placement="bottom">
+                    <i class="bi bi-moon"></i>
+                </button>
+
+                <!-- 新增的删除和编辑按钮 -->
+                <button id="del-blog-btn" class="btn btn-outline-light mx-1 no-focus d-none" data-toggle="tooltip"
+                    title="删除" data-placement="bottom">
+                    删除
+                </button>
+                <button id="update-blog-btn" class="btn btn-outline-light mx-1 no-focus d-none" data-toggle="tooltip"
+                    title="编辑" data-placement="bottom">
+                    编辑
+                </button>
+            </div>
+        </div>
+    </nav>
     <div id="layout" style="
         margin-top:1.8rem;
         ">
@@ -309,9 +397,7 @@
         <!-- <div class="btns">
                 <button onclick="location.href='./html-preview-markdown-to-html.html';">返回 Back</button>
             </div> -->
-        <div id="sidebar" style="
-                background: transparent;
-            ">
+        <div id="sidebar">
             <h1>目录</h1>
             <div class="markdown-body editormd-preview-container" id="custom-toc-container" style="background: transparent;
                 ">#custom-toc-container</div>
@@ -332,7 +418,7 @@
             <textarea id="append-test" style="display:none;"></textarea>
         </div>
     </div>
-    <div id="floatingSidebar" class="card"
+    <div id="floatingSidebar" class="card d-none d-md-block"
         style="position: fixed; right: 10px; bottom: 20px; width: 82px; z-index: 1000;">
         <div class="card-body">
             <button id="toggleDirectory" class="btn btn-primary btn-block mb-2 no-focus" data-toggle="tooltip"
@@ -388,6 +474,10 @@
 
         const params = parseQueryString(window.location.href);
         var id = params.id;
+        if (id.includes('#')) {
+            const redirectUrl = window.location.href.split('#')[0];
+            window.location.href = redirectUrl;
+        }
         $(function () {
             var testEditormdView, testEditormdView2;
             // 发送 POST 请求到服务器
@@ -554,46 +644,36 @@
         });
 
     </script>
-    <script>
-        let lastScrollTop = 0;
-        const topBar = document.getElementById('topBar');
-
-        window.addEventListener('scroll', function () {
-            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-            if (scrollTop === 0) {
-                topBar.style.display = 'flex'; // 显示 topBar
-            } else {
-                topBar.style.display = 'none'; // 隐藏 topBar
-            }
-        }, false);
-    </script>
 </body>
 <script>
     // 刷新状态
     const freshPage = () => {
-        const update_blog_btn = document.getElementById("update-blog-btn");
-        const del_blog_btn = document.getElementById("del-blog-btn");
         const status = sessionStorage.getItem('blog_website_login');
 
         if (status === 'true') { // 登录成功
-            update_blog_btn.style.display = 'block';
-            del_blog_btn.style.display = 'block';
+            $("#del-blog-btn").removeClass("d-none");
+            $("#update-blog-btn").removeClass("d-none");
         }
         else {
-            update_blog_btn.style.display = 'none';
-            del_blog_btn.style.display = 'none';
+            $("#del-blog-btn").addClass("d-none");
+            $("#update-blog-btn").addClass("d-none");
         }
     }
 
     $(document).ready(function () {
         freshPage();
 
+        let isSidebarVisible = true; // 用于跟踪侧边栏的状态
+
+        if ($(window).width() < 768) {
+            isSidebarVisible = false;
+        }
+
         // 初始化工具提示，设置延时
         $('[data-toggle="tooltip"]').tooltip({
             delay: { "show": 0, "hide": 0 }
         });
 
-        let isSidebarVisible = true; // 用于跟踪侧边栏的状态
         let fontSize = 16;
         const content = document.getElementById('test-editormd-view');
         const sidebar = document.getElementById('floatingSidebar');
@@ -612,7 +692,24 @@
             $(this).find('i').toggleClass('bi-x bi-list');
         });
 
+        $('#btnToggleDirectory').click(function () {
+            if (isSidebarVisible) {
+                $("#sidebar").removeClass("expand");
+            }
+            else {
+                $("#sidebar").addClass("expand");
+            }
+            isSidebarVisible = !isSidebarVisible;
+            $(this).find('i').toggleClass('bi-x bi-list');
+        });
+
         $('#toggleDirectory').on('mouseenter', function () {
+            $(this).tooltip('show'); // 显示 tooltip
+        }).on('mouseleave', function () {
+            $(this).tooltip('hide'); // 隐藏 tooltip
+        });
+
+        $('#btnToggleDirectory').on('mouseenter', function () {
             $(this).tooltip('show'); // 显示 tooltip
         }).on('mouseleave', function () {
             $(this).tooltip('hide'); // 隐藏 tooltip
@@ -623,7 +720,18 @@
             content.style.fontSize = fontSize + 'px';
         });
 
+        document.getElementById('btnIncreaseFont').addEventListener('click', function () {
+            fontSize += 2;
+            content.style.fontSize = fontSize + 'px';
+        });
+
         $('#increaseFont').on('mouseenter', function () {
+            $(this).tooltip('show');
+        }).on('mouseleave', function () {
+            $(this).tooltip('hide');
+        });
+
+        $('#btnIncreaseFont').on('mouseenter', function () {
             $(this).tooltip('show');
         }).on('mouseleave', function () {
             $(this).tooltip('hide');
@@ -633,7 +741,19 @@
             fontSize = Math.max(10, fontSize - 2); // 最小字体大小限制
             content.style.fontSize = fontSize + 'px';
         });
+
         $('#decreaseFont').on('mouseenter', function () {
+            $(this).tooltip('show'); // 显示 tooltip
+        }).on('mouseleave', function () {
+            $(this).tooltip('hide'); // 隐藏 tooltip
+        });
+
+        document.getElementById('btnDecreaseFont').addEventListener('click', function () {
+            fontSize = Math.max(10, fontSize - 2); // 最小字体大小限制
+            content.style.fontSize = fontSize + 'px';
+        });
+
+        $('#btnDecreaseFont').on('mouseenter', function () {
             $(this).tooltip('show'); // 显示 tooltip
         }).on('mouseleave', function () {
             $(this).tooltip('hide'); // 隐藏 tooltip
@@ -643,6 +763,7 @@
             $('body').toggleClass('night-mode'); // 切换 class
             $('#test-editormd-view').toggleClass('night-mode'); // 切换 class
             $('#title-container').toggleClass('night-mode'); // 切换 class
+            $('#sidebar').toggleClass('night-mode');
 
             const isNightMode = $('#test-editormd-view').hasClass('night-mode');
 
@@ -656,12 +777,37 @@
                 $(this).removeClass('btn-night-mode'); // 移除夜间模式按钮样式
             }
         });
+
+        document.getElementById('btnToggleNightMode').addEventListener('click', function () {
+            $('body').toggleClass('night-mode'); // 切换 class
+            $('#test-editormd-view').toggleClass('night-mode'); // 切换 class
+            $('#title-container').toggleClass('night-mode'); // 切换 class
+            $('#sidebar').toggleClass('night-mode');
+
+            const isNightMode = $('#test-editormd-view').hasClass('night-mode');
+
+            // 根据模式更新按钮图标
+            $(this).find('i').toggleClass('bi-moon bi-sun');
+
+            // 切换按钮背景色
+            if (isNightMode) {
+                $(this).addClass('btn-night-mode'); // 添加夜间模式按钮样式
+            } else {
+                $(this).removeClass('btn-night-mode'); // 移除夜间模式按钮样式
+            }
+        });
+
         $('#toggleNightMode').on('mouseenter', function () {
             $(this).tooltip('show'); // 显示 tooltip
         }).on('mouseleave', function () {
             $(this).tooltip('hide'); // 隐藏 tooltip
         });
 
+        $('#btnToggleNightMode').on('mouseenter', function () {
+            $(this).tooltip('show'); // 显示 tooltip
+        }).on('mouseleave', function () {
+            $(this).tooltip('hide'); // 隐藏 tooltip
+        });
 
         document.getElementById('toggleSidebar').addEventListener('click', function () {
             sidebar.classList.toggle('collapsed'); // 切换折叠状态

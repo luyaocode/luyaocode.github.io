@@ -128,8 +128,9 @@
 
         #test-editormd-view,
         #test-editormd-view2 {
+            max-width: 94%;
             padding-left: 320px;
-            margin: 60px 20px;
+            margin: 60px auto;
             transition: padding-left 0.3s;
             transition: font-size 0.3s;
             color: #585252;
@@ -253,13 +254,11 @@
         }
 
         .navbar-brand {
+            font-size: 16px;
             font-weight: bold;
             margin-left: 0;
-            /* 加粗字体 */
             color: #007bff;
-            /* 自定义颜色 */
             transition: color 0.3s;
-            /* 添加过渡效果 */
         }
 
         .navbar-brand:hover {
@@ -272,40 +271,29 @@
 </head>
 
 <body>
-    <div id="successInfoDialog" class="confirmation-dialog" style="display: none;">
-        <div class="dialog-content">
-            <p>删除成功</p>
-        </div>
-    </div>
-    <div id="failureInfoDialog" class="confirmation-dialog" style="display: none;">
-        <div class="dialog-content">
-            <p>删除失败：暗号错误</p>
-        </div>
-    </div>
     <!-- 导航栏 -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
         <div class="container-fluid">
             <a class="navbar-brand" href="/">主页</a>
-            <div class="ml-auto d-flex"> <!-- 靠右排列按钮 -->
-                <button id="btnToggleDirectory" class="btn btn-outline-light mx-1 no-focus d-block d-md-none"
+            <div class="ml-auto d-flex">
+                <button id="btnToggleDirectory" class="btn btn-outline-light btn-sm mx-1 no-focus d-block d-md-none"
                     data-toggle="tooltip" title="目录" data-placement="bottom">
                     <i class="bi bi-list"></i>
                 </button>
 
-                <button id="btnIncreaseFont" class="btn btn-outline-light mx-1 no-focus" data-toggle="tooltip"
+                <button id="btnIncreaseFont" class="btn btn-outline-light btn-sm mx-1 no-focus" data-toggle="tooltip"
                     title="增大字体" data-placement="bottom">
                     <i class="bi bi-plus"></i>
                 </button>
-                <button id="btnDecreaseFont" class="btn btn-outline-light mx-1 no-focus" data-toggle="tooltip"
+                <button id="btnDecreaseFont" class="btn btn-outline-light btn-sm mx-1 no-focus" data-toggle="tooltip"
                     title="减小字体" data-placement="bottom">
                     <i class="bi bi-dash"></i>
                 </button>
-                <button id="btnToggleNightMode" class="btn btn-outline-light mx-1 no-focus" data-toggle="tooltip"
+                <button id="btnToggleNightMode" class="btn btn-outline-light btn-sm mx-1 no-focus" data-toggle="tooltip"
                     title="夜间模式" data-placement="bottom">
                     <i class="bi bi-moon"></i>
                 </button>
 
-                <!-- 新增的删除和编辑按钮 -->
                 <button id="del-blog-btn" class="btn btn-outline-light mx-1 no-focus d-none" data-toggle="tooltip"
                     title="删除" data-placement="bottom">
                     删除
@@ -320,6 +308,16 @@
     <div id="layout" style="
         margin-top:1.8rem;
         ">
+        <div id="successInfoDialog" class="confirmation-dialog" style="display: none;">
+            <div class="dialog-content">
+                <p style="margin-bottom: 0;">删除成功</p>
+            </div>
+        </div>
+        <div id="failureInfoDialog" class="confirmation-dialog" style="display: none;">
+            <div class="dialog-content">
+                <p style="margin-bottom: 0;">删除失败：暗号错误</p>
+            </div>
+        </div>
         <div id="passwdDialog" class="confirmation-dialog" style="display: none;">
             <div class="dialog-content">
                 <p style="display: inline-block;">请输入暗号</p>
@@ -392,57 +390,52 @@
                 </div>
             </div>
         </div>
-        <!-- <header>
-            </header> -->
-        <!-- <div class="btns">
-                <button onclick="location.href='./html-preview-markdown-to-html.html';">返回 Back</button>
-            </div> -->
         <div id="sidebar">
             <h1>目录</h1>
             <div class="markdown-body editormd-preview-container" id="custom-toc-container" style="background: transparent;
                 ">#custom-toc-container</div>
         </div>
         <div id="test-editormd-view">
-            <div style="width:100%;
-                text-align: center;
-                ">
+            <div>
                 <div id="title-container" style="display: flex;flex-direction: column;">
                     <h1 id='title' style="border: bold;"></h1>
-                    <span id="blog-info"></span>
+                    <div style="text-align: end;">
+                        <span id="blog-info"></span>
+                    </div>
                 </div>
 
             </div>
             <textarea style="display:none;" name="test-editormd-markdown-doc"></textarea>
         </div>
-        <div id="test-editormd-view2">
+        <!-- <div id="test-editormd-view2">
             <textarea id="append-test" style="display:none;"></textarea>
-        </div>
+        </div> -->
     </div>
     <div id="floatingSidebar" class="card d-none d-md-block"
-        style="position: fixed; right: 10px; bottom: 20px; width: 82px; z-index: 1000;">
+        style="position: fixed; right: 10px; bottom: 20px; width: 76px; z-index: 1000;">
         <div class="card-body">
-            <button id="toggleDirectory" class="btn btn-primary btn-block mb-2 no-focus" data-toggle="tooltip"
+            <button id="toggleDirectory" class="btn btn-primary btn-block btn-sm mb-2 no-focus" data-toggle="tooltip"
                 title="折叠目录" data-placement="left">
                 <i class="bi bi-x"></i>
             </button>
-            <button id="increaseFont" class="btn btn-secondary btn-block mb-2 no-focus" data-toggle="tooltip"
+            <button id="increaseFont" class="btn btn-secondary btn-block btn-sm mb-2 no-focus" data-toggle="tooltip"
                 title="增大字体" data-placement="left">
                 <i class="bi bi-plus"></i>
             </button>
-            <button id="decreaseFont" class="btn btn-secondary btn-block mb-2 no-focus" data-toggle="tooltip"
+            <button id="decreaseFont" class="btn btn-secondary btn-block btn-sm mb-2 no-focus" data-toggle="tooltip"
                 title="减小字体" data-placement="left">
                 <i class="bi bi-dash"></i>
             </button>
-            <button id="toggleNightMode" class="btn btn-dark btn-block mb-2 no-focus" data-toggle="tooltip" title="夜间模式"
-                data-placement="left">
+            <button id="toggleNightMode" class="btn btn-dark btn-block btn-sm mb-2 no-focus" data-toggle="tooltip"
+                title="夜间模式" data-placement="left">
                 <i class="bi bi-moon"></i>
             </button>
-            <button id="scrollToTop" class="btn btn-success btn-block mb-2 no-focus" data-toggle="tooltip" title="回到顶部"
-                data-placement="left">
+            <button id="scrollToTop" class="btn btn-success btn-block btn-sm mb-2 no-focus" data-toggle="tooltip"
+                title="回到顶部" data-placement="left">
                 <i class="bi bi-arrow-up-circle"></i>
             </button>
-            <button id="toggleSidebar" class="btn btn-info btn-block mb-2 no-focus" data-toggle="tooltip" title="隐藏操作栏"
-                data-placement="left">
+            <button id="toggleSidebar" class="btn btn-info btn-block btn-sm mb-2 no-focus" data-toggle="tooltip"
+                title="隐藏操作栏" data-placement="left">
                 <i class="bi bi-arrows-collapse"></i>
             </button>
         </div>
@@ -452,10 +445,7 @@
         style="position: fixed; right: 10px; bottom: 50px; z-index: 1001; border-radius: 50%; width: 40px; height: 40px;"
         data-toggle="tooltip" title="展开操作栏" data-placement="left">
         ⇆</div>
-    <!-- <script src="js/zepto.min.js"></script>
-		<script>
-			var jQuery = Zepto;  // 为了避免修改flowChart.js和sequence-diagram.js的源码，所以使用Zepto.js时想支持flowChart/sequenceDiagram就得加上这一句
-		</script> -->
+
     <script src="../lib/marked.min.js"></script>
     <script src="../lib/prettify.min.js"></script>
 
@@ -629,7 +619,13 @@
                     }
                 },
                 error: function (xhr, status, error) {
-                    console.error("Error sending string:", error);
+                    if (xhr.status === 401) {
+                        console.error("未授权操作：", xhr.responseText);
+                        alert("未授权操作");
+                    }
+                    else {
+                        console.error("Error sending string:", error);
+                    }
                 }
             });
         };
@@ -683,11 +679,14 @@
             if (isSidebarVisible) {
                 $("#sidebar").addClass("hidden");
                 $("#test-editormd-view").addClass("expand");
+                $(this).attr('data-original-title', '展开目录');
             }
             else {
                 $("#sidebar").removeClass("hidden");
                 $("#test-editormd-view").removeClass("expand");
+                $(this).attr('data-original-title', '折叠目录');
             }
+            $(this).tooltip('hide').tooltip('show'); // 重新显示 tooltip
             isSidebarVisible = !isSidebarVisible;
             $(this).find('i').toggleClass('bi-x bi-list');
         });
@@ -759,7 +758,7 @@
             $(this).tooltip('hide'); // 隐藏 tooltip
         });
 
-        function toggleButtons() {
+        function toggleButtons(n) {
             const nightModeActive = $('#test-editormd-view').hasClass('night-mode');
             $('body').toggleClass('night-mode');
             $('#test-editormd-view').toggleClass('night-mode');
@@ -770,16 +769,29 @@
             if (nightModeActive) {
                 $('#toggleNightMode i').removeClass('bi-sun').addClass('bi-moon');
                 $('#btnToggleNightMode i').removeClass('bi-sun').addClass('bi-moon');
+                $('#toggleNightMode').attr('data-original-title', '白天模式');
+                $('#btnToggleNightMode').attr('data-original-title', '白天模式');
             } else {
                 $('#toggleNightMode i').removeClass('bi-moon').addClass('bi-sun');
                 $('#btnToggleNightMode i').removeClass('bi-moon').addClass('bi-sun');
+                $('#toggleNightMode').attr('data-original-title', '夜间模式');
+                $('#btnToggleNightMode').attr('data-original-title', '夜间模式');
+            }
+
+            switch (n) {
+                case 1:
+                    $("#toggleNightMode").tooltip('hide').tooltip('show');
+                    break;
+                case 2:
+                    $("#btnToggleNightMode").tooltip('hide').tooltip('show');
+                    break;
+                default:
+                    break;
             }
         }
 
-        document.getElementById('toggleNightMode').addEventListener('click', toggleButtons);
-        document.getElementById('btnToggleNightMode').addEventListener('click', toggleButtons);
-
-
+        document.getElementById('toggleNightMode').addEventListener('click', () => toggleButtons(1));
+        document.getElementById('btnToggleNightMode').addEventListener('click', () => toggleButtons(2));
 
         $('#toggleNightMode').on('mouseenter', function () {
             $(this).tooltip('show'); // 显示 tooltip

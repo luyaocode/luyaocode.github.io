@@ -779,6 +779,7 @@
 						document.getElementById('loadingModal').style.display = 'none';
 						if (xhr.status === 500) {
 							console.error("服务器异常：", xhr.responseText);
+							alert(xhr.responseText);
 						} else {
 							console.error("Error sending string:", error);
 						}

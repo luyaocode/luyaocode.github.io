@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>博客</title>
     <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="../../css/common.css">
     <link rel="stylesheet" href="../css/editormd.preview.css" />
     <link rel="shortcut icon" href="../../img/fav.png" type="image/x-icon" />
     <script src="js/jquery.min.js"></script>
@@ -13,6 +14,7 @@
     <!-- Bootstrap CSS -->
     <link href="../../css/bootstrap-4.5.2.min.css" rel="stylesheet">
     <link href="../../css/bootstrap-icons.css" rel="stylesheet">
+    <link href="../../css/all.min.css" rel="stylesheet">
     <script src="../../js/bootstrap.bundle-4.5.2.min.js"></script>
 
     <style>
@@ -133,7 +135,6 @@
             padding-left: 320px;
             margin: 60px auto;
             transition: padding-left 0.3s;
-            transition: font-size 0.3s;
             color: #585252;
             font-size: 16px;
             overflow-x: hidden;
@@ -268,6 +269,132 @@
             color: #0056b3;
             text-decoration: underline;
         }
+
+        /* 设置模态框背景色为半透明黑色 */
+        .modal-backdrop.show {
+            background-color: rgba(0, 0, 0, 0.8);
+            /* 半透明黑色背景 */
+        }
+
+        /* 设置模态框的样式 */
+        .modal-dialog {
+            margin: 0;
+            /* 去掉默认边距 */
+            height: 100%;
+            /* 占据整个高度 */
+            width: 100%;
+            /* 占据整个宽度 */
+            max-width: none;
+            /* 去掉最大宽度限制 */
+        }
+
+        .modal-content {
+            height: 100%;
+            /* 占据整个高度 */
+            border: none;
+            /* 去掉边框 */
+            border-radius: 0;
+            /* 去掉圆角 */
+            position: relative;
+            /* 使工具栏定位 */
+            overflow: hidden;
+            background: transparent;
+        }
+
+        /* 图片容器样式 */
+        .image-container {
+            display: flex;
+            /* 使用 Flexbox */
+            justify-content: center;
+            /* 水平居中 */
+            align-items: center;
+            /* 垂直居中 */
+            height: 80vh;
+            /* 限制容器高度 */
+        }
+
+        /* 图片样式 */
+        #modalImage {
+            width: 90%;
+            /* 初始宽度为 90% */
+            transition: transform 0.2s;
+            /* 平滑过渡 */
+            cursor: zoom-in;
+            /* 鼠标悬停时显示放大光标 */
+            max-width: none;
+            /* 不限制宽度 */
+            max-height: none;
+            /* 不限制高度 */
+            object-fit: contain;
+            /* 保持图片比例 */
+            display: block;
+            /* 使图片成为块级元素 */
+        }
+
+        /* 工具栏样式 */
+        .toolbar {
+            position: absolute;
+            width: 100%;
+            bottom: 0;
+            left: 0;
+            background-color: rgba(255, 255, 255, 0.5);
+            padding: 10px;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+            display: flex;
+            justify-content: center;
+            padding-bottom: 10px;
+        }
+
+        /* 按钮样式 */
+        .toolbar button {
+            margin: 0 5px;
+            background-color: transparent;
+        }
+
+        .toolbar button i {
+            color: white;
+        }
+
+        .close-btn {
+            position: absolute;
+            /* 绝对定位 */
+            right: 20px;
+            /* 距离右边 20 像素 */
+            top: 20px;
+            /* 距离顶部 20 像素 */
+            color: white;
+            /* 图标颜色为白色 */
+            background-color: rgba(255, 255, 255, 0.5);
+            /* 按钮背景色为黑色 */
+            border: 1px solid white;
+            /* 移除边框 */
+            border-radius: 50%;
+            /* 使按钮为圆形 */
+            width: 50px;
+            /* 按钮宽度 */
+            height: 50px;
+            /* 按钮高度 */
+            display: flex;
+            /* 使用 flexbox 进行居中对齐 */
+            justify-content: center;
+            /* 水平居中 */
+            align-items: center;
+            /* 垂直居中 */
+            z-index: 10500;
+            /* 确保按钮在其他内容上层 */
+            cursor: pointer;
+            /* 鼠标悬停时显示为指针 */
+        }
+
+        .close-btn:hover {
+            background-color: rgba(255, 255, 255, 0.8);
+            /* 悬停时背景色稍微改变 */
+        }
+
+        .no-scroll {
+            overflow: hidden;
+            /* 隐藏滚动条 */
+        }
     </style>
     <script src="../../js/util.js"></script>
     <script src="../../js/constDefine.js"></script>
@@ -393,6 +520,43 @@
                 </div>
             </div>
         </div>
+        <!-- 图片放大模态框 -->
+        <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <button type="button" class="close-btn" data-dismiss="modal" aria-label="Close">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <div class="modal-body d-flex justify-content-center align-items-center">
+                        <div class="image-container">
+                            <img id="modalImage" src="" alt="放大图片" class="img-fluid" />
+                        </div>
+                    </div>
+                    <div class="toolbar">
+                        <button id="zoomIn" class="btn btn-light" title="放大">
+                            <i class="fas fa-search-plus"></i>
+                        </button>
+                        <button id="zoomOut" class="btn btn-light" title="缩小">
+                            <i class="fas fa-search-minus"></i>
+                        </button>
+                        <button id="resetSize" class="btn btn-light" title="恢复初始大小">
+                            <i class="fas fa-sync"></i>
+                        </button>
+                        <button id="rotateLeft" class="btn btn-light" title="左旋转">
+                            <i class="fas fa-rotate-left"></i>
+                        </button>
+                        <button id="rotateRight" class="btn btn-light" title="右旋转">
+                            <i class="fas fa-rotate-right"></i>
+                        </button>
+                        <button id="saveImage" class="btn btn-light" title="保存图片">
+                            <i class="fas fa-download"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div id="sidebar">
             <h1>目录</h1>
             <div class="markdown-body editormd-preview-container" id="custom-toc-container" style="background: transparent;
@@ -512,6 +676,15 @@
 
                     // 为 sidebar 中所有的 a 标签绑定点击事件
                     $('#sidebar a').on('click', onTopToggleDirectoryBtnClick);
+
+                    // 为 #test-editormd-view 中的所有 img 绑定点击事件
+                    document.querySelectorAll('#test-editormd-view img').forEach(function (img) {
+                        img.addEventListener('click', function () {
+                            const src = this.src; // 获取当前点击图片的 src
+                            document.getElementById('modalImage').src = src; // 更新模态框中的图片 src
+                            $('#imageModal').modal('show'); // 打开模态框
+                        });
+                    });
                 },
                 error: function (xhr, status, error) {
                     console.error("Error sending string:", error);
@@ -688,6 +861,14 @@
         }
     }
 
+    let scale = 1; // 当前缩放比例
+    let rotation = 0; // 当前旋转角度
+
+    const restoreScale = () => {
+        scale = 1; // 当前缩放比例
+        rotation = 0; // 当前旋转角度
+    }
+
     $(document).ready(function () {
         freshPage();
         // 初始化工具提示，设置延时
@@ -856,6 +1037,76 @@
             // 检查点击是否在 sidebar 内部
             if ($(event.target).closest('#test-editormd-view').length) {
                 closeDirectory();
+            }
+        });
+
+        // 鼠标滚轮缩放图片
+        const modalImage = document.getElementById('modalImage');
+        modalImage.addEventListener('wheel', function (event) {
+            event.preventDefault();
+            if (event.deltaY < 0) {
+                scale *= 1.1; // 放大
+            } else {
+                scale /= 1.1; // 缩小
+            }
+            modalImage.style.transform = `scale(${scale}) rotate(${rotation}deg)`; // 应用缩放和旋转
+        });
+
+        // 放大按钮
+        document.getElementById('zoomIn').addEventListener('click', function () {
+            scale *= 1.1;
+            modalImage.style.transform = `scale(${scale}) rotate(${rotation}deg)`; // 应用缩放
+        });
+
+        // 缩小按钮
+        document.getElementById('zoomOut').addEventListener('click', function () {
+            scale /= 1.1;
+            modalImage.style.transform = `scale(${scale}) rotate(${rotation}deg)`; // 应用缩放
+        });
+
+        // 恢复初始大小按钮
+        document.getElementById('resetSize').addEventListener('click', function () {
+            scale = 1; // 重置缩放比例
+            rotation = 0; // 重置旋转角度
+            modalImage.style.transform = `scale(${scale}) rotate(${rotation}deg)`; // 应用缩放和旋转
+        });
+
+        // 左旋转按钮
+        document.getElementById('rotateLeft').addEventListener('click', function () {
+            rotation -= 90; // 左旋转 90 度
+            modalImage.style.transform = `scale(${scale}) rotate(${rotation}deg)`; // 应用缩放和旋转
+        });
+
+        // 右旋转按钮
+        document.getElementById('rotateRight').addEventListener('click', function () {
+            rotation += 90; // 右旋转 90 度
+            modalImage.style.transform = `scale(${scale}) rotate(${rotation}deg)`; // 应用缩放和旋转
+        });
+
+        // 保存图片按钮
+        document.getElementById('saveImage').addEventListener('click', function () {
+            const link = document.createElement('a'); // 创建一个链接元素
+            link.href = modalImage.src; // 设置链接的 href 为图片的 src
+            link.download = 'downloaded_image.png'; // 设置下载的文件名
+            link.click(); // 触发下载
+        });
+
+        // 打开模态框时隐藏滚动条并重置缩放比例和旋转角度
+        $('#imageModal').on('show.bs.modal', function () {
+            $('body').addClass('no-scroll'); // 添加 no-scroll 类
+            restoreScale()
+            $('#modalImage').css('transform', 'scale(1) rotate(0deg)'); // 恢复缩放和旋转
+        });
+
+        // 关闭模态框时恢复滚动条
+        $('#imageModal').on('hide.bs.modal', function () {
+            $('body').removeClass('no-scroll'); // 移除 no-scroll 类
+        });
+
+        // 点击非图片区域关闭模态框
+        $('.modal-body').on('click', function (e) {
+            if (!$(e.target).closest('#modalImage').length) {
+                $('#imageModal').modal('hide'); // 关闭模态框
             }
         });
     });

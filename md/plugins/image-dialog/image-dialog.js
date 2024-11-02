@@ -152,9 +152,12 @@
                         var form = dialog.find("[enctype=\"multipart/form-data\"]")[0];
                         var formData = new FormData(form);
                         $.ajax({
-                            type: 'post',
                             // url: "http://localhost:8080/upload/test", // 你的服务器端的图片上传接口。如果你设置了 imageUploadURL，那么可以使用下面的方式
                             url: settings.imageUploadURL + (settings.imageUploadURL.indexOf("?") >= 0 ? "&" : "?") + "guid=" + guid,
+                            type: 'post',
+                            xhrFields: {
+                                withCredentials: true
+                            },
                             data: formData,
                             cache: false,
                             processData: false,

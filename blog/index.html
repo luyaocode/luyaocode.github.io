@@ -358,11 +358,10 @@
 					<div class="collapse navbar-collapse" id="navbarNav">
 						<ul class="navbar-nav ms-auto">
 							<li class="nav-item">
-								<a class="nav-link" id="d-write-blog"
-									href="../editor.md/examples/write-blog.html">创作</a>
+								<a class="nav-link" id="d-write-blog" href="../md/page/write-blog.html">创作</a>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link" id="setting-btn" href="setting/index.html">管理</a>
+								<a class="nav-link" id="setting-btn" href="./setting/index.html">管理</a>
 							</li>
 							<li class="nav-item">
 								<a class="nav-link" id="auth-btn" onclick="openAuthPopup()">
@@ -464,7 +463,7 @@
 
 				const aElement = document.createElement('a');
 				aElement.id = blog.id;
-				aElement.href = "../editor.md/examples/blog.html?id=" + blog.id;
+				aElement.href = "../md/page/blog.html?id=" + blog.id;
 				aElement.textContent = blog.title === '' ? '无标题' : blog.title;
 				aElement.className = "text-decoration-none";
 

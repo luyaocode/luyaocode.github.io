@@ -41,10 +41,11 @@
                 var guid   = (new Date).getTime();
                 var action = settings.imageUploadURL + (settings.imageUploadURL.indexOf("?") >= 0 ? "&" : "?") + "guid=" + guid;
 
-                if (settings.crossDomainUpload)
-                {
-                    action += "&callback=" + settings.uploadCallbackURL + "&dialog_id=editormd-image-dialog-" + guid;
-                }
+                // if (settings.crossDomainUpload)
+                // {
+                //     action += "&callback=" + settings.uploadCallbackURL + "&dialog_id=editormd-image-dialog-" + guid;
+                // }
+                action = "";
 
                 var dialogContent = ( (settings.imageUpload) ? "<form action=\"" + action +"\" target=\"" + iframeName + "\" method=\"post\" enctype=\"multipart/form-data\" class=\"" + classPrefix + "form\">" : "<div class=\"" + classPrefix + "form\">" ) +
                                         ( (settings.imageUpload) ? "<iframe name=\"" + iframeName + "\" id=\"" + iframeName + "\" guid=\"" + guid + "\"></iframe>" : "" ) +
@@ -134,43 +135,50 @@
 					if (fileName === "")
 					{
 						alert(imageLang.uploadFileEmpty);
-                        
+
                         return false;
 					}
-					
+
                     if (!isImage.test(fileName))
 					{
 						alert(imageLang.formatNotAllowed + settings.imageFormats.join(", "));
-                        
+
                         return false;
 					}
 
                     loading(true);
 
-                    var submitHandler = function() {
-
-                        var uploadIframe = document.getElementById(iframeName);
-
-                        uploadIframe.onload = function() {
-                            
-                            loading(false);
-
-                            var body = (uploadIframe.contentWindow ? uploadIframe.contentWindow : uploadIframe.contentDocument).document.body;
-                            var json = (body.innerText) ? body.innerText : ( (body.textContent) ? body.textContent : null);
-
-                            json = (typeof JSON.parse !== "undefined") ? JSON.parse(json) : eval("(" + json + ")");
-
-                            if (json.success === 1)
-                            {
-                                dialog.find("[data-url]").val(json.url);
+                    var submitHandler = function () {
+                        var form = dialog.find("[enctype=\"multipart/form-data\"]")[0];
+                        var formData = new FormData(form);
+                        $.ajax({
+                            type: 'post',
+                            // url: "http://localhost:8080/upload/test", // 你的服务器端的图片上传接口。如果你设置了 imageUploadURL，那么可以使用下面的方式
+                            url: settings.imageUploadURL + (settings.imageUploadURL.indexOf("?") >= 0 ? "&" : "?") + "guid=" + guid,
+                            data: formData,
+                            cache: false,
+                            processData: false,
+                            contentType: false,
+                            success: function(data, textStatus, jqXHR) {
+                                // console.log(data);
+                                // console.log(textStatus);
+                                // console.log(jqXHR);
+                                if (data.success === 1) { // 上传成功
+                                    dialog.find("[data-url]").val(data.url); // 设置图片地址
+                                }
+                                else {
+                                    alert(data.message); // 上传失败，弹出警告信息
+                                }
+                            },
+                            error: function(XMLHttpRequest, textStatus, errorThrown) {
+                                // console.log(XMLHttpRequest);
+                                // console.log(textStatus);
+                                // console.log(errorThrown);
                             }
-                            else
-                            {
-                                alert(json.message);
-                            }
+                        });
 
-                            return false;
-                        };
+                        loading(false);
+                        return false;
                     };
 
                     dialog.find("[type=\"submit\"]").bind("click", submitHandler).trigger("click");

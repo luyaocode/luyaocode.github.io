@@ -225,18 +225,18 @@
             transition: background-color 0.3s;
         }
 
-        .card.collapsed {
-            display: none;
-        }
-
         #floatingSidebar {
             transition: width 0.3s, height 0.3s;
         }
 
         #toggleButton {
-            display: flex;
+            display: none;
             justify-content: center;
             align-items: center;
+        }
+
+        #toggleButton.show {
+            display: flex;
         }
 
         .no-focus:active,
@@ -449,7 +449,7 @@
     </div>
     <!-- 隐藏操作栏之后的小球 -->
     <div id="toggleButton" class="btn btn-warning"
-        style="position: fixed; right: 10px; bottom: 50px; z-index: 1001; border-radius: 50%; width: 40px; height: 40px; display: none;"
+        style="position: fixed; right: 10px; bottom: 50px; z-index: 1001; border-radius: 50%; width: 40px; height: 40px;"
         data-toggle="tooltip" title="展开操作栏" data-placement="left">
         ⇆</div>
     <!-- <script src="js/zepto.min.js"></script>
@@ -759,43 +759,27 @@
             $(this).tooltip('hide'); // 隐藏 tooltip
         });
 
-        document.getElementById('toggleNightMode').addEventListener('click', function () {
-            $('body').toggleClass('night-mode'); // 切换 class
-            $('#test-editormd-view').toggleClass('night-mode'); // 切换 class
-            $('#title-container').toggleClass('night-mode'); // 切换 class
+        function toggleButtons() {
+            const nightModeActive = $('#test-editormd-view').hasClass('night-mode');
+            $('body').toggleClass('night-mode');
+            $('#test-editormd-view').toggleClass('night-mode');
+            $('#title-container').toggleClass('night-mode');
             $('#sidebar').toggleClass('night-mode');
 
-            const isNightMode = $('#test-editormd-view').hasClass('night-mode');
-
-            // 根据模式更新按钮图标
-            $(this).find('i').toggleClass('bi-moon bi-sun');
-
-            // 切换按钮背景色
-            if (isNightMode) {
-                $(this).addClass('btn-night-mode'); // 添加夜间模式按钮样式
+            // 更新按钮图标和样式
+            if (nightModeActive) {
+                $('#toggleNightMode i').removeClass('bi-sun').addClass('bi-moon');
+                $('#btnToggleNightMode i').removeClass('bi-sun').addClass('bi-moon');
             } else {
-                $(this).removeClass('btn-night-mode'); // 移除夜间模式按钮样式
+                $('#toggleNightMode i').removeClass('bi-moon').addClass('bi-sun');
+                $('#btnToggleNightMode i').removeClass('bi-moon').addClass('bi-sun');
             }
-        });
+        }
 
-        document.getElementById('btnToggleNightMode').addEventListener('click', function () {
-            $('body').toggleClass('night-mode'); // 切换 class
-            $('#test-editormd-view').toggleClass('night-mode'); // 切换 class
-            $('#title-container').toggleClass('night-mode'); // 切换 class
-            $('#sidebar').toggleClass('night-mode');
+        document.getElementById('toggleNightMode').addEventListener('click', toggleButtons);
+        document.getElementById('btnToggleNightMode').addEventListener('click', toggleButtons);
 
-            const isNightMode = $('#test-editormd-view').hasClass('night-mode');
 
-            // 根据模式更新按钮图标
-            $(this).find('i').toggleClass('bi-moon bi-sun');
-
-            // 切换按钮背景色
-            if (isNightMode) {
-                $(this).addClass('btn-night-mode'); // 添加夜间模式按钮样式
-            } else {
-                $(this).removeClass('btn-night-mode'); // 移除夜间模式按钮样式
-            }
-        });
 
         $('#toggleNightMode').on('mouseenter', function () {
             $(this).tooltip('show'); // 显示 tooltip
@@ -810,8 +794,8 @@
         });
 
         document.getElementById('toggleSidebar').addEventListener('click', function () {
-            sidebar.classList.toggle('collapsed'); // 切换折叠状态
-            toggleButton.style.display = sidebar.classList.contains('collapsed') ? 'flex' : 'none'; // 根据状态显示或隐藏按钮
+            sidebar.classList.toggle('d-md-block');
+            toggleButton.classList.toggle("show");
         });
         $('#toggleSidebar').on('mouseenter', function () {
             $(this).tooltip('show'); // 显示 tooltip
@@ -821,8 +805,8 @@
 
         // 隐藏操作栏按钮
         toggleButton.addEventListener('click', function () {
-            sidebar.classList.toggle('collapsed'); // 再次切换状态
-            toggleButton.style.display = sidebar.classList.contains('collapsed') ? 'flex' : 'none'; // 更新按钮显示
+            sidebar.classList.toggle('d-md-block');
+            toggleButton.classList.toggle("show");
         });
         $('#toggleButton').on('mouseenter', function () {
             $(this).tooltip('show'); // 显示 tooltip

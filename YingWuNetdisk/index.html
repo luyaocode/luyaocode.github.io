@@ -4,9 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="../img/yingwu.ico" type="image/x-icon" />
     <title>鹦鹉网盘</title>
     <link rel="stylesheet" href="../css/common.css">
     <link rel="stylesheet" href="../css/bootstrap.min.css">
+    <link href="../css/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="../css/all.min.css">
     <style>
         .navbar {
@@ -28,14 +30,15 @@
 
         .container {
             margin-top: 60px;
+            max-width: 98%;
         }
 
         #dropZone {
             border: 2px dashed #007bff;
             border-radius: 5px;
-            padding: 50px 20px;
+            padding: 40px 10px;
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             position: relative;
             transition: background-color 0.3s;
             background-color: #e9f7ff;
@@ -54,9 +57,9 @@
         }
 
         .file-list {
-            max-height: 150px;
+            max-height: 500px;
             overflow-y: auto;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             background-color: #ffffff;
             border-radius: 5px;
             padding: 10px;
@@ -99,19 +102,40 @@
         }
 
         .upload-area {
-            background-color: #e9f7ff;
-            padding: 20px;
+            background-color: #f3f5f6;
+            padding: 10px;
             border-radius: 5px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border: 1px solid white;
         }
 
         .download-area {
-            background-color: #f0f8ff;
-            padding: 20px;
+            background-color: #f4f4f4;
+            padding: 10px;
             border-radius: 5px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border: 1px solid white;
+        }
+
+        /* 上传加载框 */
+        #loadingModal {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        #loading-content {
+            background-color: transparent;
+            border: none;
+            margin-top: 40vh;
+        }
+
+        .loading-spinner {
+            color: white;
         }
     </style>
 </head>
@@ -121,35 +145,22 @@
         <div class="container-fluid">
             <a class="navbar-brand" href="/">主页</a>
             <div class="ml-auto d-flex">
-                <button id="btnToggleDirectory" class="btn btn-outline-light btn-sm mx-1 no-focus d-block d-md-none"
-                    data-toggle="tooltip" title="目录" data-placement="bottom">
-                    <i class="bi bi-list"></i>
+                <button id="btnUploadRecord" class="btn btn-outline-light btn-sm mx-1 no-focus" data-toggle="tooltip"
+                    title="上传记录" data-placement="bottom">
+                    <i class="bi bi-upload"></i> 上传记录
                 </button>
-
-                <button id="btnIncreaseFont" class="btn btn-outline-light btn-sm mx-1 no-focus" data-toggle="tooltip"
-                    title="增大字体" data-placement="bottom">
-                    <i class="bi bi-plus"></i>
+                <button id="btnDownloadRecord" class="btn btn-outline-light btn-sm mx-1 no-focus" data-toggle="tooltip"
+                    title="下载记录" data-placement="bottom">
+                    <i class="bi bi-download"></i> 下载记录
                 </button>
-                <button id="btnDecreaseFont" class="btn btn-outline-light btn-sm mx-1 no-focus" data-toggle="tooltip"
-                    title="减小字体" data-placement="bottom">
-                    <i class="bi bi-dash"></i>
-                </button>
-                <button id="btnToggleNightMode" class="btn btn-outline-light btn-sm mx-1 no-focus" data-toggle="tooltip"
-                    title="夜间模式" data-placement="bottom">
-                    <i class="bi bi-moon"></i>
-                </button>
-
-                <button id="del-blog-btn" class="btn btn-outline-light mx-1 no-focus d-none" data-toggle="tooltip"
-                    title="删除" data-placement="bottom">
-                    删除
-                </button>
-                <button id="update-blog-btn" class="btn btn-outline-light mx-1 no-focus d-none" data-toggle="tooltip"
-                    title="编辑" data-placement="bottom">
-                    编辑
+                <button id="btnLogin" class="btn btn-outline-light btn-sm mx-1 no-focus" data-toggle="tooltip"
+                    title="登录" data-placement="bottom">
+                    <i class="bi bi-person-circle"></i> 登录
                 </button>
             </div>
         </div>
     </nav>
+
     <div class="container">
         <!-- 文件上传区域 -->
         <div id="dropZone" class="text-center">
@@ -157,195 +168,322 @@
                 <i class="fas fa-arrow-up"></i>
             </button>
             <div style="margin-bottom: 10px;">将文件拖拽到这里上传</div>
-            <input type="file" id="fileInput" class="form-control-file mb-3" multiple style="display: none;" />
+            <input type="file" id="fileInput" class="form-control-file mb-2" multiple style="display: none;" />
             <label for="fileInput" class="btn btn-primary">选择文件上传</label>
         </div>
 
-        <div class="row">
+        <div class="row g-3">
             <!-- 上传文件列表 -->
-            <div class="col upload-area">
-                <h6 class="mt-5">待上传文件列表</h6>
-                <div class="file-list">
-                    <ul id="uploadFileList" class="list-group"></ul>
-                </div>
+            <div class="col-md-8 upload-area">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>文件名</th>
+                            <th>大小</th>
+                            <th>进度</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="uploadFileList">
+                        <!-- 动态添加上传文件信息 -->
+                    </tbody>
+                </table>
                 <div class="text-right">
-                    <button id="uploadFileButton" class="btn btn-success">上传文件</button>
+                    <button id="uploadFileButton" class="btn btn-success btn-sm">上传文件</button>
                 </div>
-                <h6 class="mt-5">已上传文件列表</h6>
+                <h6 class="mt-2">已上传文件列表</h6>
                 <div class="file-list">
-                    <ul id="uploadedFileList" class="list-group"></ul>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>文件名</th>
+                                <th>大小</th>
+                                <th>上传时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="uploadedFileList"></tbody>
+                    </table>
                 </div>
             </div>
 
             <!-- 下载文件区域 -->
-            <div class="col download-area">
-                <h6 class="mt-5">下载文件</h6>
+            <div class="col-md-4 download-area">
+                <h6 class="mt-2">下载文件</h6>
                 <div class="input-group mb-3">
-                    <input type="text" id="fileId" class="form-control" placeholder="输入文件标识" required>
+                    <input type="text" id="fileId" class="form-control form-control-sm" placeholder="输入文件标识" required
+                        data-bs-toggle="tooltip" data-bs-placement="bottom" title="请输入文件标识">
                     <div class="input-group-append">
-                        <button id="downloadButton" class="btn btn-success">下载</button>
+                        <button id="downloadButton" class="btn btn-success btn-sm ms-2">下载</button>
                     </div>
                 </div>
 
-                <h6 class="mt-5">下载文件列表</h6>
+                <h6 class="mt-2">下载文件列表</h6>
                 <div class="file-list">
                     <ul id="downloadFileList" class="list-group"></ul>
                 </div>
             </div>
         </div>
-    </div>
 
-    <script src="../js/constDefine.js"></script>
-    <script>
-        const dropZone = document.getElementById('dropZone');
-        const fileInput = document.getElementById('fileInput');
-        const uploadFileList = document.getElementById('uploadFileList');
-        const uploadedFileList = document.getElementById('uploadedFileList');
-        const downloadFileList = document.getElementById('downloadFileList');
-        const maxFileSize = 10 * 1024 * 1024; // 10MB
-        let selectedFiles = [];
+        <div id="loadingModal" class="modal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div id="loading-content" class="modal-content text-center">
+                    <div class="modal-body">
+                        <div class="loading-spinner">
+                            <div class="spinner-border" role="status">
+                                <span class="visually-hidden">正在加载...</span>
+                            </div>
+                            <div>正在上传文件...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-        function goBack() {
-            window.history.back();
-        }
-
-        dropZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            dropZone.classList.add('dragover');
-        });
-
-        dropZone.addEventListener('dragleave', () => {
-            dropZone.classList.remove('dragover');
-        });
-
-        dropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropZone.classList.remove('dragover');
-            handleFiles(e.dataTransfer.files);
-        });
-
-        fileInput.addEventListener('change', (e) => {
-            handleFiles(e.target.files);
-        });
-
-        function handleFiles(files) {
-            for (let i = 0; i < files.length; i++) {
-                if (files[i].size > maxFileSize) {
-                    alert(`${files[i].name} 超过最大上传限制 (10MB)`);
-                    continue;
-                }
-                selectedFiles.push(files[i]);
-                const listItem = document.createElement('li');
-                listItem.className = 'list-group-item';
-                listItem.innerHTML = `${files[i].name} - ${(files[i].size / 1024).toFixed(2)} KB <span class="remove-file" onclick="removeFile(this)">✖</span>`;
-                uploadFileList.appendChild(listItem);
-            }
-        }
-        const downloadFile = async (fileID) => {
-            const downloadResponse = await fetch(`${backend_yingwu}/files/download/${fileID}`, {
-                credentials: 'include'
-            });
-            // 检查响应状态
-            const respJson = await downloadResponse.json();
-            if (downloadResponse.ok) {
-            }
-            else {
-                console.log(respJson?.error);
-                alert("下载失败：" + respJson?.error);
-                return;
-            }
-            // 获取文件内容为 Blob
-            const fileBlob = await downloadResponse.blob();
-            // 获取文件名
-            let fileName = '未命名文件';
-            const contentDisposition = downloadResponse.headers.get('Content-Disposition');
-            if (contentDisposition) {
-                const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
-                if (filenameMatch && filenameMatch[1]) {
-                    // 去除引号
-                    fileName = filenameMatch[1].replace(/['"]/g, '');
-                    // 去除 UTF-8
-                    fileName = fileName.replace(/UTF-8/g, '').trim(); // 去除所有的 UTF-8 并去掉多余空格
-                    // 解码文件名
-                    fileName = decodeURIComponent(fileName);
-                }
-            }
-            // 创建一个 URL 对象
-            const fileURL = URL.createObjectURL(fileBlob);
-            // 创建一个下载链接
-            const a = document.createElement('a');
-            a.href = fileURL;
-            a.download = fileName; // 设置下载文件名
-            document.body.appendChild(a);
-            a.click(); // 模拟点击以启动下载
-            a.remove(); // 移除临时链接
-
-            // 释放 URL 对象
-            URL.revokeObjectURL(fileURL);
-        }
-
-        function removeFile(element) {
-            const listItem = element.parentNode;
-            const fileName = listItem.firstChild.textContent.split(' - ')[0];
-            selectedFiles = selectedFiles.filter(file => file.name !== fileName);
-            listItem.remove();
-        }
-
-        document.getElementById('uploadFileButton').onclick = async function () {
-            if (selectedFiles.length === 0) {
-                alert("请拖拽或选择文件上传");
-                return;
-            }
-            const formData = new FormData();
-            selectedFiles.forEach(file => formData.append('files', file));
-            const response = await fetch(`${backend_yingwu}/files/upload`, {
-                method: 'POST',
-                body: formData
-            });
-            if (response.ok) {
-                selectedFiles = [];
-                uploadFileList.innerHTML = '';
-                fileInput.value = '';
-            }
-        };
-
-        document.getElementById('downloadButton').onclick = async function () {
-            const fileId = document.getElementById('fileId').value;
-            if (!fileId) {
-                alert("请输入文件标识");
-                return;
-            }
-            window.location.href = `/download/${fileId}`;
-        };
-
-        async function loadFiles() {
-            const uploadResponse = await fetch(`${backend_yingwu}/allfiles`, {
-                credentials: 'include'
-            });
-
-            const uploads = await uploadResponse.json();
-            uploadFileList.innerHTML = '';
-            uploads.forEach(file => {
-                const listItem = document.createElement('li');
-                listItem.className = 'list-group-item';
-                listItem.innerHTML = `
-                    ${file.filename} - ${(file.size / 1024).toFixed(2)} KB
-                    <span class="download-file" onclick="downloadFile('${file.hash}')">⬇️</span>`;
-                uploadedFileList.appendChild(listItem);
-            });
-        }
-
-        async function removeUploadedFile(element) {
-            const listItem = element.parentNode;
-            const fileName = listItem.firstChild.textContent.split(' - ')[0];
-            await fetch(`/remove/${fileName}`, { method: 'DELETE' });
-            listItem.remove();
-        }
-
-        loadFiles();
-
-
-    </script>
 </body>
+<script src="../js/jquery.min.js"></script>
+<script src="../js/constDefine.js"></script>
+<script src="../js/bootstrap.bundle.min.js"></script>
+<script>
+    // 初始化工具提示
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const uploadFileList = document.getElementById('uploadFileList');
+    const uploadedFileList = document.getElementById('uploadedFileList');
+    const downloadFileList = document.getElementById('downloadFileList');
+    const maxFileSize = 100 * 1024 * 1024; // 100MB
+    let selectedFiles = [];
+
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('dragover');
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('dragover');
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+        handleFiles(e.dataTransfer.files);
+    });
+
+    fileInput.addEventListener('change', (e) => {
+        handleFiles(e.target.files);
+    });
+
+    function handleFiles(files) {
+        for (let i = 0; i < files.length; i++) {
+            if (files[i].size > maxFileSize) {
+                alert(`${files[i].name} 超过最大上传限制 (100MB)`);
+                continue;
+            }
+            selectedFiles.push(files[i]);
+
+            const row = document.createElement('tr');
+
+            const fileNameCell = document.createElement('td');
+            fileNameCell.textContent = files[i].name;
+
+            const fileSizeCell = document.createElement('td');
+            fileSizeCell.textContent = `${(files[i].size / (1024 * 1024)).toFixed(2)} MB`;
+
+            const progressCell = document.createElement('td');
+            const progressBar = document.createElement('div');
+            progressBar.className = 'progress';
+            const progress = document.createElement('div');
+            progress.className = 'progress-bar progress-bar-striped progress-bar-animated';
+            progress.style.width = '0%'; // 初始进度
+            progress.setAttribute('role', 'progressbar');
+            progress.setAttribute('aria-valuenow', '0');
+            progress.setAttribute('aria-valuemin', '0');
+            progress.setAttribute('aria-valuemax', '100');
+            progressBar.appendChild(progress);
+            progressCell.appendChild(progressBar);
+
+            const actionCell = document.createElement('td');
+            const cancelButton = document.createElement('button');
+            cancelButton.className = 'btn btn-danger btn-sm';
+            cancelButton.textContent = '取消';
+            cancelButton.onclick = () => removeFile(row, progress, cancelButton); // 调用取消函数
+            actionCell.appendChild(cancelButton);
+
+            row.appendChild(fileNameCell);
+            row.appendChild(fileSizeCell);
+            row.appendChild(progressCell);
+            row.appendChild(actionCell);
+            uploadFileList.appendChild(row);
+        }
+    }
+
+    const downloadFile = async (fileID) => {
+        const downloadResponse = await fetch(`${backend_yingwu}/files/download/${fileID}`, {
+            credentials: 'include'
+        });
+
+        // 检查响应状态
+        if (downloadResponse.ok) {
+            const contentType = downloadResponse.headers.get('Content-Type');
+            if (contentType && contentType.includes('application/json')) {
+                const respJson = await downloadResponse.json();
+                if (respJson) {
+                    alert(respJson.error);
+                    return;
+                }
+            } else {
+                // 处理文件响应
+                let fileName = '未命名文件';
+                const contentDisposition = downloadResponse.headers.get('Content-Disposition');
+                if (contentDisposition) {
+                    const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+                    if (filenameMatch && filenameMatch[1]) {
+                        // 去除引号
+                        fileName = filenameMatch[1].replace(/['"]/g, '');
+                        // 去除 UTF-8
+                        fileName = fileName.replace(/UTF-8/g, '').trim(); // 去除所有的 UTF-8 并去掉多余空格
+                        // 解码文件名
+                        fileName = decodeURIComponent(fileName);
+                    }
+                }
+                const blob = await downloadResponse.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = fileName; // 指定下载文件名
+                document.body.appendChild(a);
+                a.click(); // 仅下载文件
+                document.body.removeChild(a); // 清理
+                window.URL.revokeObjectURL(url); // 释放 URL 对象
+            }
+        }
+        else {
+            alert("请求失败");
+        }
+    }
+
+    function removeFile(element) {
+        const row = element.closest('tr'); // 获取当前行
+        const fileName = row.cells[0].textContent; // 获取第一列（文件名）
+
+        // 从 selectedFiles 中移除对应的文件
+        selectedFiles = selectedFiles.filter(file => file.name !== fileName);
+
+        // 获取进度条和取消按钮
+        const progressBar = row.querySelector('.progress-bar');
+        const cancelButton = row.querySelector('button');
+
+        // 将进度条变灰并停止动画
+        progressBar.className = 'progress-bar'; // 移除动画和样式
+        progressBar.style.backgroundColor = '#6c757d'; // 设置灰色
+        progressBar.style.width = '100%'; // 显示为已取消状态
+
+        // 禁用取消按钮并变灰
+        cancelButton.className = 'btn btn-secondary btn-sm'; // 改为次要按钮
+        cancelButton.disabled = true; // 禁用按钮
+        cancelButton.textContent = '已取消'; // 改变按钮文本
+    }
+
+    document.getElementById('uploadFileButton').onclick = async function () {
+
+        if (selectedFiles.length === 0) {
+            alert("请拖拽或选择文件上传");
+            return;
+        }
+        const formData = new FormData();
+        selectedFiles.forEach(file => formData.append('files', file));
+        $('#loadingModal').modal('show');
+        const response = await fetch(`${backend_yingwu}/files/upload`, {
+            method: 'POST',
+            body: formData
+        });
+        if (response.ok) {
+            selectedFiles = [];
+            uploadFileList.innerHTML = '';
+            fileInput.value = '';
+
+            // 修改文本为上传成功
+            const spinnerText = $('#loadingModal .loading-spinner div:nth-child(2)');
+            spinnerText.text('上传成功！');
+            $('#loadingModal').modal('hide');
+            loadFiles();
+        }
+        else {
+            // 修改文本为上传失败
+            const spinnerText = $('#loadingModal .loading-spinner div:nth-child(2)');
+            spinnerText.text('上传失败！');
+            $('#loadingModal').modal('hide');
+        }
+    };
+
+    const fileIdInput = document.getElementById('fileId');
+    const downloadButton = document.getElementById('downloadButton');
+
+    // 监听输入框变化
+    fileIdInput.addEventListener('input', function () {
+        const tooltip = bootstrap.Tooltip.getInstance(this);
+        if (this.value) {
+            if (tooltip) {
+                tooltip.dispose(); // 移除工具提示
+            }
+        } else {
+            if (!tooltip) {
+                new bootstrap.Tooltip(this).show(); // 显示工具提示
+            } else {
+                tooltip.show(); // 确保工具提示可见
+            }
+        }
+    });
+
+    downloadButton.onclick = async function () {
+        const fileId = fileIdInput.value;
+
+        if (!fileId) {
+            bootstrap.Tooltip.getInstance(fileIdInput) || new bootstrap.Tooltip(fileIdInput).show(); // 显示工具提示
+            return;
+        }
+
+        // 如果输入框不为空，继续下载
+        downloadFile(fileId);
+    };
+
+    async function loadFiles() {
+        const uploadResponse = await fetch(`${backend_yingwu}/allfiles`, {
+            credentials: 'include'
+        });
+
+        const uploads = await uploadResponse.json();
+        uploadFileList.innerHTML = '';
+        uploads.forEach(file => {
+            const row = document.createElement('tr');
+            const size = (file.size / (1024 * 1024)).toFixed(2);
+            row.innerHTML = `
+                <td><a href="${backend_yingwu}/files/download/${file.hash}">${file.filename}</a></td>
+                <td>${size} MB</td>
+                <td>${new Date(file.uploaded_at).toLocaleString()}</td>
+                <td><button class="btn btn-success btn-sm" onclick="downloadFile('${file.hash}')">下载</button></td>
+            `;
+            uploadedFileList.appendChild(row);
+        });
+    }
+
+    async function removeUploadedFile(element) {
+        const listItem = element.parentNode;
+        const fileName = listItem.firstChild.textContent.split(' - ')[0];
+        await fetch(`/remove/${fileName}`, { method: 'DELETE' });
+        listItem.remove();
+    }
+
+    $(document).ready(function () {
+        loadFiles();
+    });
+
+</script>
 
 </html>

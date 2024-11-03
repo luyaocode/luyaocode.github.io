@@ -284,12 +284,18 @@
                 alert(`${files[i].name} 超过最大上传限制 (100MB)`);
                 continue;
             }
+            // 检查文件名是否重复
+            const isDuplicate = selectedFiles.some(file => file.name === files[i].name);
+            if (isDuplicate) {
+                continue;
+            }
             selectedFiles.push(files[i]);
 
             const row = document.createElement('tr');
 
             const fileNameCell = document.createElement('td');
             fileNameCell.textContent = files[i].name;
+            fileNameCell.style.color = 'gray';  // 设置文本颜色为灰色
 
             const fileSizeCell = document.createElement('td');
             fileSizeCell.textContent = `${(files[i].size / (1024 * 1024)).toFixed(2)} MB`;

@@ -13,4 +13,4 @@ const Page_Blog_Setting = "/blog/setting";
 const Page_Blog_Update = "/md/page/update";
 const Page_Blog_Write = "/md/page/write";
 
-const Page_Yingwu_Home = "/YingWuNetDisk/home";
+const Page_Yingwu_Home = "/YingWuNetdisk/home";

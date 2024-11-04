@@ -352,7 +352,7 @@
 			<!-- 导航栏 -->
 			<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 				<div class="container-fluid">
-					<a class="navbar-brand" href="/">主页</a>
+					<a id="home-page" class="navbar-brand" href="/">主页</a>
 					<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
 						aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
 						<span class="navbar-toggler-icon"></span>
@@ -360,10 +360,10 @@
 					<div class="collapse navbar-collapse" id="navbarNav">
 						<ul class="navbar-nav ms-auto">
 							<li class="nav-item">
-								<a class="nav-link" id="d-write-blog" href="../md/page/write-blog.html">创作</a>
+								<a class="nav-link" id="d-write-blog" href="">创作</a>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link" id="setting-btn" href="./setting/index.html">管理</a>
+								<a class="nav-link" id="setting-btn" href="">管理</a>
 							</li>
 							<li class="nav-item">
 								<a class="nav-link" id="auth-btn" onclick="openAuthPopup()">
@@ -465,7 +465,7 @@
 
 				const aElement = document.createElement('a');
 				aElement.id = blog.id;
-				aElement.href = "../md/page/blog.html?id=" + blog.id;
+				aElement.href = `../md/page/${Home_Page_Blog}?id=` + blog.id;
 				aElement.textContent = blog.title === '' ? '无标题' : blog.title;
 				aElement.className = "text-decoration-none";
 
@@ -699,7 +699,7 @@
 		function openAuthPopup() {
 			const state = Math.floor(Math.random() * Math.pow(10, 8));
 			localStorage.setItem("state", state);
-			const url = `https://github.com/login/oauth/authorize?client_id=Iv23liOH77T5kmvXYkx8&redirect_uri=https://blog.chaosgomoku.fun/blog/index.html&allow_signup=true&scope=user:email&state=${state}`;
+			const url = `https://github.com/login/oauth/authorize?client_id=Iv23liOH77T5kmvXYkx8&redirect_uri=https://blog.chaosgomoku.fun${Page_Blog_Home}&allow_signup=true&scope=user:email&state=${state}`;
 			window.location.href = url;
 		}
 	</script>
@@ -814,5 +814,13 @@
 
 	</script>
 </body>
+<script>
+	document.addEventListener('DOMContentLoaded', () => {
+		document.querySelector('#home-page').href = `${Homepage}`;
+		document.querySelector('#setting-btn').href = `${Page_Blog_Setting}`;
+		document.querySelector('#write-btn').href = `${Page_Blog_Write}`;
+
+	});
+</script>
 
 </html>

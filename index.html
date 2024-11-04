@@ -32,7 +32,6 @@
 	</style>
 
 </head>
-<!-- partial:index.partial.html -->
 
 <body>
 	<div class="wrapper" id="welcomeTitle">
@@ -107,7 +106,7 @@
 								<!-- As cities never sleep, there are always something going on, no matter what time! -->
 								这是我的博客网站，主要分享技术问题，欢迎来踩。
 							</p>
-							<a href="./blog/index.html" class="inside-page__btn inside-page__btn--city">查看详情</a>
+							<a id="into_blog" href="" class="inside-page__btn inside-page__btn--city">查看详情</a>
 						</div>
 					</div>
 				</div>
@@ -285,8 +284,7 @@
 							<p class="inside-page__text">
 								...
 							</p>
-							<a href="./YingWuNetdisk/index.html"
-								class="inside-page__btn inside-page__btn--camping">查看详情</a>
+							<a id="into_yingwu" href="" class="inside-page__btn inside-page__btn--camping">查看详情</a>
 						</div>
 					</div>
 				</div>
@@ -295,6 +293,13 @@
 	</main>
 	<!-- partial -->
 </body>
+<script src="./js/constDefine.js"></script>
+<script>
+	document.addEventListener('DOMContentLoaded', () => {
+		document.querySelector('#into_blog').href = `${Page_Blog_Home}`;
+		document.querySelector('#into_yingwu').href = `${Page_YingwuNetDisk_Home}`;
+	});
+</script>
 <script src="./js/jquery.min.js"></script>
 <script src="https://myhkw.cn/api/player/166175577147" id="myhk" key="166175577147" m="1"></script>
 <script src="./js/main.js"></script>

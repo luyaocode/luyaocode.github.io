@@ -785,7 +785,7 @@
                         const infoDialog = document.getElementById("successInfoDialog");
                         infoDialog.style.display = 'flex';
                         setTimeout(() => {
-                            window.location.href = "../../blog/index.html";
+                            window.location.href = `${Page_Blog_Home}`;
                         }, 1000);
                     }
                     else if (response.code === -1) {
@@ -813,7 +813,7 @@
         });
 
         $("#update-blog-btn").click(function () {
-            const url = `./update-blog.html?id=${id}`;
+            const url = `${Page_Blog_Update}?id=${id}`;
             window.location.href = url;
         });
 

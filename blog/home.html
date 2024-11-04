@@ -465,7 +465,7 @@
 
 				const aElement = document.createElement('a');
 				aElement.id = blog.id;
-				aElement.href = `../md/page/${Home_Page_Blog}?id=` + blog.id;
+				aElement.href = `${Page_Blog_Blog}?id=` + blog.id;
 				aElement.textContent = blog.title === '' ? '无标题' : blog.title;
 				aElement.className = "text-decoration-none";
 
@@ -816,9 +816,9 @@
 </body>
 <script>
 	document.addEventListener('DOMContentLoaded', () => {
-		document.querySelector('#home-page').href = `${Homepage}`;
+		document.querySelector('#home-page').href = `${HomePage}`;
 		document.querySelector('#setting-btn').href = `${Page_Blog_Setting}`;
-		document.querySelector('#write-btn').href = `${Page_Blog_Write}`;
+		document.querySelector('#d-write-blog').href = `${Page_Blog_Write}`;
 
 	});
 </script>

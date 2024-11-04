@@ -14,6 +14,7 @@
         #main-content {
             display: none;
             /* 初始隐藏主要内容 */
+            margin-bottom: 20px;
         }
 
         /* 手动添加一些高亮样式，确保生效 */
@@ -57,12 +58,12 @@
                     <div class="sidebar-sticky pt-3">
                         <ul class="nav flex-column">
                             <li class="nav-item">
-                                <a class="nav-link active" href="#" id="tag-management">
+                                <a class="nav-link active" href="" id="tag-management">
                                     标签管理
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="#" id="article-management">
+                                <a class="nav-link" href="" id="article-management">
                                     文章管理
                                 </a>
                             </li>
@@ -384,7 +385,7 @@
                                     console.error("未授权访问:", xhr.responseText);
                                     sessionStorage.setItem('blog_website_login', "false");
                                     alert("未授权，请登录后再试。");
-                                    window.location.href = `./${Page_Blog_Home}`;
+                                    window.location.href = `${Page_Blog_Home}`;
                                 } else {
                                     console.error("Error sending string:", error);
                                 }
@@ -439,7 +440,7 @@
                 // 绑定编辑按钮点击事件
                 $('.edit-blog').click(function () {
                     const blogId = $(this).data('id');
-                    window.open(`../../md/page/${Page_Blog_Update}?id=${blogId}`, '_blank');
+                    window.open(`${Page_Blog_Update}?id=${blogId}`, '_blank');
                 });
 
                 // 绑定删除按钮点击事件
@@ -526,7 +527,7 @@
                                     console.error("未授权访问:", xhr.responseText);
                                     sessionStorage.setItem('blog_website_login', "false");
                                     alert("未授权，请登录后再试。");
-                                    window.location.href = `./${Page_Blog_Home}`;
+                                    window.location.href = `${Page_Blog_Home}`;
                                 } else {
                                     console.error("Error sending string:", error);
                                 }
@@ -567,7 +568,7 @@
                             console.error("未授权访问:", xhr.responseText);
                             sessionStorage.setItem('blog_website_login', "false");
                             alert("未授权，请登录后再试。");
-                            window.location.href = `./${Page_Blog_Home}`;
+                            window.location.href = `${Page_Blog_Home}`;
                         } else {
                             console.error("Error sending string:", error);
                         }
@@ -597,7 +598,7 @@
                         console.error("未授权访问:", xhr.responseText);
                         sessionStorage.setItem('blog_website_login', "false");
                         alert("未授权，请登录后再试。");
-                        window.location.href = `./${Page_Blog_Home}`;
+                        window.location.href = `${Page_Blog_Home}`;
                     } else {
                         console.error("Error sending string:", error);
                     }
@@ -626,7 +627,7 @@
                         console.error("未授权访问:", xhr.responseText);
                         sessionStorage.setItem('blog_website_login', "false");
                         alert("未授权，请登录后再试。");
-                        window.location.href = `./${Page_Blog_Home}`;
+                        window.location.href = `${Page_Blog_Home}`;
                     } else {
                         console.error("Error sending string:", error);
                     }
@@ -680,7 +681,7 @@
                         console.error("未授权访问:", xhr.responseText);
                         sessionStorage.setItem('blog_website_login', "false");
                         alert("未授权，请登录后再试。");
-                        window.location.href = `./${Page_Blog_Home}`;
+                        window.location.href = `${Page_Blog_Home}`;
                     }
                     else if (xhr.status === 500) {
                         showToast(xhr.responseText);
@@ -716,7 +717,7 @@
                     console.error("未授权访问:");
                     sessionStorage.setItem('blog_website_login', "false");
                     alert("未授权，请登录后再试。");
-                    window.location.href = `./${Page_Blog_Home}`;
+                    window.location.href = `${Page_Blog_Home}`;
                 } else {
                     console.error("Error sending string:", error);
                 }
@@ -750,7 +751,7 @@
                     console.error("未授权访问:");
                     sessionStorage.setItem('blog_website_login', "false");
                     alert("未授权，请登录后再试。");
-                    window.location.href = `./${Page_Blog_Home}`;
+                    window.location.href = `${Page_Blog_Home}`;
                 } else {
                     console.error("Error sending string:", error);
                 }
@@ -828,7 +829,7 @@
             });
 
             $("#create-blog-btn").click(() => {
-                window.open(`../../md/page/${Page_Blog_Write}`, '_blank');
+                window.open(`${Page_Blog_Write}`, '_blank');
             });
 
             // 新增标签模态框的逻辑

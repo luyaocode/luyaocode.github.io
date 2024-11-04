@@ -30,24 +30,6 @@
 		background-color: #fcfcfc;
 	}
 
-	.div1 {
-		/* background-image: url("../img/moon.jpg"); */
-		position: absolute;
-		background-size: cover;
-		background-repeat: no-repeat;
-		background-attachment: fixed;
-		/* 可解决背景图太小，div2滑到底部没有背景的问题 */
-		width: 100%;
-		height: 100%;
-	}
-
-	.div2 {
-		position: relative;
-		width: 100%;
-		height: 100%;
-		background: rgba(255, 255, 255, 0.3);
-	}
-
 	.title {
 		display: flex;
 		flex-direction: row;
@@ -278,22 +260,23 @@
 		color: #000000;
 	}
 
-
+	/* 导航栏 */
 	.navbar-brand {
+		font-size: 16px;
 		font-weight: bold;
-		margin-left: 10px;
-		/* 加粗字体 */
+		margin-left: 0;
 		color: #007bff;
-		/* 自定义颜色 */
 		transition: color 0.3s;
-		/* 添加过渡效果 */
 	}
 
 	.navbar-brand:hover {
 		color: #0056b3;
-		/* 悬停时颜色变化 */
 		text-decoration: underline;
-		/* 悬停时添加下划线 */
+	}
+
+	.navbar {
+		height: 60px;
+		padding-left: 10px;
 	}
 
 	.selected-tags {
@@ -346,52 +329,48 @@
 </style>
 
 <body>
-	<div class="div1">
-		<div class="div2">
 
-			<!-- 导航栏 -->
-			<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-				<div class="container-fluid">
-					<a id="home-page" class="navbar-brand" href="/">主页</a>
-					<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-						aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-						<span class="navbar-toggler-icon"></span>
-					</button>
-					<div class="collapse navbar-collapse" id="navbarNav">
-						<ul class="navbar-nav ms-auto">
-							<li class="nav-item">
-								<a class="nav-link" id="d-write-blog" href="">创作</a>
-							</li>
-							<li class="nav-item">
-								<a class="nav-link" id="setting-btn" href="">管理</a>
-							</li>
-							<li class="nav-item">
-								<a class="nav-link" id="auth-btn" onclick="openAuthPopup()">
-									<i class="fab fa-github"></i> 登录
-								</a>
-							</li>
-						</ul>
-					</div>
+	<!-- 导航栏 -->
+	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+		<div class="container-fluid">
+			<a id="home-page" class="navbar-brand" href="/">主页</a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+				aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarNav">
+				<ul class="navbar-nav ms-auto">
+					<li class="nav-item">
+						<a class="nav-link" id="d-write-blog" href="">创作</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" id="setting-btn" href="">管理</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" id="auth-btn" onclick="openAuthPopup()">
+							<i class="fab fa-github"></i> 登录
+						</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+	<div class="container">
+		<div class="row">
+			<div class="col-md-2 col-12">
+				<div id="tags" class="tag-container mb-4">
 				</div>
-			</nav>
-			<div class="container">
-				<div class="row">
-					<div class="col-md-2 col-12">
-						<div id="tags" class="tag-container mb-4">
-						</div>
-					</div>
-					<div class="col-md-10 col-12">
-						<div class="d-flex align-items-center mb-2">
-							<button id="clear-filters" class="btn btn-secondary me-2">清空筛选</button> <!-- 添加按钮 -->
-							<div id="selected-tags" class="selected-tags d-flex align-items-center"></div>
-							<!-- 用于显示当前选中的标签 -->
-						</div>
-						<ul id="blogs" class="list-group">
-							<!-- Blogs will be rendered here -->
-						</ul>
-						<div id="blog-pagination" class="pagination"></div>
-					</div>
+			</div>
+			<div class="col-md-10 col-12">
+				<div class="d-flex align-items-center mb-2">
+					<button id="clear-filters" class="btn btn-secondary me-2">清空筛选</button> <!-- 添加按钮 -->
+					<div id="selected-tags" class="selected-tags d-flex align-items-center"></div>
+					<!-- 用于显示当前选中的标签 -->
 				</div>
+				<ul id="blogs" class="list-group">
+					<!-- Blogs will be rendered here -->
+				</ul>
+				<div id="blog-pagination" class="pagination"></div>
 			</div>
 		</div>
 	</div>

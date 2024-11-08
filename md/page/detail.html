@@ -148,6 +148,10 @@
             transition: background-color 0.3s, color 0.3s;
         }
 
+        #test-editormd-view.night-mode img {
+            filter: brightness(0.5);
+        }
+
         #test-editormd-view.night-mode pre.prettyprint {
             background-color: #9d9d9d;
             transition: background-color 0.3s, color 0.3s;
@@ -326,7 +330,7 @@
             /* 鼠标悬停时显示放大光标 */
             max-width: none;
             /* 不限制宽度 */
-            max-height: none;
+            max-height: 80vh;
             /* 不限制高度 */
             object-fit: contain;
             /* 保持图片比例 */

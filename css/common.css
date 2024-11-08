@@ -1,25 +1,37 @@
-/* 滚动条 */
-/* 自定义滚动条样式 */
+/* Webkit 浏览器（Chrome, Safari, Edge） */
+
+/* 设置全局滚动条 */
+* {
+    scrollbar-width: thin; /* Firefox 默认较窄 */
+    scrollbar-color: rgba(0, 0, 0, 0.5) rgba(0, 0, 0, 0.1); /* 滚动条和轨道颜色 */
+}
+
+/* 设置滚动条宽度 */
 ::-webkit-scrollbar {
-    width: 12px;
+    width: 8px; /* 更窄的滚动条 */
 }
 
+/* 滚动条轨道 */
 ::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.1); /* 设置轨道背景色 */
+    border-radius: 10px; /* 圆角 */
 }
 
+/* 滚动条滑块 */
 ::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.5);
-    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.5); /* 设置滑块颜色 */
+    border-radius: 10px; /* 圆角 */
 }
 
+/* 鼠标悬停时滑块样式 */
 ::-webkit-scrollbar-thumb:hover {
     background: rgba(0, 0, 0, 0.7);
 }
 
 /* Firefox */
+
+/* 设置滚动条宽度和颜色 */
 html {
-    scrollbar-width: thin;
-    scrollbar-color: rgba(0, 0, 0, 0.5) rgba(0, 0, 0, 0.1);
+    scrollbar-width: thin; /* 滚动条宽度为薄 */
+    scrollbar-color: rgba(0, 0, 0, 0.5) rgba(0, 0, 0, 0.1); /* 滚动条和轨道颜色 */
 }

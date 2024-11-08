@@ -137,6 +137,68 @@
         .loading-spinner {
             color: white;
         }
+
+        /* 预览容器 */
+        .preview-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            justify-content: center;
+            align-items: center;
+            z-index: 20;
+            /* 确保容器位于蒙版之上 */
+            background: rgba(0, 0, 0, 0.6);
+            /* 半透明背景蒙版 */
+        }
+
+        /* 内容容器居中 */
+        .preview-content {
+            width: 90%;
+            max-width: 1000px;
+            max-height: 90%;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            /* 添加阴影 */
+            border-radius: 8px;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 内嵌的图片和 PDF 内容容器 */
+        .preview-content img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        /* PDF 内容居中 */
+        .preview-content canvas {
+            display: block;
+            max-width: 100%;
+            max-height: 100%;
+            margin: 0 auto;
+        }
+
+        #pdf-content {
+            display: none;
+            flex-direction: column;
+        }
+
+        #image-content {
+            display: none;
+            flex-direction: column;
+        }
+
+        .image-preview {
+            max-height: 40vh;
+            width: auto;
+        }
     </style>
 </head>
 
@@ -147,15 +209,15 @@
             <div class="ml-auto d-flex">
                 <button id="btnUploadRecord" class="btn btn-outline-light btn-sm mx-1 no-focus" data-toggle="tooltip"
                     title="上传记录" data-placement="bottom">
-                    <i class="bi bi-upload"></i> 上传记录
+                    <i class="bi bi-upload"></i>
                 </button>
                 <button id="btnDownloadRecord" class="btn btn-outline-light btn-sm mx-1 no-focus" data-toggle="tooltip"
                     title="下载记录" data-placement="bottom">
-                    <i class="bi bi-download"></i> 下载记录
+                    <i class="bi bi-download"></i>
                 </button>
                 <button id="btnLogin" class="btn btn-outline-light btn-sm mx-1 no-focus" data-toggle="tooltip"
                     title="登录" data-placement="bottom">
-                    <i class="bi bi-person-circle"></i> 登录
+                    <i class="bi bi-person-circle"></i>
                 </button>
             </div>
         </div>
@@ -240,10 +302,45 @@
             </div>
         </div>
 
+    </div>
+    <!-- 预览容器（背景蒙版与内容容器组合） -->
+    <div class="preview-container" id="preview-container">
+        <div class="preview-content" id="preview-content">
+            <div id="pdf-content">
+                <div class="d-flex justify-content-center">
+                    <div class="d-flex flex-row align-items-center border p-3 rounded">
+                        <button id="prevPage" class="btn btn-sm btn-primary mb-2 mx-2">
+                            <i class="bi bi-arrow-left-circle"></i>
+                        </button>
+                        <button id="nextPage" class="btn btn-sm btn-primary mb-2 mx-2">
+                            <i class="bi bi-arrow-right-circle"></i>
+                        </button>
+                        <button id="closePreview-pdf" class="btn btn-sm btn-danger mb-2 mx-2">
+                            <i class="bi bi-x-circle"></i>
+                        </button>
+                    </div>
+                </div>
+                <canvas id="pdf-canvas"></canvas>
+            </div>
+            <!-- 图片显示区域 -->
+            <div id="image-content">
+                <div class="d-flex justify-content-end">
+                    <div class="d-flex flex-row align-items-center border p-3 rounded">
+                        <button id="closePreview-img" class="btn btn-sm btn-danger mb-2 mx-2">
+                            <i class="bi bi-x-circle"></i>
+                        </button>
+                    </div>
+                </div>
+                <img id="image-preview" class="img-fluid" alt="img-preview" style="max-height: 100%; width: auto;">
+            </div>
+        </div>
+    </div>
 </body>
 <script src="../js/jquery.min.js"></script>
 <script src="../js/constDefine.js"></script>
 <script src="../js/bootstrap.bundle.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
 <script>
     // 初始化工具提示
     const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
@@ -374,6 +471,51 @@
         }
     }
 
+    const previewFile = async (fileID) => {
+        document.getElementById('preview-container').style.display = 'flex'; // 显示预览容器
+        const downloadResponse = await fetch(`${backend_yingwu}/files/download/${fileID}`, {
+            credentials: 'include'
+        });
+
+        // 检查响应状态
+        if (downloadResponse.ok) {
+            const contentType = downloadResponse.headers.get('Content-Type');
+            if (contentType && contentType.includes('application/json')) {
+                const respJson = await downloadResponse.json();
+                if (respJson) {
+                    alert(respJson.error);
+                    return;
+                }
+            } else {
+                // 处理文件响应
+                let fileName = '未命名文件';
+                const contentDisposition = downloadResponse.headers.get('Content-Disposition');
+                if (contentDisposition) {
+                    const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+                    if (filenameMatch && filenameMatch[1]) {
+                        // 去除引号
+                        fileName = filenameMatch[1].replace(/['"]/g, '');
+                        // 去除 UTF-8
+                        fileName = fileName.replace(/UTF-8/g, '').trim(); // 去除所有的 UTF-8 并去掉多余空格
+                        // 解码文件名
+                        fileName = decodeURIComponent(fileName);
+                    }
+                }
+                // 获取 Blob 数据
+                const blob = await downloadResponse.blob();
+
+                // 创建 Blob URL
+                const blobUrl = URL.createObjectURL(blob);
+                let fileExtension = fileName.substring(fileName.lastIndexOf('.') + 1);
+                openPreview(fileExtension, blobUrl);
+                setTimeout(() => URL.revokeObjectURL(blobUrl), 60000);
+            }
+        }
+        else {
+            alert("请求失败");
+        }
+    }
+
     function removeFile(element) {
         const row = element.closest('tr'); // 获取当前行
         const fileName = row.cells[0].textContent; // 获取第一列（文件名）
@@ -470,7 +612,7 @@
             const row = document.createElement('tr');
             const size = (file.size / (1024 * 1024)).toFixed(2);
             row.innerHTML = `
-                <td><a href="${backend_yingwu}/files/download/${file.hash}">${file.filename}</a></td>
+                <td><a href="javascript:void(0);" onclick="previewFile('${file.hash}')">${file.filename}</a></td>
                 <td>${size} MB</td>
                 <td>${new Date(file.uploaded_at).toLocaleString()}</td>
                 <td><button class="btn btn-success btn-sm" onclick="downloadFile('${file.hash}')">下载</button></td>
@@ -490,6 +632,101 @@
         loadFiles();
     });
 
+</script>
+<script>// 预览文件
+    let pdfDoc = null;  // PDF 文档对象
+    let currentPage = 1; // 当前页数
+    let totalPages = 0;  // 总页数
+    const canvas = document.getElementById('pdf-canvas');
+    const ctx = canvas.getContext('2d');
+
+    // 渲染 PDF 页面
+    async function renderPdf(pageNumber) {
+        try {
+            // 获取页面对象
+            const page = await pdfDoc.getPage(pageNumber);
+
+            // 设置缩放比例
+            const scale = 1.5;
+            const viewport = page.getViewport({ scale });
+
+            // 设置 canvas 尺寸
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+
+            // 渲染页面到 canvas
+            await page.render({ canvasContext: ctx, viewport }).promise;
+        } catch (error) {
+            console.error("渲染页面失败：", error);
+        }
+    }
+
+    // 打开预览（示例，点击按钮时）
+    function openPreview(contentType, contentSrc) {
+        if (contentType === 'pdf') {
+            showPdfPreview(contentSrc);
+        }
+        else if (["jpg", "jpeg", "png", "gif"].includes(contentType)) {
+            showImage(contentSrc);
+        }
+        else {
+            closePreview();
+            alert("该文件格式暂不支持预览");
+        }
+    }
+
+    // 显示 PDF 预览
+    async function showPdfPreview(pdfUrl) {
+        $("#pdf-content").css("display", "flex");
+        try {
+            // 加载 PDF
+            pdfDoc = await pdfjsLib.getDocument(pdfUrl).promise;
+            totalPages = pdfDoc.numPages;
+            renderPdf(currentPage); // 渲染第一页
+        } catch (error) {
+            closePreview();
+            console.error("加载PDF失败：", error);
+        }
+    }
+
+    // 翻到上一页
+    function goToPrevPage() {
+        if (currentPage > 1) {
+            currentPage--;
+            renderPdf(currentPage);
+        }
+    }
+
+    // 翻到下一页
+    function goToNextPage() {
+        if (currentPage < totalPages) {
+            currentPage++;
+            renderPdf(currentPage);
+        }
+    }
+
+    function closePreview() {
+        $("#preview-container").css("display", "none");
+        document.getElementById("image-preview").src = "";
+        $("#image-content").css("display", "none");
+        $("#pdf-content").css("display", "none");
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    // 绑定翻页按钮事件
+    document.getElementById('prevPage').addEventListener('click', goToPrevPage);
+    document.getElementById('nextPage').addEventListener('click', goToNextPage);
+
+    // 关闭pdf预览
+    document.getElementById('closePreview-pdf').addEventListener('click', closePreview);
+
+    // 图片预览
+    function showImage(imageUrl) {
+        $("#image-content").css("display", "flex");
+        document.getElementById("image-preview").src = imageUrl;
+    }
+    // 关闭图片预览
+    document.getElementById('closePreview-img').addEventListener('click', closePreview);
 </script>
 
 </html>

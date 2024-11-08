@@ -25,7 +25,7 @@
 
 /* 鼠标悬停时滑块样式 */
 ::-webkit-scrollbar-thumb:hover {
-    background: #555; /* 设置滑块悬停时的背景颜色为深灰色 */
+    background: #555; /* 设置滑块悬停时的背景颜色为更深的灰色 */
 }
 
 /* Firefox */

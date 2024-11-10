@@ -177,6 +177,11 @@
                 padding-left: 0;
                 margin-right: 2px;
             }
+
+            [data-toggle="tooltip"] {
+                pointer-events: none;
+                /* 禁用 pointer 事件，防止触发 tooltip */
+            }
         }
 
         #test-editormd-view.expand {

@@ -260,7 +260,7 @@
                             <tr>
                                 <th>文件名</th>
                                 <th>大小</th>
-                                <th>上传时间</th>
+                                <!-- <th>上传时间</th> -->
                                 <th>操作</th>
                             </tr>
                         </thead>
@@ -614,7 +614,6 @@
             row.innerHTML = `
                 <td><a href="javascript:void(0);" onclick="previewFile('${file.hash}')">${file.filename}</a></td>
                 <td>${size} MB</td>
-                <td>${new Date(file.uploaded_at).toLocaleString()}</td>
                 <td><button class="btn btn-success btn-sm" onclick="downloadFile('${file.hash}')">下载</button></td>
             `;
             uploadedFileList.appendChild(row);

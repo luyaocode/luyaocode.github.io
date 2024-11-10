@@ -640,7 +640,7 @@
 
         const params = parseQueryString(window.location.href);
         var id = params.id;
-        if (id.includes('#')) {
+        if (id && id.includes('#')) {
             const redirectUrl = window.location.href.split('#')[0];
             window.location.href = redirectUrl;
         }

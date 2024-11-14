@@ -344,16 +344,28 @@
 	document.addEventListener('DOMContentLoaded', () => {
 		document.querySelector('#into_blog').href = `${Page_Blog_Home}`;
 		document.querySelector('#into_yingwu').href = `${Page_Yingwu_Home}`;
-
-		const element = document.getElementById('welcomeTitle');
-		if ($(window).width() <= 768) {
-			element.style.display = "none";
-		}
-		else {
-			element.style.display = "block";
-		}
 	});
 </script>
+<script>
+	const element = document.getElementById('welcomeTitle');
+
+	function adjustTitleDisplay() {
+		if ($(window).width() <= 768) {
+			element.style.display = "none";
+		} else {
+			element.style.display = "block";
+		}
+	}
+
+	// 初始调用以设置状态
+	adjustTitleDisplay();
+
+	// 监听窗口大小变化事件
+	$(window).resize(function () {
+		adjustTitleDisplay();
+	});
+</script>
+
 <script src="https://myhkw.cn/api/player/166175577147" id="myhk" key="166175577147" m="1"></script>
 
 </html>

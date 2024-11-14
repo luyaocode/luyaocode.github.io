@@ -92,17 +92,17 @@ const authorize = () => {
                 document.body.classList.remove('disabled');
 
                 // 隐藏加载弹窗
+                const currentUrl = window.location.href;
+                const url = new URL(currentUrl);
+                url.search = '';
                 if (loadingModal) {
                     loadingModal.style.display = 'none';
-                    // 重定向
-                    const currentUrl = window.location.href;
-                    const url = new URL(currentUrl);
-                    url.search = '';
                     window.location.href = url.toString();
                 }
                 if (!data) { // 授权失败
                     alert("您不在白名单当中，请联系网站管理员");
-                    // window.location.href = `${Page_Blog_Home}`;
+                    // 重定向
+                    window.location.href = url.toString();
                 }
             },
             error: function (xhr, status, error) {

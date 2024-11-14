@@ -74,6 +74,9 @@ const authorize = () => {
             loadingModal.style.display = 'block';
         }
         // 将参数发送给后端
+        const currentUrl = window.location.href;
+        const url = new URL(fullUrl);
+        const baseUrl = url.origin;
         $.ajax({
             url: backend_url + '/auth',
             type: 'POST',
@@ -92,18 +95,13 @@ const authorize = () => {
                 document.body.classList.remove('disabled');
 
                 // 隐藏加载弹窗
-                const currentUrl = window.location.href;
-                const url = new URL(fullUrl);
-                const baseUrl = url.origin;
                 if (loadingModal) {
                     loadingModal.style.display = 'none';
-                    window.location.href = baseUrl.toString();
                 }
                 if (!data) { // 授权失败
                     alert("您不在白名单当中，请联系网站管理员");
-                    // 重定向
-                    window.location.href = baseUrl.toString();
                 }
+                window.location.href = baseUrl.toString();
             },
             error: function (xhr, status, error) {
                 if (loadingModal) {

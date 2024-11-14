@@ -89,8 +89,9 @@ const authorize = () => {
         }
         // 将参数发送给后端
         const currentUrl = window.location.href;
-        const url = new URL(currentUrl);
-        const baseUrl = url.origin;
+        const url = new URL(currentUrl); // 创建 URL 对象
+        const tempUrl = url.origin + url.pathname;
+        const baseUrl = tempUrl.endsWith('/') ? tempUrl.slice(0, -1) : tempUrl; // 如果末尾有 '/', 就去掉
         $.ajax({
             url: backend_url + '/auth',
             type: 'POST',

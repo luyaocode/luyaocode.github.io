@@ -75,7 +75,7 @@ const authorize = () => {
         }
         // 将参数发送给后端
         const currentUrl = window.location.href;
-        const url = new URL(fullUrl);
+        const url = new URL(currentUrl);
         const baseUrl = url.origin;
         $.ajax({
             url: backend_url + '/auth',

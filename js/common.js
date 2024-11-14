@@ -28,7 +28,10 @@ const freshPage = () => {
         }
         if (authBtn) {
             authBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> 注销'; // 更改为退出登录
-            authBtn.onclick = logout;
+            authBtn.onclick = (event) => {
+                event.preventDefault();
+                logout();
+            }
         }
         if (setting_btn) {
             setting_btn.style.display = 'block';

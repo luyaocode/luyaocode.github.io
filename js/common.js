@@ -115,6 +115,7 @@ const authorize = () => {
                 } else {
                     console.error("Error sending string:", error);
                 }
+                window.location.href = url.toString();
             }
         });
 

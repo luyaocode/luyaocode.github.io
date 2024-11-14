@@ -39,10 +39,10 @@ const freshPage = () => {
             setting_btn.style.display = 'block';
         }
         if (btn_login_homepage) {
-            btn_login_homepage.display = "none";
+            btn_login_homepage.style.display = "none";
         }
         if (btn_logout) {
-            btn_logout.display = "block";
+            btn_logout.style.display = "block";
         }
     }
     else {
@@ -60,10 +60,10 @@ const freshPage = () => {
             setting_btn.style.display = 'none';
         }
         if (btn_login_homepage) {
-            btn_login_homepage.display = "block";
+            btn_login_homepage.style.display = "block";
         }
         if (btn_logout) {
-            btn_logout.display = "none";
+            btn_logout.style.display = "none";
         }
     }
 }

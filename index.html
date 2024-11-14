@@ -80,6 +80,15 @@
 		.nav-link:hover {
 			background-color: #c69d9d;
 		}
+
+		.chart-container {
+			display: flex;
+			margin: 20px 20px;
+		}
+
+		.statsModal {
+			width: 80%;
+		}
 	</style>
 
 </head>
@@ -96,7 +105,7 @@
 				<ul class="navbar-nav ms-auto">
 					<!-- 监控按钮 -->
 					<li class="nav-item">
-						<a class="nav-link" onclick="showMinitor()">
+						<a class="nav-link" data-bs-toggle="modal" data-bs-target="#statsModal">
 							<i class="fas fa-chart-line"></i> 监控
 						</a>
 					</li>
@@ -380,28 +389,63 @@
 		</div>
 	</div>
 
-	<div class="container mt-5">
-		<h2>System Stats</h2>
-		<div id="stats" class="row">
-			<div class="col">
-				<h4>CPU Usage: <span id="cpuUsage">Loading...</span>%</h4>
-			</div>
-			<div class="col">
-				<h4>Memory Usage: <span id="memoryUsage">Loading...</span>%</h4>
-			</div>
-			<div class="col">
-				<h4>Disk Usage: <span id="diskUsage">Loading...</span>%</h4>
-			</div>
-		</div>
-		<div id="moreStats" class="row mt-3">
-			<div class="col">
-				<h4>Total Memory: <span id="totalMemory">Loading...</span> GB</h4>
-			</div>
-			<div class="col">
-				<h4>Total Disk: <span id="totalDisk">Loading...</span> GB</h4>
+	<div class="chart-container">
+		<!-- Modal -->
+		<div class="modal fade" id="statsModal" tabindex="-1" aria-labelledby="statsModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-lg">
+				<div class="modal-content">
+					<div class="modal-header flex-column">
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						<h5 class="modal-title" id="statsModalLabel">服务器状态</h5>
+					</div>
+					<div class="modal-body">
+						<div class="container-fluid">
+							<div class="row d-flex justify-content-between">
+								<!-- CPU 饼状图 -->
+								<div
+									class="col-12 col-md-4 mb-4 d-flex flex-column justify-content-center align-items-center">
+									<h4>CPU</h4>
+									<canvas id="cpuChart" width="200" height="200"
+										style="max-width: 45vw; width: 100%;"></canvas>
+								</div>
+
+								<!-- 内存饼状图 -->
+								<div
+									class="col-12 col-md-4 mb-4 d-flex flex-column justify-content-center align-items-center">
+									<h4>内存</h4>
+									<canvas id="memoryChart" width="200" height="200"
+										style="max-width: 45vw; width: 100%;"></canvas>
+								</div>
+
+								<!-- 磁盘饼状图 -->
+								<div
+									class=" col-12 col-md-4 mb-4 d-flex flex-column justify-content-center align-items-center">
+									<h4>磁盘</h4>
+									<canvas id="diskChart" width="200" height="200"
+										style="max-width: 45vw; width: 100%;"></canvas>
+								</div>
+							</div>
+
+							<!-- 总内存和总磁盘 -->
+							<div class="row mt-3">
+								<div
+									class="col-12 col-md-6 d-flex flex-column justify-content-center align-items-center">
+									<h4>内存总量: <span id="totalMemory">Loading...</span> GB</h4>
+								</div>
+								<div
+									class="col-12 col-md-6 d-flex flex-column justify-content-center align-items-center">
+									<h4>磁盘总量: <span id="totalDisk">Loading...</span> GB</h4>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
+
+
+
 </body>
 <script src="./js/main.js"></script>
 <script src="./js/constDefine.js"></script>
@@ -432,18 +476,152 @@
 		adjustTitleDisplay();
 	});
 </script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <script>
+	// WebSocket 连接
 	const socket = new WebSocket(ws_url);
+
+	// 获取饼状图的 context
+	const cpuCtx = document.getElementById('cpuChart').getContext('2d');
+	const memoryCtx = document.getElementById('memoryChart').getContext('2d');
+	const diskCtx = document.getElementById('diskChart').getContext('2d');
+
+	// 创建 CPU 使用率的饼状图
+	const cpuChart = new Chart(cpuCtx, {
+		type: 'pie',
+		data: {
+			labels: ['Used', 'Free'],
+			datasets: [{
+				data: [0, 100], // 初始值为 0
+				backgroundColor: ['#ff6347', '#4caf50'],
+				borderWidth: 1
+			}]
+		},
+		options: {
+			responsive: true,
+			plugins: {
+				legend: {
+					position: 'top',
+				},
+				tooltip: {
+					callbacks: {
+						label: function (tooltipItem) {
+							let value = tooltipItem.raw;
+
+							// 尝试将非数字值转换为数字
+							value = Number(value); // 或者使用 parseFloat(value)
+
+							// 如果转换后的值是有效数字，格式化为两位小数
+							if (!isNaN(value)) {
+								return value.toFixed(2) + '%';
+							}
+
+							// 如果不是有效数字，返回默认值或提示信息
+							return 'Invalid data'; // 可以替换成你希望显示的默认文本
+						}
+					}
+				}
+			}
+		}
+	});
+
+	const memoryChart = new Chart(memoryCtx, {
+		type: 'pie',
+		data: {
+			labels: ['Used', 'Free'],
+			datasets: [{
+				data: [0, 100], // 初始值为 0
+				backgroundColor: ['#ff6347', '#4caf50'],
+				borderWidth: 1
+			}]
+		},
+		options: {
+			responsive: true,
+			plugins: {
+				legend: {
+					position: 'top',
+				},
+				tooltip: {
+					callbacks: {
+						label: function (tooltipItem) {
+							let value = tooltipItem.raw;
+
+							// 尝试将非数字值转换为数字
+							value = Number(value); // 或者使用 parseFloat(value)
+
+							// 如果转换后的值是有效数字，格式化为两位小数
+							if (!isNaN(value)) {
+								return value.toFixed(2) + '%';
+							}
+
+							// 如果不是有效数字，返回默认值或提示信息
+							return 'Invalid data'; // 可以替换成你希望显示的默认文本
+						}
+					}
+				}
+			}
+		}
+	});
+
+	const diskChart = new Chart(diskCtx, {
+		type: 'pie',
+		data: {
+			labels: ['Used', 'Free'],
+			datasets: [{
+				data: [0, 100], // 初始值为 0
+				backgroundColor: ['#ff6347', '#4caf50'],
+				borderWidth: 1
+			}]
+		},
+		options: {
+			responsive: true,
+			plugins: {
+				legend: {
+					position: 'top',
+				},
+				tooltip: {
+					callbacks: {
+						label: function (tooltipItem) {
+							let value = tooltipItem.raw;
+
+							// 尝试将非数字值转换为数字
+							value = Number(value); // 或者使用 parseFloat(value)
+
+							// 如果转换后的值是有效数字，格式化为两位小数
+							if (!isNaN(value)) {
+								return value.toFixed(2) + '%';
+							}
+
+							// 如果不是有效数字，返回默认值或提示信息
+							return 'Invalid data'; // 可以替换成你希望显示的默认文本
+						}
+					}
+				}
+			}
+		}
+	});
+
 
 	// 监听 WebSocket 消息事件
 	socket.addEventListener('message', (event) => {
 		const stats = JSON.parse(event.data);
-		document.getElementById('cpuUsage').textContent = stats.cpuUsage;
-		document.getElementById('memoryUsage').textContent = stats.memoryUsage;
-		document.getElementById('diskUsage').textContent = stats.diskUsage;
+
+		// 更新饼图数据
+		cpuChart.data.datasets[0].data = [stats.cpuUsage, 100 - stats.cpuUsage];
+		cpuChart.update();
+
+		memoryChart.data.datasets[0].data = [stats.memoryUsage, 100 - stats.memoryUsage];
+		memoryChart.update();
+
+		diskChart.data.datasets[0].data = [stats.diskUsage, 100 - stats.diskUsage];
+		diskChart.update();
+
+		// 更新总内存和总磁盘
 		document.getElementById('totalMemory').textContent = stats.totalMemory;
 		document.getElementById('totalDisk').textContent = stats.totalDisk;
 	});
+
 
 	socket.addEventListener('open', () => {
 		console.log('WebSocket connected');

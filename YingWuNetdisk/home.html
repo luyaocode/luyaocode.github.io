@@ -426,48 +426,52 @@
     }
 
     const downloadFile = async (fileID) => {
-        const downloadResponse = await fetch(`${backend_yingwu}/files/download/${fileID}`, {
-            credentials: 'include'
-        });
+        try {
+            const downloadResponse = await fetch(`${backend_yingwu}/files/download/${fileID}`, {
+                credentials: 'include'
+            });
 
-        // 检查响应状态
-        if (downloadResponse.ok) {
-            const contentType = downloadResponse.headers.get('Content-Type');
-            if (contentType && contentType.includes('application/json')) {
-                const respJson = await downloadResponse.json();
-                if (respJson) {
-                    alert(respJson.error);
-                    return;
-                }
-            } else {
-                // 处理文件响应
-                let fileName = '未命名文件';
-                const contentDisposition = downloadResponse.headers.get('Content-Disposition');
-                if (contentDisposition) {
-                    const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
-                    if (filenameMatch && filenameMatch[1]) {
-                        // 去除引号
-                        fileName = filenameMatch[1].replace(/['"]/g, '');
-                        // 去除 UTF-8
-                        fileName = fileName.replace(/UTF-8/g, '').trim(); // 去除所有的 UTF-8 并去掉多余空格
-                        // 解码文件名
-                        fileName = decodeURIComponent(fileName);
+            // 检查响应状态
+            if (downloadResponse.ok) {
+                const contentType = downloadResponse.headers.get('Content-Type');
+                if (contentType && contentType.includes('application/json')) {
+                    const respJson = await downloadResponse.json();
+                    if (respJson) {
+                        alert(respJson.error);
+                        return;
                     }
+                } else {
+                    // 处理文件响应
+                    let fileName = '未命名文件';
+                    const contentDisposition = downloadResponse.headers.get('Content-Disposition');
+                    if (contentDisposition) {
+                        const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+                        if (filenameMatch && filenameMatch[1]) {
+                            // 去除引号
+                            fileName = filenameMatch[1].replace(/['"]/g, '');
+                            // 去除 UTF-8
+                            fileName = fileName.replace(/UTF-8/g, '').trim(); // 去除所有的 UTF-8 并去掉多余空格
+                            // 解码文件名
+                            fileName = decodeURIComponent(fileName);
+                        }
+                    }
+                    const blob = await downloadResponse.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = url;
+                    a.download = fileName; // 指定下载文件名
+                    document.body.appendChild(a);
+                    a.click(); // 仅下载文件
+                    document.body.removeChild(a); // 清理
+                    window.URL.revokeObjectURL(url); // 释放 URL 对象
                 }
-                const blob = await downloadResponse.blob();
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.style.display = 'none';
-                a.href = url;
-                a.download = fileName; // 指定下载文件名
-                document.body.appendChild(a);
-                a.click(); // 仅下载文件
-                document.body.removeChild(a); // 清理
-                window.URL.revokeObjectURL(url); // 释放 URL 对象
             }
-        }
-        else {
-            alert("请求失败");
+            else {
+                alert("请求失败");
+            }
+        } catch (error) {
+            console.error();
         }
     }
 
@@ -547,23 +551,30 @@
         const formData = new FormData();
         selectedFiles.forEach(file => formData.append('files', file));
         $('#loadingModal').modal('show');
-        const response = await fetch(`${backend_yingwu}/files/upload`, {
-            method: 'POST',
-            body: formData
-        });
-        if (response.ok) {
-            selectedFiles = [];
-            uploadFileList.innerHTML = '';
-            fileInput.value = '';
+        try {
+            const response = await fetch(`${backend_yingwu}/files/upload`, {
+                method: 'POST',
+                body: formData
+            });
+            if (response.ok) {
+                selectedFiles = [];
+                uploadFileList.innerHTML = '';
+                fileInput.value = '';
 
-            // 修改文本为上传成功
-            const spinnerText = $('#loadingModal .loading-spinner div:nth-child(2)');
-            spinnerText.text('上传成功！');
-            $('#loadingModal').modal('hide');
-            loadFiles();
-        }
-        else {
-            // 修改文本为上传失败
+                // 修改文本为上传成功
+                const spinnerText = $('#loadingModal .loading-spinner div:nth-child(2)');
+                spinnerText.text('上传成功！');
+                $('#loadingModal').modal('hide');
+                loadFiles();
+            }
+            else {
+                // 修改文本为上传失败
+                const spinnerText = $('#loadingModal .loading-spinner div:nth-child(2)');
+                spinnerText.text('上传失败！');
+                $('#loadingModal').modal('hide');
+            }
+        } catch (error) {
+            console.error(error);
             const spinnerText = $('#loadingModal .loading-spinner div:nth-child(2)');
             spinnerText.text('上传失败！');
             $('#loadingModal').modal('hide');

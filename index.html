@@ -24,16 +24,57 @@
 		<img alt="嫌弃" src="img/xianqi.jpg">
 	</noscript>
 
+	<!-- Bootstrap CSS -->
+	<script src="./js/jquery.min.js"></script>
+	<link href="./css/bootstrap.min.css" rel="stylesheet">
+	<link href="./css/bootstrap-icons.css" rel="stylesheet">
+	<link href="./css/all.min.css" rel="stylesheet">
+	<script src="./js/bootstrap.bundle.min.js"></script>
+
 	<!-- <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,700'> -->
 	<style>
 		#welcomeTitle {
 			display: none;
+			font-size: 28px;
+		}
+
+		.nav-item {
+			cursor: pointer;
+			font-size: 16px;
+			padding: 0.5rem;
 		}
 	</style>
 
 </head>
 
 <body>
+	<!-- 导航栏 -->
+	<nav class="navbar navbar-expand-lg navbar-dark bg-transparent fixed-top">
+		<div class="container-fluid">
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+				aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarNav">
+				<ul class="navbar-nav ms-auto">
+					<!-- 监控按钮 -->
+					<li class="nav-item">
+						<a class="nav-link" onclick="showMinitor()">
+							<i class="fas fa-chart-line"></i> 监控
+						</a>
+					</li>
+					<!-- 登录按钮 -->
+					<li class="nav-item">
+						<a class="nav-link" id="auth-btn" onclick="openAuthPopup()">
+							<i class="fab fa-github"></i> 登录
+						</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+
+
 	<div class="wrapper" id="welcomeTitle">
 		<h1>Hello, 这里是小饿鱼...<span>&nbsp;</span></h1>
 	</div>
@@ -293,15 +334,16 @@
 	</main>
 	<!-- partial -->
 </body>
+<script src="./js/main.js"></script>
+<script src="./js/common.js"></script>
 <script src="./js/constDefine.js"></script>
 <script>
+	authorize();
 	document.addEventListener('DOMContentLoaded', () => {
 		document.querySelector('#into_blog').href = `${Page_Blog_Home}`;
 		document.querySelector('#into_yingwu').href = `${Page_Yingwu_Home}`;
 	});
 </script>
-<script src="./js/jquery.min.js"></script>
 <script src="https://myhkw.cn/api/player/166175577147" id="myhk" key="166175577147" m="1"></script>
-<script src="./js/main.js"></script>
 
 </html>

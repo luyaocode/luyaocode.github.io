@@ -434,5 +434,6 @@ h1 span{
 }
 
 .wrapper{
+    margin-top: 60px;
     position: absolute;
 }

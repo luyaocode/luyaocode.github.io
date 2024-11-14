@@ -602,11 +602,19 @@
     };
 
     async function loadFiles() {
-        const uploadResponse = await fetch(`${backend_yingwu}/allfiles`, {
-            credentials: 'include'
-        });
-
-        const uploads = await uploadResponse.json();
+        let uploads;
+        try {
+            const uploadResponse = await fetch(`${backend_yingwu}/allfiles`, {
+                credentials: 'include'
+            });
+            if (!uploadResponse.ok) {
+                return;
+            }
+            uploads = await uploadResponse.json();
+        } catch (error) {
+            return;
+        }
+        if (!uploads || uploads.length == 0) return;
         uploadFileList.innerHTML = '';
         uploads.forEach(file => {
             const row = document.createElement('tr');

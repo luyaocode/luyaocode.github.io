@@ -21,6 +21,7 @@ const freshPage = () => {
     const setting_btn = document.getElementById("setting-btn");
     const status = sessionStorage.getItem('blog_website_login');
     const btn_login_homepage = document.getElementById("auth-btn_homepage");
+    const btn_logout = document.getElementById("btn_logout");
 
     if (status === 'true') { // 登录成功
         if (d_write_blog) {
@@ -38,11 +39,10 @@ const freshPage = () => {
             setting_btn.style.display = 'block';
         }
         if (btn_login_homepage) {
-            btn_login_homepage.innerHTML = '<i class="fas fa-sign-out-alt"></i> 注销'; // 更改为退出登录
-            btn_login_homepage.onclick = (event) => {
-                event.preventDefault();
-                logout();
-            }
+            btn_login_homepage.display = "none";
+        }
+        if (btn_logout) {
+            btn_logout.display = "block";
         }
     }
     else {
@@ -60,10 +60,10 @@ const freshPage = () => {
             setting_btn.style.display = 'none';
         }
         if (btn_login_homepage) {
-            authBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> 登录';
-            btn_login_homepage.onclick = (event) => {
-                openAuthPopup();
-            }
+            btn_login_homepage.display = "block";
+        }
+        if (btn_logout) {
+            btn_logout.display = "none";
         }
     }
 }

@@ -93,16 +93,16 @@ const authorize = () => {
 
                 // 隐藏加载弹窗
                 const currentUrl = window.location.href;
-                const url = new URL(currentUrl);
-                url.search = '';
+                const url = new URL(fullUrl);
+                const baseUrl = url.origin;
                 if (loadingModal) {
                     loadingModal.style.display = 'none';
-                    window.location.href = url.toString();
+                    window.location.href = baseUrl.toString();
                 }
                 if (!data) { // 授权失败
                     alert("您不在白名单当中，请联系网站管理员");
                     // 重定向
-                    window.location.href = url.toString();
+                    window.location.href = baseUrl.toString();
                 }
             },
             error: function (xhr, status, error) {
@@ -115,7 +115,7 @@ const authorize = () => {
                 } else {
                     console.error("Error sending string:", error);
                 }
-                window.location.href = url.toString();
+                window.location.href = baseUrl.toString();
             }
         });
 

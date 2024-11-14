@@ -88,6 +88,12 @@
 		.statsModal {
 			width: 80%;
 		}
+
+		/* 设置模态框背景为浅灰色 */
+		.modal-content {
+			background-color: #f1f1f1;
+			/* 浅灰色背景 */
+		}
 	</style>
 
 </head>
@@ -110,8 +116,8 @@
 					</li>
 					<!-- 登录按钮 -->
 					<li class="nav-item">
-						<a class="nav-link" id="auth-btn">
-							<i class="fab fa-github"></i> 登录
+						<a class="nav-link" id="auth-btn_homepage" data-bs-toggle="modal" data-bs-target="#loginModal">
+							<i class="fas fa-sign-in-alt"></i> 登录
 						</a>
 					</li>
 				</ul>
@@ -443,6 +449,41 @@
 		</div>
 	</div>
 
+	<!-- 登录弹窗 -->
+	<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="loginModalLabel">登录</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<!-- 登录选项按钮 -->
+					<div class="d-flex flex-column">
+						<!-- Github 登录按钮 -->
+						<button class="btn btn-dark mb-2" id="btn_login_github">
+							<i class="fab fa-github"></i> 使用 Github 登录
+						</button>
+
+						<!-- Google 登录按钮 -->
+						<button class="btn btn-danger mb-2 disabled">
+							<i class="fab fa-google"></i> 使用 Google 登录（暂不支持）
+						</button>
+
+						<!-- 微信登录按钮 -->
+						<button class="btn btn-success mb-2 disabled">
+							<i class="fab fa-weixin"></i> 使用微信登录（暂不支持）
+						</button>
+
+						<!-- 手机号登录按钮 -->
+						<button class="btn btn-info mb-2 disabled">
+							<i class="fas fa-phone"></i> 使用手机号登录（暂不支持）
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 
 
 </body>
@@ -473,6 +514,10 @@
 	// 监听窗口大小变化事件
 	$(window).resize(function () {
 		adjustTitleDisplay();
+	});
+
+	document.addEventListener('DOMContentLoaded', () => {
+		document.getElementById("btn_login_github").onclick = () => openAuthPopup();
 	});
 </script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

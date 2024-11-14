@@ -1,7 +1,9 @@
 function openAuthPopup() {
     const state = Math.floor(Math.random() * Math.pow(10, 8));
     localStorage.setItem("state", state);
-    const url = `https://github.com/login/oauth/authorize?client_id=Iv23liOH77T5kmvXYkx8&redirect_uri=https://blog.chaosgomoku.fun${Page_Blog_Home}&allow_signup=true&scope=user:email&state=${state}`;
+    let url;
+    const currentUrl = window.location.href;
+    url = `https://github.com/login/oauth/authorize?client_id=Iv23liOH77T5kmvXYkx8&redirect_uri=${currentUrl}&allow_signup=true&scope=user:email&state=${state}`;
     window.location.href = url;
 }
 
@@ -38,7 +40,9 @@ const freshPage = () => {
         }
         if (authBtn) {
             authBtn.innerHTML = '<i class="fab fa-github"></i> 登录';
-            authBtn.onclick = openAuthPopup;
+            authBtn.onclick = () => {
+                openAuthPopup();
+            };
         }
         if (setting_btn) {
             setting_btn.style.display = 'none';

@@ -67,7 +67,7 @@
 					</li>
 					<!-- 登录按钮 -->
 					<li class="nav-item">
-						<a class="nav-link" id="auth-btn" onclick="openAuthPopup()">
+						<a class="nav-link" id="auth-btn">
 							<i class="fab fa-github"></i> 登录
 						</a>
 					</li>
@@ -344,6 +344,7 @@
 	document.addEventListener('DOMContentLoaded', () => {
 		document.querySelector('#into_blog').href = `${Page_Blog_Home}`;
 		document.querySelector('#into_yingwu').href = `${Page_Yingwu_Home}`;
+		document.getElementById("auth-btn").onclick = () => openAuthPopup();
 	});
 </script>
 <script>

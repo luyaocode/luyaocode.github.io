@@ -94,6 +94,11 @@ const authorize = () => {
                 // 隐藏加载弹窗
                 if (loadingModal) {
                     loadingModal.style.display = 'none';
+                    // 重定向
+                    const currentUrl = window.location.href;
+                    const url = new URL(currentUrl);
+                    url.search = '';
+                    window.location.href = url.toString();
                 }
                 if (!data) { // 授权失败
                     alert("您不在白名单当中，请联系网站管理员");

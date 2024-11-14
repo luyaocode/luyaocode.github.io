@@ -9,15 +9,11 @@
     var bIsCE = sUserAgent.match(/windows ce/i) == "windows ce";
     var bIsWM = sUserAgent.match(/windows mobile/i) == "windows mobile";
     var url = "./js/sakura.js";
-    const element = document.getElementById('welcomeTitle');
     if(bIsIpad || bIsIphoneOs || bIsMidp || bIsUc7 || bIsUc || bIsAndroid || bIsCE || bIsWM) {
         var script = document.createElement('script');
         script.setAttribute('type','text/javascript');
         // script.setAttribute('src',url);
         document.getElementsByTagName('head')[0].appendChild(script);
         // document.write("<script src="+url+"></script>");
-        element.remove();
-    } else {
-        element.style.display = "block";
     }
 })();

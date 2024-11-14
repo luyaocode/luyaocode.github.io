@@ -34,6 +34,8 @@
 	<!-- <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,700'> -->
 	<style>
 		#welcomeTitle {
+			margin-top: 60px;
+			position: absolute;
 			display: none;
 			font-size: 28px;
 		}
@@ -342,6 +344,14 @@
 	document.addEventListener('DOMContentLoaded', () => {
 		document.querySelector('#into_blog').href = `${Page_Blog_Home}`;
 		document.querySelector('#into_yingwu').href = `${Page_Yingwu_Home}`;
+
+		const element = document.getElementById('welcomeTitle');
+		if ($(window).width() <= 768) {
+			element.style.display = "none";
+		}
+		else {
+			element.style.display = "block";
+		}
 	});
 </script>
 <script src="https://myhkw.cn/api/player/166175577147" id="myhk" key="166175577147" m="1"></script>

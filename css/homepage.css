@@ -432,8 +432,3 @@ h1 span{
 @keyframes cursor{
     50% { border-color: white;}
 }
-
-.wrapper{
-    margin-top: 60px;
-    position: absolute;
-}

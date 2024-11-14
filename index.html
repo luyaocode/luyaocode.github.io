@@ -379,6 +379,29 @@
 			</div>
 		</div>
 	</div>
+
+	<div class="container mt-5">
+		<h2>System Stats</h2>
+		<div id="stats" class="row">
+			<div class="col">
+				<h4>CPU Usage: <span id="cpuUsage">Loading...</span>%</h4>
+			</div>
+			<div class="col">
+				<h4>Memory Usage: <span id="memoryUsage">Loading...</span>%</h4>
+			</div>
+			<div class="col">
+				<h4>Disk Usage: <span id="diskUsage">Loading...</span>%</h4>
+			</div>
+		</div>
+		<div id="moreStats" class="row mt-3">
+			<div class="col">
+				<h4>Total Memory: <span id="totalMemory">Loading...</span> GB</h4>
+			</div>
+			<div class="col">
+				<h4>Total Disk: <span id="totalDisk">Loading...</span> GB</h4>
+			</div>
+		</div>
+	</div>
 </body>
 <script src="./js/main.js"></script>
 <script src="./js/constDefine.js"></script>
@@ -407,6 +430,27 @@
 	// 监听窗口大小变化事件
 	$(window).resize(function () {
 		adjustTitleDisplay();
+	});
+</script>
+<script>
+	const socket = new WebSocket('ws://localhost:5001');
+
+	// 监听 WebSocket 消息事件
+	socket.addEventListener('message', (event) => {
+		const stats = JSON.parse(event.data);
+		document.getElementById('cpuUsage').textContent = stats.cpuUsage;
+		document.getElementById('memoryUsage').textContent = stats.memoryUsage;
+		document.getElementById('diskUsage').textContent = stats.diskUsage;
+		document.getElementById('totalMemory').textContent = stats.totalMemory;
+		document.getElementById('totalDisk').textContent = stats.totalDisk;
+	});
+
+	socket.addEventListener('open', () => {
+		console.log('WebSocket connected');
+	});
+
+	socket.addEventListener('close', () => {
+		console.log('WebSocket disconnected');
 	});
 </script>
 

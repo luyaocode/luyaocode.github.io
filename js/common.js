@@ -94,7 +94,7 @@ const authorize = () => {
                 }
                 if (!data) { // 授权失败
                     alert("您不在白名单当中，请联系网站管理员");
-                    window.location.href = `${Page_Blog_Home}`;
+                    // window.location.href = `${Page_Blog_Home}`;
                 }
             },
             error: function (xhr, status, error) {

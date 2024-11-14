@@ -433,7 +433,7 @@
 	});
 </script>
 <script>
-	const socket = new WebSocket('ws://localhost:5001');
+	const socket = new WebSocket(ws_url);
 
 	// 监听 WebSocket 消息事件
 	socket.addEventListener('message', (event) => {

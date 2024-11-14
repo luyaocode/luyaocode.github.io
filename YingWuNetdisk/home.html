@@ -602,6 +602,11 @@
     };
 
     async function loadFiles() {
+        uploadFileList.innerHTML = '';
+        const status = sessionStorage.getItem('blog_website_login');
+        if (status !== "true") {
+            return;
+        }
         let uploads;
         try {
             const uploadResponse = await fetch(`${backend_yingwu}/allfiles`, {

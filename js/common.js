@@ -66,7 +66,10 @@ const authorize = () => {
         const status = sessionStorage.getItem('blog_website_login');
         if (status === 'true') return; // 如果已授权就返回
         // 显示加载弹窗
-        document.getElementById('loadingModal').style.display = 'block';
+        const loadingModal = document.getElementById('loadingModal');
+        if (loadingModal) {
+            loadingModal.style.display = 'block';
+        }
         // 将参数发送给后端
         $.ajax({
             url: backend_url + '/auth',
@@ -86,15 +89,18 @@ const authorize = () => {
                 document.body.classList.remove('disabled');
 
                 // 隐藏加载弹窗
-                document.getElementById('loadingModal').style.display = 'none';
+                if (loadingModal) {
+                    loadingModal.style.display = 'none';
+                }
                 if (!data) { // 授权失败
                     alert("您不在白名单当中，请联系网站管理员");
                     window.location.href = `${Page_Blog_Home}`;
                 }
             },
             error: function (xhr, status, error) {
-                // 隐藏加载弹窗
-                document.getElementById('loadingModal').style.display = 'none';
+                if (loadingModal) {
+                    loadingModal.style.display = 'none';
+                }
                 if (xhr.status === 500) {
                     console.error("服务器异常：", xhr.responseText);
                     alert(xhr.responseText);

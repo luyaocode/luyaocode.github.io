@@ -3,7 +3,8 @@ function openAuthPopup() {
     localStorage.setItem("state", state);
     let url;
     const currentUrl = window.location.href;
-    url = `https://github.com/login/oauth/authorize?client_id=Iv23liOH77T5kmvXYkx8&redirect_uri=${currentUrl}&allow_signup=true&scope=user:email&state=${state}`;
+    const urlWithoutSlash = currentUrl.endsWith('/') ? currentUrl.slice(0, -1) : currentUrl;
+    url = `https://github.com/login/oauth/authorize?client_id=Iv23liOH77T5kmvXYkx8&redirect_uri=${urlWithoutSlash}&allow_signup=true&scope=user:email&state=${state}`;
     window.location.href = url;
 }
 

@@ -212,6 +212,12 @@
         .modal-content {
             word-break: break-all;
         }
+
+        /* 表格样式 */
+        .table td,
+        .table th {
+            vertical-align: middle;
+        }
     </style>
 </head>
 
@@ -266,14 +272,13 @@
                 <div class="text-right">
                     <button id="uploadFileButton" class="btn btn-success btn-sm">上传文件</button>
                 </div>
-                <h6 class="mt-2">已上传文件列表</h6>
+                <h6 class="mt-2">已上传文件</h6>
                 <div class="file-list">
                     <table class="table">
                         <thead>
                             <tr>
                                 <th>文件名</th>
                                 <th>大小</th>
-                                <!-- <th>上传时间</th> -->
                                 <th>过期时间</th>
                                 <th>操作</th>
                             </tr>
@@ -281,7 +286,26 @@
                         <tbody id="uploadedFileList"></tbody>
                     </table>
                 </div>
+                <!-- 分页控件 -->
+                <ul class="pagination" id="uploaded_files_pagination">
+                    <li class="page-item" id="prevPage">
+                        <a class="page-link" href="javascript:void(0);" onclick="changePage(currentUploadedPage - 1)"
+                            aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item disabled" id="pageInfo">
+                        <span class="page-link">第 1 页 / 共 10 页</span>
+                    </li>
+                    <li class="page-item" id="nextPage">
+                        <a class="page-link" href="javascript:void(0);" onclick="changePage(currentUploadedPage + 1)"
+                            aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
             </div>
+
 
             <!-- 下载文件区域 -->
             <div class="col-md-4 download-area">
@@ -351,7 +375,7 @@
     </div>
 
     <!-- 上传结果模态框 -->
-    <div class="modal fade" id="uploadedModal" tabindex="-1" aria-labelledby="uploadedModalLabel" aria-hidden="true">
+    <div class="modal fade" id="uploadedModal" tabindex="-1" aria-labelledby="uploadedModalLabel">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
@@ -397,6 +421,43 @@
 
 <script src="./js/pdf.min.js"></script>
 <script>
+    // 分页参数
+    let currentUploadedPage = 1;  // 当前页
+    const UploadedFilesPerPage = 10;  // 每页显示的文件数
+
+    // 更新分页信息
+    function updateUploadedFilesPagination(totalCount, page) {
+        const totalPages = Math.ceil(totalCount / UploadedFilesPerPage);
+
+        // 更新页码信息
+        document.getElementById('pageInfo').innerHTML = `第 ${page} 页 / 共 ${totalPages} 页`;
+
+        // 控制上一页、下一页按钮的禁用状态
+        document.getElementById('prevPage').classList.toggle('disabled', page <= 1);
+        document.getElementById('nextPage').classList.toggle('disabled', page >= totalPages);
+    }
+
+    // 切换分页
+    function changePage(page) {
+        if (page < 1) return;
+
+        // 发起请求加载数据（伪代码）
+        fetch(`${backend_yingwu}/files?page=${page}&limit=${UploadedFilesPerPage}`)
+            .then(response => response.json())
+            .then(data => {
+                renderUploadedFiles(data.files);
+                updateUploadedFilesPagination(data.totalCount, page);
+                currentUploadedPage = page;
+            })
+            .catch(error => console.error('Error loading files:', error));
+    }
+
+    // 上传文件结果弹窗
+    const modalElement = document.getElementById('uploadedModal');
+    const uploadedModal = new bootstrap.Modal(modalElement, {
+        backdrop: 'static',  // 禁止点击外部区域关闭模态框
+        keyboard: false      // 禁止按下 ESC 键关闭模态框
+    });
     // 初始化工具提示
     const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
     const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
@@ -630,8 +691,8 @@
                     if (failureCount > 0 && failureFiles && failureFiles.length > 0) {
                         renderFailureFiles(failureFiles);
                     }
-                    const uploadedModalElement = document.getElementById('uploadedModal');
-                    const uploadedModal = new bootstrap.Modal(uploadedModalElement);
+                    // const uploadedModalElement = document.getElementById('uploadedModal');
+                    // const uploadedModal = new bootstrap.Modal(uploadedModalElement);
                     uploadedModal.show();
                 }
             }
@@ -680,22 +741,10 @@
         downloadFile(fileId);
     };
 
-    async function loadFiles() {
-        uploadFileList.innerHTML = '';
-        let uploads;
-        try {
-            const uploadResponse = await fetch(`${backend_yingwu}/allfiles`, {
-                credentials: 'include'
-            });
-            if (!uploadResponse.ok) {
-                return;
-            }
-            uploads = await uploadResponse.json();
-        } catch (error) {
-            return;
-        }
+    function renderUploadedFiles(uploads) {
         if (!uploads || uploads.length == 0) return;
-        uploadFileList.innerHTML = '';
+        uploadedFileList.innerHTML = '';
+
         uploads.forEach(file => {
             const row = document.createElement('tr');
             const size = (file.size / (1024 * 1024)).toFixed(2);
@@ -731,6 +780,23 @@
         });
     }
 
+    async function loadFiles() {
+        uploadFileList.innerHTML = '';
+        let uploads;
+        try {
+            const uploadResponse = await fetch(`${backend_yingwu}/allfiles`, {
+                credentials: 'include'
+            });
+            if (!uploadResponse.ok) {
+                return;
+            }
+            uploads = await uploadResponse.json();
+        } catch (error) {
+            return;
+        }
+        renderUploadedFiles(uploads);
+    }
+
     async function removeUploadedFile(element) {
         const listItem = element.parentNode;
         const fileName = listItem.firstChild.textContent.split(' - ')[0];
@@ -747,7 +813,7 @@
         successTableBody.innerHTML = ''; // 清空现有的表格
 
         data.forEach(file => {
-            const label = file.label.substring(6); // 获取文件标识
+            const label = file.label.substring(file.label.lastIndexOf("_") + 1); // 获取文件标识
             const fullPath = `${backend_yingwu}/files/download/${label}`;
 
             const row = document.createElement('tr');
@@ -756,11 +822,18 @@
             <td>
                 <span id="file-id-${label}" class="text-bg-success"
                     style="cursor: pointer; background-color: white; color: green; font-weight: bold; padding: 3px 8px;"
-                    onclick="copyFileId('${label}')">
+                    onclick="copyText('${label}')">
                     ${label}
                 </span>
+
             </td>
-            <td>${fullPath}</td>
+            <td>
+                <span id="file-id-${label}" class="text-bg-success"
+                    style="cursor: pointer; background-color: white; color: blue; font-weight: bold; padding: 3px 8px;"
+                    onclick="copyText('${fullPath}')">
+                    ${fullPath}
+                </span>
+            </td>
         `;
             successTableBody.appendChild(row);
         });
@@ -784,20 +857,17 @@
     }
 
     // 复制单个文件标识
-    function copyFileId(fileId) {
-        const tempInput = document.createElement('input');
-        tempInput.value = fileId;
-        document.body.appendChild(tempInput);
-        tempInput.select();
-        document.execCommand('copy');
-        document.body.removeChild(tempInput);
-        // 使用 Bootstrap Toast 创建气泡提示
-        showToast(`已复制 ${fileId}`);
+    function copyText(text) {
+        navigator.clipboard.writeText(text).then(() => {
+            showToast(`已复制`);
+        }).catch(err => {
+            console.error('复制失败', err);
+        });
     }
 
     $(document).ready(function () {
-        loadFiles();
-
+        // loadFiles();
+        changePage(currentUploadedPage);
         $('#uploadedModal').on('hidden.bs.modal', function () {
             // 模态框关闭时，隐藏成功和失败表格
             const successTable = document.getElementById('success-table');
@@ -805,6 +875,11 @@
 
             successTable.classList.add('hidden');  // 隐藏成功表格
             failureTable.classList.add('hidden');  // 隐藏失败表格
+        });
+
+        // 保证点击关闭按钮时模态框关闭
+        $('#uploadedModal .btn-close').on('click', function () {
+            uploadedModal.hide();
         });
     });
 

@@ -442,7 +442,12 @@
         if (page < 1) return;
 
         // 发起请求加载数据（伪代码）
-        fetch(`${backend_yingwu}/files?page=${page}&limit=${UploadedFilesPerPage}`)
+        fetch(`${backend_yingwu}/files?page=${page}&limit=${UploadedFilesPerPage}`,
+            {
+                method: 'GET',
+                credentials: 'include'
+            }
+        )
             .then(response => response.json())
             .then(data => {
                 renderUploadedFiles(data.files);

@@ -748,8 +748,7 @@
 
         data.forEach(file => {
             const label = file.label.substring(6); // 获取文件标识
-            const currentOrigin = window.location.origin;
-            const fullPath = `${currentOrigin}/files/download/${label}`;
+            const fullPath = `${backend_yingwu}/files/download/${label}`;
 
             const row = document.createElement('tr');
             row.innerHTML = `

@@ -134,3 +134,60 @@ const authorize = () => {
 
     }
 }
+
+
+// 创建并显示气泡提示（Toast）
+function showToast(message, position = 'top-right', bgColor = 'bg-success', textColor = 'text-white', autoHideDelay = 3000) {
+    const toastElement = document.createElement('div');
+    toastElement.classList.add('toast', 'align-items-center', bgColor, textColor, 'border-0');
+    toastElement.style.position = 'fixed';
+    toastElement.style.zIndex = 99999
+
+    // 设置气泡的位置（可以是 top-left, top-right, bottom-left, bottom-right）
+    switch (position) {
+        case 'top-left':
+            toastElement.style.top = '20px';
+            toastElement.style.left = '20px';
+            break;
+        case 'top-right':
+            toastElement.style.top = '20px';
+            toastElement.style.right = '20px';
+            break;
+        case 'bottom-left':
+            toastElement.style.bottom = '20px';
+            toastElement.style.left = '20px';
+            break;
+        case 'bottom-right':
+            toastElement.style.bottom = '20px';
+            toastElement.style.right = '20px';
+            break;
+        default:
+            toastElement.style.top = '20px';
+            toastElement.style.right = '20px';
+            break;
+    }
+
+    toastElement.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body">
+                ${message}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    `;
+
+    // 将 Toast 添加到页面中
+    document.body.appendChild(toastElement);
+
+    // 初始化并显示 Toast
+    const toast = new bootstrap.Toast(toastElement, {
+        autohide: true,
+        delay: autoHideDelay // 设置气泡显示时间
+    });
+    toast.show();
+
+    // 删除气泡元素
+    toastElement.addEventListener('hidden.bs.toast', () => {
+        document.body.removeChild(toastElement);
+    });
+}

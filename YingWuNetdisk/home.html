@@ -199,6 +199,10 @@
             max-height: 40vh;
             width: auto;
         }
+
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 
@@ -261,6 +265,7 @@
                                 <th>文件名</th>
                                 <th>大小</th>
                                 <!-- <th>上传时间</th> -->
+                                <th>过期时间</th>
                                 <th>操作</th>
                             </tr>
                         </thead>
@@ -335,9 +340,50 @@
             </div>
         </div>
     </div>
+
+    <!-- 上传结果模态框 -->
+    <div class="modal fade" id="uploadedModal" tabindex="-1" aria-labelledby="uploadedModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- 上传成功表格 -->
+                    <h5 style="color:red">注意：文件有效期默认为8小时，请及时下载，过期文件无法恢复</h5>
+                    <table id="success-table" class="table table-bordered mb-4 table-responsive hidden">
+                        <thead>
+                            <tr>
+                                <th>文件名</th>
+                                <th>文件标识</th>
+                                <th>文件全路径</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- 文件上传成功信息将插入到这里 -->
+                        </tbody>
+                    </table>
+
+                    <!-- 上传失败表格 -->
+                    <table id="failure-table" class="table table-bordered hidden">
+                        <thead>
+                            <tr>
+                                <th>文件名</th>
+                                <th>失败原因</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- 文件上传失败信息将插入到这里 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 <script src="../js/jquery.min.js"></script>
 <script src="../js/constDefine.js"></script>
+<script src="../js/common.js"></script>
 <script src="../js/bootstrap.bundle.min.js"></script>
 
 <script src="./js/pdf.min.js"></script>
@@ -558,14 +604,27 @@
                 credentials: 'include'
             });
             if (response.ok) {
-                selectedFiles = [];
-                uploadFileList.innerHTML = '';
-                fileInput.value = '';
+                const data = await response.json();
+                if (data.result) {
+                    const { successFiles, failureFiles, failureCount, message } = data.result;
+                    selectedFiles = [];
+                    uploadFileList.innerHTML = '';
+                    fileInput.value = '';
 
-                // 修改文本为上传成功
-                const spinnerText = $('#loadingModal .loading-spinner div:nth-child(2)');
-                spinnerText.text('上传成功！');
-                $('#loadingModal').modal('hide');
+                    // 修改文本为上传成功
+                    const spinnerText = $('#loadingModal .loading-spinner div:nth-child(2)');
+                    spinnerText.text('上传成功！');
+                    $('#loadingModal').modal('hide');
+                    if (successFiles && successFiles.length > 0) {
+                        renderSuccessFiles(successFiles);
+                    }
+                    if (failureCount > 0 && failureFiles && failureFiles.length > 0) {
+                        renderFailureFiles(failureFiles);
+                    }
+                    const uploadedModalElement = document.getElementById('uploadedModal');
+                    const uploadedModal = new bootstrap.Modal(uploadedModalElement);
+                    uploadedModal.show();
+                }
             }
             else {
                 // 修改文本为上传失败
@@ -614,10 +673,6 @@
 
     async function loadFiles() {
         uploadFileList.innerHTML = '';
-        const status = sessionStorage.getItem('blog_website_login');
-        if (status !== "true") {
-            return;
-        }
         let uploads;
         try {
             const uploadResponse = await fetch(`${backend_yingwu}/allfiles`, {
@@ -635,10 +690,33 @@
         uploads.forEach(file => {
             const row = document.createElement('tr');
             const size = (file.size / (1024 * 1024)).toFixed(2);
+            let strExpired = "";
+            let color = "white";
+            if (file.expired_at) {
+                if (!file.expired_at.Valid) {
+                    strExpired = "永久有效";
+                    color = "green";
+                }
+                else {
+                    const expiredAt = new Date(`${file.expired_at.Time}`);
+                    const now = new Date();
+                    // 计算时间差，单位为毫秒
+                    const diffInMs = expiredAt - now;
+                    // 将毫秒转换为小时和分钟
+                    const diffInMinutes = Math.floor(diffInMs / 60000); // 转换为分钟
+                    const hours = Math.floor(diffInMinutes / 60); // 小时
+                    const minutes = diffInMinutes % 60; // 分钟
+                    strExpired = `${hours}小时${minutes}分后`
+                    color = "red";
+                }
+            }
             row.innerHTML = `
                 <td><a href="javascript:void(0);" onclick="previewFile('${file.hash}')">${file.filename}</a></td>
                 <td>${size} MB</td>
-                <td><button class="btn btn-success btn-sm" onclick="downloadFile('${file.hash}')">下载</button></td>
+                <td style="color:${color};">${strExpired}</td>
+                <td>
+                    <button class="btn btn-success btn-sm" onclick="downloadFile('${file.hash}')">下载</button>
+                </td>
             `;
             uploadedFileList.appendChild(row);
         });
@@ -651,8 +729,75 @@
         listItem.remove();
     }
 
+    // 更新上传成功的文件表格
+    function renderSuccessFiles(data) {
+        const successTable = document.getElementById('success-table');
+        successTable.classList.remove('hidden');
+
+        const successTableBody = document.getElementById('success-table').getElementsByTagName('tbody')[0];
+        successTableBody.innerHTML = ''; // 清空现有的表格
+
+        data.forEach(file => {
+            const label = file.label.substring(6); // 获取文件标识
+            const currentOrigin = window.location.origin;
+            const fullPath = `${currentOrigin}/files/download/${label}`;
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+            <td>${file.fileName}</td>
+            <td>
+                <span id="file-id-${label}" class="text-bg-success"
+                    style="cursor: pointer; background-color: white; color: green; font-weight: bold; padding: 3px 8px;"
+                    onclick="copyFileId('${label}')">
+                    ${label}
+                </span>
+            </td>
+            <td>${fullPath}</td>
+        `;
+            successTableBody.appendChild(row);
+        });
+    }
+
+    // 更新上传失败的文件表格
+    function renderFailureFiles(data) {
+        const failureTable = document.getElementById('failure-table');
+        failureTable.classList.remove('hidden');  // 显示失败表格
+        const failureTableBody = document.getElementById('failure-table').getElementsByTagName('tbody')[0];
+        failureTableBody.innerHTML = ''; // 清空现有的表格
+
+        data.forEach(file => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+            <td>${file.id}</td>
+            <td>${file.reason}</td>
+        `;
+            failureTableBody.appendChild(row);
+        });
+    }
+
+    // 复制单个文件标识
+    function copyFileId(fileId) {
+        const tempInput = document.createElement('input');
+        tempInput.value = fileId;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        document.execCommand('copy');
+        document.body.removeChild(tempInput);
+        // 使用 Bootstrap Toast 创建气泡提示
+        showToast(`已复制 ${fileId}`);
+    }
+
     $(document).ready(function () {
         loadFiles();
+
+        $('#uploadedModal').on('hidden.bs.modal', function () {
+            // 模态框关闭时，隐藏成功和失败表格
+            const successTable = document.getElementById('success-table');
+            const failureTable = document.getElementById('failure-table');
+
+            successTable.classList.add('hidden');  // 隐藏成功表格
+            failureTable.classList.add('hidden');  // 隐藏失败表格
+        });
     });
 
 </script>

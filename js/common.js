@@ -79,6 +79,7 @@ const authorize = () => {
     const prevState = localStorage.getItem("state");
     if (state && state !== prevState) {
         console.log("state changed.");
+        window.location.href=window.location.origin
     }
     // 检查参数是否存在
     else if (code && state) {

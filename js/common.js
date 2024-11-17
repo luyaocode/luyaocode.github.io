@@ -11,8 +11,21 @@ function openAuthPopup() {
 // 登录认证
 
 function logout() {
-    sessionStorage.setItem('blog_website_login', 'false');
-    freshPage();
+    $.ajax({
+        url: backend_url + '/logout',
+        type: 'GET',
+        xhrFields: {
+            withCredentials: true
+        },
+        success: function () {
+            sessionStorage.setItem('blog_website_login', 'false');
+            freshPage();
+        },
+        error: function (xhr, status, error) {
+            console.error(error);
+        }
+    });
+
 }
 
 const freshPage = () => {
@@ -46,8 +59,6 @@ const freshPage = () => {
         }
     }
     else {
-        // 清除cookie
-        document.cookie = 'auth_token=; Max-Age=0; path=/; domain=.chaosgomoku.fun; secure; SameSite=None;';
         if (d_write_blog) {
             d_write_blog.style.opacity = 0;
             d_write_blog.style.pointerEvents = 'none';

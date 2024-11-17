@@ -11,6 +11,8 @@ function openAuthPopup() {
 // 登录认证
 
 function logout() {
+    localStorage.setItem('blog_website_login', 'false');
+    freshPage();
     $.ajax({
         url: backend_url + '/logout',
         type: 'GET',
@@ -18,8 +20,6 @@ function logout() {
             withCredentials: true
         },
         success: function () {
-            localStorage.setItem('blog_website_login', 'false');
-            freshPage();
         },
         error: function (xhr, status, error) {
             console.error(error);

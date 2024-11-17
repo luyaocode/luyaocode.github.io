@@ -46,6 +46,8 @@ const freshPage = () => {
         }
     }
     else {
+        // 清除cookie
+        document.cookie = 'auth_token=; Max-Age=0; path=/; domain=.chaosgomoku.fun; secure; SameSite=None;';
         if (d_write_blog) {
             d_write_blog.style.opacity = 0;
             d_write_blog.style.pointerEvents = 'none';

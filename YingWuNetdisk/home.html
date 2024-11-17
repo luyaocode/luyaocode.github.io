@@ -763,6 +763,14 @@
                 if (!file.expired_at.Valid) {
                     strExpired = "永久有效";
                     color = "green";
+                    row.innerHTML = `
+                        <td><a href="javascript:void(0);" onclick="previewFile('${file.hash}')">${file.filename}</a></td>
+                        <td>${size} MB</td>
+                        <td style="color:${color};">${strExpired}</td>
+                        <td>
+                            <button class="btn btn-success btn-sm" onclick="downloadFile('${file.hash}')">下载</button>
+                        </td>
+                    `;
                 }
                 else {
                     const expiredAt = new Date(`${file.expired_at.Time}`);

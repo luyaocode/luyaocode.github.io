@@ -798,7 +798,7 @@
         authorize().then((res) => {
             if (!res) {
                 alert("未授权访问，请重新登录.");
-                window.location.href = "";
+                window.location.href = Page_Blog_Home;
                 return;
             }
             document.getElementById('main-content').style.display = 'block'; // 显示主要内容

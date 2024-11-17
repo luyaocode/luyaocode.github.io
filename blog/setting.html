@@ -384,7 +384,7 @@
                             error: function (xhr, status, error) {
                                 if (xhr.status === 401) {
                                     console.error("未授权访问:", xhr.responseText);
-                                    sessionStorage.setItem('blog_website_login', "false");
+                                    localStorage.setItem('blog_website_login', "false");
                                     alert("未授权，请登录后再试。");
                                     window.location.href = `${Page_Blog_Home}`;
                                 } else {
@@ -526,7 +526,7 @@
                             error: function (xhr, status, error) {
                                 if (xhr.status === 401) {
                                     console.error("未授权访问:", xhr.responseText);
-                                    sessionStorage.setItem('blog_website_login', "false");
+                                    localStorage.setItem('blog_website_login', "false");
                                     alert("未授权，请登录后再试。");
                                     window.location.href = `${Page_Blog_Home}`;
                                 } else {
@@ -567,7 +567,7 @@
                     error: function (xhr, status, error) {
                         if (xhr.status === 401) {
                             console.error("未授权访问:", xhr.responseText);
-                            sessionStorage.setItem('blog_website_login', "false");
+                            localStorage.setItem('blog_website_login', "false");
                             alert("未授权，请登录后再试。");
                             window.location.href = `${Page_Blog_Home}`;
                         } else {
@@ -597,7 +597,7 @@
                 error: function (xhr, status, error) {
                     if (xhr.status === 401) {
                         console.error("未授权访问:", xhr.responseText);
-                        sessionStorage.setItem('blog_website_login', "false");
+                        localStorage.setItem('blog_website_login', "false");
                         alert("未授权，请登录后再试。");
                         window.location.href = `${Page_Blog_Home}`;
                     } else {
@@ -626,7 +626,7 @@
                 error: function (xhr, status, error) {
                     if (xhr.status === 401) {
                         console.error("未授权访问:", xhr.responseText);
-                        sessionStorage.setItem('blog_website_login', "false");
+                        localStorage.setItem('blog_website_login', "false");
                         alert("未授权，请登录后再试。");
                         window.location.href = `${Page_Blog_Home}`;
                     } else {
@@ -680,7 +680,7 @@
                 error: function (xhr, status, error) {
                     if (xhr.status === 401) {
                         console.error("未授权访问:", xhr.responseText);
-                        sessionStorage.setItem('blog_website_login', "false");
+                        localStorage.setItem('blog_website_login', "false");
                         alert("未授权，请登录后再试。");
                         window.location.href = `${Page_Blog_Home}`;
                     }
@@ -716,7 +716,7 @@
             } catch (error) {
                 if (error.status === 401) {
                     console.error("未授权访问:");
-                    sessionStorage.setItem('blog_website_login', "false");
+                    localStorage.setItem('blog_website_login', "false");
                     alert("未授权，请登录后再试。");
                     window.location.href = `${Page_Blog_Home}`;
                 } else {
@@ -750,7 +750,7 @@
             } catch (error) {
                 if (error.status === 401) {
                     console.error("未授权访问:");
-                    sessionStorage.setItem('blog_website_login', "false");
+                    localStorage.setItem('blog_website_login', "false");
                     alert("未授权，请登录后再试。");
                     window.location.href = `${Page_Blog_Home}`;
                 } else {
@@ -760,7 +760,7 @@
         }
 
         const authorize = async () => {
-            const status = sessionStorage.getItem('blog_website_login');
+            const status = localStorage.getItem('blog_website_login');
             if (status !== 'true') {
                 return false;
             }
@@ -780,13 +780,13 @@
                 }
                 else {
                     console.error("未授权访问");
-                    sessionStorage.setItem('blog_website_login', "false");
+                    localStorage.setItem('blog_website_login', "false");
                     return false;
                 }
             } catch (error) {
                 if (error.status === 401) {
                     console.error("未授权访问:");
-                    sessionStorage.setItem('blog_website_login', "false");
+                    localStorage.setItem('blog_website_login', "false");
                     return false;
                 } else {
                     console.error("Error sending string:", error);

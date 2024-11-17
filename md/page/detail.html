@@ -832,7 +832,7 @@
 <script>
     // 刷新状态
     const freshPage = () => {
-        const status = sessionStorage.getItem('blog_website_login');
+        const status = localStorage.getItem('blog_website_login');
 
         if (status === 'true') { // 登录成功
             $("#del-blog-btn").removeClass("d-none");

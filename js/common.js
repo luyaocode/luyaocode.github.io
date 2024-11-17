@@ -18,7 +18,7 @@ function logout() {
             withCredentials: true
         },
         success: function () {
-            sessionStorage.setItem('blog_website_login', 'false');
+            localStorage.setItem('blog_website_login', 'false');
             freshPage();
         },
         error: function (xhr, status, error) {
@@ -32,7 +32,7 @@ const freshPage = () => {
     const d_write_blog = document.getElementById("d-write-blog");
     const authBtn = document.getElementById("auth-btn");
     const setting_btn = document.getElementById("setting-btn");
-    const status = sessionStorage.getItem('blog_website_login');
+    const status = localStorage.getItem('blog_website_login');
     const btn_login_homepage = document.getElementById("auth-btn_homepage");
     const btn_logout = document.getElementById("btn_logout");
 
@@ -94,7 +94,7 @@ const authorize = () => {
     }
     // 检查参数是否存在
     else if (code && state) {
-        const status = sessionStorage.getItem('blog_website_login');
+        const status = localStorage.getItem('blog_website_login');
         if (status === 'true') return; // 如果已授权就返回
         // 显示加载弹窗
         const loadingModal = document.getElementById('loadingModal');
@@ -117,7 +117,7 @@ const authorize = () => {
             },
             success: function (data) {
                 const res = data ? 'true' : 'false';
-                sessionStorage.setItem('blog_website_login', res);
+                localStorage.setItem('blog_website_login', res);
                 console.log('授权结果：' + res);
                 document.body.classList.add('disabled');
                 freshPage();

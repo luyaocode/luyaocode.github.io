@@ -382,7 +382,7 @@
                                 }
                             },
                             error: function (xhr, status, error) {
-                                if (xhr.status === 401) {
+                                if (xhr.status === StatusCode.Unauthorized) {
                                     console.error("未授权访问:", xhr.responseText);
                                     localStorage.setItem('blog_website_login', "false");
                                     alert("未授权，请登录后再试。");
@@ -524,7 +524,7 @@
                                 }
                             },
                             error: function (xhr, status, error) {
-                                if (xhr.status === 401) {
+                                if (xhr.status === StatusCode.Unauthorized) {
                                     console.error("未授权访问:", xhr.responseText);
                                     localStorage.setItem('blog_website_login', "false");
                                     alert("未授权，请登录后再试。");
@@ -565,7 +565,7 @@
                         resolve(response);
                     },
                     error: function (xhr, status, error) {
-                        if (xhr.status === 401) {
+                        if (xhr.status === StatusCode.Unauthorized) {
                             console.error("未授权访问:", xhr.responseText);
                             localStorage.setItem('blog_website_login', "false");
                             alert("未授权，请登录后再试。");
@@ -595,7 +595,7 @@
                     }
                 },
                 error: function (xhr, status, error) {
-                    if (xhr.status === 401) {
+                    if (xhr.status === StatusCode.Unauthorized) {
                         console.error("未授权访问:", xhr.responseText);
                         localStorage.setItem('blog_website_login', "false");
                         alert("未授权，请登录后再试。");
@@ -624,7 +624,7 @@
                     }
                 },
                 error: function (xhr, status, error) {
-                    if (xhr.status === 401) {
+                    if (xhr.status === StatusCode.Unauthorized) {
                         console.error("未授权访问:", xhr.responseText);
                         localStorage.setItem('blog_website_login', "false");
                         alert("未授权，请登录后再试。");
@@ -678,7 +678,7 @@
                     }
                 },
                 error: function (xhr, status, error) {
-                    if (xhr.status === 401) {
+                    if (xhr.status === StatusCode.Unauthorized) {
                         console.error("未授权访问:", xhr.responseText);
                         localStorage.setItem('blog_website_login', "false");
                         alert("未授权，请登录后再试。");
@@ -714,7 +714,7 @@
                     showToast('删除标签失败！');
                 }
             } catch (error) {
-                if (error.status === 401) {
+                if (error.status === StatusCode.Unauthorized) {
                     console.error("未授权访问:");
                     localStorage.setItem('blog_website_login', "false");
                     alert("未授权，请登录后再试。");
@@ -748,7 +748,7 @@
                     showToast('删除博客失败！');
                 }
             } catch (error) {
-                if (error.status === 401) {
+                if (error.status === StatusCode.Unauthorized) {
                     console.error("未授权访问:");
                     localStorage.setItem('blog_website_login', "false");
                     alert("未授权，请登录后再试。");
@@ -784,7 +784,7 @@
                     return false;
                 }
             } catch (error) {
-                if (error.status === 401) {
+                if (error.status === StatusCode.Unauthorized) {
                     console.error("未授权访问:");
                     localStorage.setItem('blog_website_login', "false");
                     return false;

@@ -16,3 +16,8 @@ const Page_Blog_Update = "/md/page/update";
 const Page_Blog_Write = "/md/page/write";
 
 const Page_Yingwu_Home = "/YingWuNetdisk/home";
+
+// 服务器状态码
+const StatusCode = {
+    Unauthorized:401,
+}

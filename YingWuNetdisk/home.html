@@ -247,10 +247,12 @@
         <div class="container-fluid">
             <a class="navbar-brand" href="/">主页</a>
             <div class="ml-auto d-flex">
+                <!-- 按钮 -->
                 <button id="btnUploadRecord" class="btn btn-outline-light btn-sm mx-1 no-focus" data-toggle="tooltip"
                     title="上传记录" data-placement="bottom">
                     <i class="bi bi-upload"></i>
                 </button>
+
                 <button id="btnDownloadRecord" class="btn btn-outline-light btn-sm mx-1 no-focus" data-toggle="tooltip"
                     title="下载记录" data-placement="bottom">
                     <i class="bi bi-download"></i>
@@ -343,10 +345,11 @@
                     </div>
                 </div>
 
-                <h6 class="mt-2">下载文件列表</h6>
+                <h6 class="mt-2">文件下载排名</h6>
                 <div class="file-list">
-                    <ul id="downloadFileList" class="list-group"></ul>
+                    <canvas id="downloadChart" width="400" height="200"></canvas>
                 </div>
+
             </div>
         </div>
 
@@ -439,6 +442,74 @@
         </div>
     </div>
 
+    <!-- 上传记录的模态框 -->
+    <div class="modal fade" id="uploadFilesHistoryModal" tabindex="-1" role="dialog" aria-labelledby="uploadModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="uploadModalLabel">上传记录</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-bordered" id="uploadTable">
+                        <thead>
+                            <tr>
+                                <th>文件名</th>
+                                <th>文件标识</th>
+                                <th>文件链接</th>
+                                <th>上传时间</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- 上传记录列表 -->
+                        </tbody>
+                    </table>
+                    <!-- 分页控件 -->
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center" id="uploadPagination">
+                            <!-- 分页按钮将动态添加到这里 -->
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 下载记录的模态框 -->
+    <div class="modal fade" id="downloadedFilesHistoryModal" tabindex="-1" role="dialog"
+        aria-labelledby="downloadModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="downloadModalLabel">下载记录</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-bordered" id="downloadTable">
+                        <thead>
+                            <tr>
+                                <th>文件名</th>
+                                <th>文件标识</th>
+                                <th>文件链接</th>
+                                <th>下载时间</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- 下载记录列表 -->
+                        </tbody>
+                    </table>
+                    <!-- 分页控件 -->
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center" id="downloadPagination">
+                            <!-- 分页按钮将动态添加到这里 -->
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- 登录弹窗 -->
     <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -483,13 +554,118 @@
             </div>
         </div>
     </div>
+
+
 </body>
 <script src="../js/jquery.min.js"></script>
 <script src="../js/constDefine.js"></script>
 <script src="../js/common.js"></script>
+<script src="../js/util.js"></script>
 <script src="../js/bootstrap.bundle.min.js"></script>
-
 <script src="./js/pdf.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0/dist/chartjs-plugin-datalabels.min.js">
+</script>
+<script>
+    // 每页显示条数
+    const recordsPerPage = 5;
+
+    // 更新上传记录分页
+    function updateUploadPagination(totalRecords) {
+        const totalPages = Math.ceil(totalRecords / recordsPerPage);
+        const pagination = document.getElementById('uploadPagination');
+        pagination.innerHTML = ''; // 清空现有分页内容
+
+        for (let i = 1; i <= totalPages; i++) {
+            const li = document.createElement('li');
+            li.classList.add('page-item');
+            li.innerHTML = `<a class="page-link" href="#" onclick="loadUploadPage(${i})">${i}</a>`;
+            pagination.appendChild(li);
+        }
+    }
+
+    // 更新下载记录分页
+    function updateDownloadPagination(totalRecords) {
+        const totalPages = Math.ceil(totalRecords / recordsPerPage);
+        const pagination = document.getElementById('downloadPagination');
+        pagination.innerHTML = ''; // 清空现有分页内容
+
+        for (let i = 1; i <= totalPages; i++) {
+            const li = document.createElement('li');
+            li.classList.add('page-item');
+            li.innerHTML = `<a class="page-link" href="#" onclick="loadDownloadPage(${i})">${i}</a>`;
+            pagination.appendChild(li);
+        }
+    }
+
+    // 加载上传记录页面数据
+    async function loadUploadPage(pageNum) {
+        // 假设你从后端获取数据的 API 为 `/api/upload/records?page=pageNum&limit=recordsPerPage`
+        const response = await fetch(`${backend_yingwu}/files/uploads?page=${pageNum}&limit=${recordsPerPage}`);
+        const data = await response.json();
+
+        if (data.success) {
+            renderUploadRecords(data.records);
+            updateUploadPagination(data.totalRecords);
+        } else {
+            alert('无法加载上传记录');
+        }
+    }
+
+    // 加载下载记录页面数据
+    async function loadDownloadPage(pageNum) {
+        // 假设你从后端获取数据的 API 为 `/api/download/records?page=pageNum&limit=recordsPerPage`
+        const response = await fetch(`/api/download/records?page=${pageNum}&limit=${recordsPerPage}`);
+        const data = await response.json();
+
+        if (data.success) {
+            renderDownloadRecords(data.records);
+            updateDownloadPagination(data.totalRecords);
+        } else {
+            alert('无法加载下载记录');
+        }
+    }
+
+    // 渲染上传记录到表格
+    function renderUploadRecords(records) {
+        const uploadTableBody = document.getElementById('uploadTable').getElementsByTagName('tbody')[0];
+        uploadTableBody.innerHTML = ''; // 清空现有记录
+
+        records.forEach(record => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+            <td>${record.filename}</td>
+            <td>${formatFileSize(record.size)}</td>
+            <td>${record.uploaded_at}</td>
+        `;
+            uploadTableBody.appendChild(row);
+        });
+    }
+
+    // 渲染下载记录到表格
+    function renderDownloadRecords(records) {
+        const downloadTableBody = document.getElementById('downloadTable').getElementsByTagName('tbody')[0];
+        downloadTableBody.innerHTML = ''; // 清空现有记录
+
+        records.forEach(record => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+            <td>${record.filename}</td>
+            <td>${record.downloaded_at}</td>
+        `;
+            downloadTableBody.appendChild(row);
+        });
+    }
+
+    // 格式化文件大小（例如：1 MB, 200 KB）
+    function formatFileSize(bytes) {
+        const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+        if (bytes === 0) return '0 Byte';
+        const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
+        return Math.round(bytes / Math.pow(1024, i)) + ' ' + sizes[i];
+    }
+</script>
 <script>
     // 分页参数
     let currentUploadedPage = 1;  // 当前页
@@ -510,8 +686,6 @@
     // 切换分页
     function changePage(page) {
         if (page < 1) return;
-
-        // 发起请求加载数据（伪代码）
         fetch(`${backend_yingwu}/files?page=${page}&limit=${UploadedFilesPerPage}`,
             {
                 method: 'GET',
@@ -525,6 +699,20 @@
                 currentUploadedPage = page;
             })
             .catch(error => console.error('Error loading files:', error));
+    }
+
+    const requestDownloadedFilesRank = () => {
+        fetch(`${backend_yingwu}/files/downloadRank`,
+            {
+                method: 'GET',
+                credentials: 'include'
+            }
+        )
+            .then(response => response.json())
+            .then(data => {
+                renderDownloadedFilesRank(data.files);
+            })
+            .catch(error => console.error('Error loading downloaded files rank:', error));
     }
 
     // 上传文件结果弹窗
@@ -616,6 +804,50 @@
         }
     }
 
+    /**
+     * 合并成功和失败的文件数据，并更新 sessionStorage 中的 uploaded_files
+     * @param {Array} successFiles 新上传的成功文件数组
+     * @param {Array} failureFiles 新上传的失败文件数组
+     */
+    function mergeUploadedFilesHistory(successFiles, failureFiles) {
+        // 从 sessionStorage 中获取已上传的文件数据
+        const uploadedFiles = JSON.parse(sessionStorage.getItem('uploaded_files') || '{}');
+
+        // 提取现有的 successFiles 和 failureFiles，确保它们是数组类型
+        const storedSuccessFiles = Array.isArray(uploadedFiles.successFiles) ? uploadedFiles.successFiles : [];
+        const storedFailureFiles = Array.isArray(uploadedFiles.failureFiles) ? uploadedFiles.failureFiles : [];
+
+        // 确保传入的 successFiles 和 failureFiles 是数组类型
+        const newSuccessFiles = Array.isArray(successFiles) ? successFiles : [];
+        const newFailureFiles = Array.isArray(failureFiles) ? failureFiles : [];
+
+        // 合并新的成功文件和失败文件
+        const mergedSuccessFiles = [...storedSuccessFiles, ...newSuccessFiles];
+        const mergedFailureFiles = [...storedFailureFiles, ...newFailureFiles];
+
+        // 更新 uploadedFiles 对象
+        uploadedFiles.successFiles = mergedSuccessFiles;
+        uploadedFiles.failureFiles = mergedFailureFiles;
+
+        // 将合并后的数据保存回 sessionStorage
+        sessionStorage.setItem('uploaded_files', JSON.stringify(uploadedFiles));
+    }
+
+    function mergeDownloadedFilesHistory(files) {
+        // 从 sessionStorage 中获取已下载的文件数据
+        const storedFiles = JSON.parse(sessionStorage.getItem('downloaded_files') || '[]');
+
+        // 确保传入的 files 是数组类型
+        const newFiles = Array.isArray(files) ? files : [];
+
+        // 合并新的文件和存储的文件
+        const mergedFiles = [...storedFiles, ...newFiles];
+
+        // 将合并后的数据保存回 sessionStorage
+        sessionStorage.setItem('downloaded_files', JSON.stringify(mergedFiles));
+    }
+
+
     const downloadFile = async (fileID) => {
         try {
             const downloadResponse = await fetch(`${backend_yingwu}/files/download/${fileID}`, {
@@ -656,6 +888,15 @@
                     a.click(); // 仅下载文件
                     document.body.removeChild(a); // 清理
                     window.URL.revokeObjectURL(url); // 释放 URL 对象
+
+                    // 记录在案
+                    const downloadedFile = {
+                        fileName,
+                        label: "file_" + fileID.substring(0, 6),
+                        downloadedAt: new Date().toISOString()
+                    }
+                    const arr = []
+                    mergeDownloadedFilesHistory([...arr, downloadedFile]);
                 }
             }
             else {
@@ -737,8 +978,7 @@
         cancelButton.textContent = '已取消'; // 改变按钮文本
     }
 
-    document.getElementById('uploadFileButton').onclick = async function () {
-
+    const uploadFile = async () => {
         if (selectedFiles.length === 0) {
             alert("请拖拽或选择文件上传");
             return;
@@ -765,14 +1005,20 @@
                     spinnerText.text('上传成功！');
                     $('#waitingModal').modal('hide');
                     if (successFiles && successFiles.length > 0) {
+                        successFiles.forEach(file => {
+                            file.uploadedAt = new Date().toISOString();
+                        });
                         renderSuccessFiles(successFiles);
                     }
                     if (failureCount > 0 && failureFiles && failureFiles.length > 0) {
+                        failureFiles.forEach(file => {
+                            file.uploadedAt = new Date().toISOString();
+                        });
                         renderFailureFiles(failureFiles);
                     }
-                    // const uploadedModalElement = document.getElementById('uploadedModal');
-                    // const uploadedModal = new bootstrap.Modal(uploadedModalElement);
                     uploadedModal.show();
+                    // 保存记录到本地
+                    mergeUploadedFilesHistory(successFiles, failureFiles);
                 }
             }
             else {
@@ -787,7 +1033,8 @@
             spinnerText.text('上传失败！');
             $('#waitingModal').modal('hide');
         }
-    };
+    }
+    document.getElementById('uploadFileButton').onclick = uploadFile;
 
     const fileIdInput = document.getElementById('fileId');
     const downloadButton = document.getElementById('downloadButton');
@@ -819,6 +1066,91 @@
         // 如果输入框不为空，继续下载
         downloadFile(fileId);
     };
+
+    function renderDownloadedFilesRank(files) {
+        // 提取文件名和下载量，确保下载量为整数
+        const labels = files.map(file => file.filename);
+        const downloadCounts = files.map(file => Math.floor(file.download_count)); // 保证下载量为整数
+
+        // 设置最大文件名长度为 8，超出部分使用 '...' 表示
+        const maxFilenameLength = 50; // 设置文件名的最大字符数
+        const truncatedLabels = labels.map(filename => {
+            if (filename.length > maxFilenameLength) {
+                return filename.substring(0, maxFilenameLength) + '...';
+            }
+            return filename;
+        });
+
+        // 创建柱状图
+        const ctx = document.getElementById('downloadChart').getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'bar',  // 设置图表类型为柱状图
+            data: {
+                labels: truncatedLabels,  // 截断后的文件名
+                datasets: [{
+                    label: '下载量',
+                    data: downloadCounts,  // 下载量
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',  // 柱状图的背景色
+                    borderColor: 'rgba(54, 162, 235, 1)',  // 柱状图的边框色
+                    borderWidth: 1,
+                    barThickness: 20,  // 设置柱子的固定宽度
+                    categoryPercentage: 0.6,  // 控制每个类别的宽度
+                    barPercentage: 0.8,  // 控制柱子在类别宽度中的占比
+                }]
+            },
+            options: {
+                responsive: true,
+                indexAxis: 'y',  // 反转图表，横纵轴交换
+                scales: {
+                    x: {
+                        beginAtZero: true,  // 横轴从 0 开始
+                        title: {
+                            display: true,
+                            text: '下载量'
+                        },
+                        ticks: {
+                            stepSize: 10,  // 设置刻度间隔为 10
+                            callback: function (value) {
+                                if (value % 10 === 0) {  // 只显示整10的数字
+                                    return value;
+                                }
+                                return '';  // 其他值不显示
+                            }
+                        }
+                    },
+                    y: {
+                        display: false  // 隐藏纵轴
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            title: function (tooltipItem) {
+                                // 显示完整的文件名作为提示框标题
+                                const index = tooltipItem[0].dataIndex;
+                                return labels[index];  // 返回完整的文件名
+                            },
+                            label: function (tooltipItem) {
+                                return `下载量: ${tooltipItem.raw}`;  // 显示下载量作为提示框内容
+                            }
+                        }
+                    },
+                    datalabels: {
+                        anchor: 'end',  // 将标签固定在柱子中间
+                        align: 'right',   // 标签居中显示
+                        color: 'black',    // 设置标签文字颜色
+                        font: {
+                            size: 10          // 设置字体大小
+                        },
+                        formatter: function (value, context) {
+                            return context.chart.data.labels[context.dataIndex];  // 显示文件名
+                        }
+                    }
+                }
+            },
+            plugins: [ChartDataLabels]  // 注册插件
+        });
+    }
 
     function renderUploadedFiles(uploads) {
         if (!uploads || uploads.length == 0) return;
@@ -950,9 +1282,46 @@
         });
     }
 
+    // 渲染上传记录
+    const renderUploadedHistory = (files) => {
+        const uploadTableBody = document.getElementById('uploadTable').getElementsByTagName('tbody')[0];
+        uploadTableBody.innerHTML = ''; // 清空现有记录
+        files.forEach(function (file) {
+            const fileName = file.fileName ? file.fileName : "";
+            const label = file.label ? file.label.substring(file.label.lastIndexOf("_") + 1) : ""; // 获取文件标识
+            const fullPath = label ? `${backend_yingwu}/files/download/${label}` : "";
+            const uploadedAt = file.uploadedAt ? formatDateFull(file.uploadedAt) : "";
+            $('#uploadTable tbody').append(`
+        <tr>
+            <td>${fileName}</td>
+            <td>${label}</td>
+            <td>${fullPath}</td>
+            <td>${uploadedAt}</td>
+        </tr>`);
+        });
+    }
+    // 渲染下载记录
+    const renderDownloadedHistory = (files) => {
+        const downloadTableBody = document.getElementById('downloadTable').getElementsByTagName('tbody')[0];
+        downloadTableBody.innerHTML = ''; // 清空现有记录
+        files.forEach(function (file) {
+            const fileName = file.fileName ? file.fileName : "";
+            const label = file.label ? file.label.substring(file.label.lastIndexOf("_") + 1) : ""; // 获取文件标识
+            const fullPath = label ? `${backend_yingwu}/files/download/${label}` : "";
+            const downloadedAt = file.downloadedAt ? formatDateFull(file.downloadedAt) : "";
+            $('#downloadTable tbody').append(`
+        <tr>
+            <td>${fileName}</td>
+            <td>${label}</td>
+            <td>${fullPath}</td>
+            <td>${downloadedAt}</td>
+        </tr>`);
+        });
+    }
+
     $(document).ready(function () {
-        // loadFiles();
         changePage(currentUploadedPage);
+        requestDownloadedFilesRank();
         $('#uploadedModal').on('hidden.bs.modal', function () {
             // 模态框关闭时，隐藏成功和失败表格
             const successTable = document.getElementById('success-table');
@@ -965,6 +1334,37 @@
         // 保证点击关闭按钮时模态框关闭
         $('#uploadedModal .btn-close').on('click', function () {
             uploadedModal.hide();
+        });
+
+        // 点击上传记录按钮，显示上传记录
+        $('#btnUploadRecord').click(function () {
+            const status = localStorage.getItem("blog_website_login");
+            if (status === "true") {
+                loadUploadPage(1);
+            }
+            let uploaded_files = sessionStorage.getItem("uploaded_files");
+            if (uploaded_files) {
+                uploaded_files = JSON.parse(uploaded_files);
+                const { successFiles } = uploaded_files;
+                renderUploadedHistory(successFiles);
+            }
+            const uploadedFilesModal = new bootstrap.Modal(document.getElementById('uploadFilesHistoryModal'));
+            uploadedFilesModal.show();
+        });
+
+        // 点击下载记录按钮，显示下载记录
+        $('#btnDownloadRecord').click(function () {
+            const status = localStorage.getItem("blog_website_login");
+            if (status === "true") {
+                loadDownloadPage(1);
+            }
+            let downloaded_files = sessionStorage.getItem("downloaded_files");
+            if (downloaded_files) {
+                downloaded_files = JSON.parse(downloaded_files);
+                renderDownloadedHistory(downloaded_files);
+            }
+            const downloadedFilesModal = new bootstrap.Modal(document.getElementById('downloadedFilesHistoryModal'));
+            downloadedFilesModal.show();
         });
     });
 

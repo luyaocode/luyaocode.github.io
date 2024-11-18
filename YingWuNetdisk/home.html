@@ -623,7 +623,10 @@
 
         // 创建 "下一页" 按钮
         const nextButton = document.createElement('li');
-        nextButton.classList.add('page-item', currentUploadedFileHistoryPage === totalPages ? 'disabled' : '');
+        nextButton.classList.add('page-item');
+        if (currentUploadedFileHistoryPage === totalPages) {
+            nextButton.classList.add('disabled'); // 如果是第末页，禁用下一页按钮
+        }
         nextButton.innerHTML = `<a class="page-link" href="#" onclick="loadUploadPage(${currentUploadedFileHistoryPage + 1})">&raquo;</a>`;
         pagination.appendChild(nextButton);
     }
@@ -678,7 +681,10 @@
 
         // 创建 "下一页" 按钮
         const nextButton = document.createElement('li');
-        nextButton.classList.add('page-item', currentDownloadedFileHistoryPage === totalPages ? 'disabled' : '');
+        nextButton.classList.add('page-item');
+        if (currentDownloadedFileHistoryPage === totalPages) {
+            nextButton.classList.add('disabled'); // 如果是第末页，禁用下一页按钮
+        }
         nextButton.innerHTML = `<a class="page-link" href="#" onclick="loadUploadPage(${currentDownloadedFileHistoryPage + 1})">&raquo;</a>`;
         pagination.appendChild(nextButton);
     }

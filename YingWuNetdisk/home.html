@@ -1394,8 +1394,8 @@
 
     // 渲染上传记录
     const renderUploadedHistory = (files) => {
-        const uploadTableBody = document.getElementById('uploadTable').getElementsByTagName('tbody')[0];
-        uploadTableBody.innerHTML = ''; // 清空现有记录
+        // const uploadTableBody = document.getElementById('uploadTable').getElementsByTagName('tbody')[0];
+        // uploadTableBody.innerHTML = ''; // 清空现有记录
         files.forEach(function (file) {
             const fileName = file.fileName ? file.fileName : "";
             const label = file.label ? file.label.substring(file.label.lastIndexOf("_") + 1) : ""; // 获取文件标识
@@ -1412,8 +1412,8 @@
     }
     // 渲染下载记录
     const renderDownloadedHistory = (files) => {
-        const downloadTableBody = document.getElementById('downloadTable').getElementsByTagName('tbody')[0];
-        downloadTableBody.innerHTML = ''; // 清空现有记录
+        // const downloadTableBody = document.getElementById('downloadTable').getElementsByTagName('tbody')[0];
+        // downloadTableBody.innerHTML = ''; // 清空现有记录
         files.forEach(function (file) {
             const fileName = file.fileName ? file.fileName : "";
             const label = file.label ? file.label.substring(file.label.lastIndexOf("_") + 1) : ""; // 获取文件标识

@@ -601,29 +601,38 @@
 
     // 加载上传记录页面数据
     async function loadUploadPage(pageNum) {
-        // 假设你从后端获取数据的 API 为 `/api/upload/records?page=pageNum&limit=recordsPerPage`
-        const response = await fetch(`${backend_yingwu}/files/uploads?page=${pageNum}&limit=${recordsPerPage}`);
-        const data = await response.json();
-
-        if (data.success) {
-            renderUploadRecords(data.records);
-            updateUploadPagination(data.totalRecords);
-        } else {
-            alert('无法加载上传记录');
+        try {
+            const response = await fetch(`${backend_yingwu}/files/uploads?page=${pageNum}&limit=${recordsPerPage}`, {
+                credentials: 'include'
+            });
+            if (response.ok) {
+                const data = await response.json();
+                renderUploadRecords(data.files);
+                updateUploadPagination(data.totalCount);
+            } else {
+                alert('无法加载上传记录');
+            }
+        } catch (error) {
+            console.error(error);
         }
     }
 
     // 加载下载记录页面数据
     async function loadDownloadPage(pageNum) {
-        // 假设你从后端获取数据的 API 为 `/api/download/records?page=pageNum&limit=recordsPerPage`
-        const response = await fetch(`/api/download/records?page=${pageNum}&limit=${recordsPerPage}`);
-        const data = await response.json();
+        try {
+            const response = await fetch(`/api/download/records?page=${pageNum}&limit=${recordsPerPage}`, {
+                credentials: 'include'
+            });
 
-        if (data.success) {
-            renderDownloadRecords(data.records);
-            updateDownloadPagination(data.totalRecords);
-        } else {
-            alert('无法加载下载记录');
+            if (response.ok) {
+                const data = await response.json();
+                renderDownloadRecords(data.files);
+                updateDownloadPagination(data.totalCount);
+            } else {
+                alert('无法加载下载记录');
+            }
+        } catch (error) {
+            console.error(error);
         }
     }
 

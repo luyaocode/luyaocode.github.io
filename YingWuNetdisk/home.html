@@ -220,8 +220,8 @@
         }
 
         /* 加载弹窗 */
-        #loadingModal {
-            display: none;
+        #waitingModal {
+            display: block;
             position: fixed;
             top: 0;
             left: 0;
@@ -236,7 +236,7 @@
             user-select: none;
         }
 
-        .loading-spinner {
+        .waiting-spinner {
             margin-bottom: 20px;
         }
     </style>
@@ -476,8 +476,8 @@
     </div>
 
     <!-- 加载弹窗的HTML -->
-    <div id="loadingModal">
-        <div class="loading-spinner">
+    <div id="waitingModal">
+        <div class="waiting-spinner">
             <div class="spinner-border" role="status">
                 <span class="sr-only"></span>
             </div>

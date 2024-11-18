@@ -610,7 +610,7 @@
                 renderUploadRecords(data.files);
                 updateUploadPagination(data.totalCount);
             } else {
-                alert('无法加载上传记录');
+                showToast("响应失败");
             }
         } catch (error) {
             console.error(error);
@@ -629,7 +629,7 @@
                 renderDownloadRecords(data.files);
                 updateDownloadPagination(data.totalCount);
             } else {
-                alert('无法加载下载记录');
+                showToast("响应失败");
             }
         } catch (error) {
             console.error(error);

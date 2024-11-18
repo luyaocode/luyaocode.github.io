@@ -239,6 +239,28 @@
         .waiting-spinner {
             margin-bottom: 20px;
         }
+
+        /* 记录表 */
+        /* 浅蓝色标识 */
+        .label-style {
+            color: #5bc0de;
+            /* 浅蓝色 */
+            font-weight: bold;
+            /* 可选，突出显示 */
+        }
+
+        /* 浅蓝色 URL */
+        .url-style {
+            color: #5bc0de;
+            /* 浅蓝色 */
+            text-decoration: none;
+            /* 去掉下划线 */
+        }
+
+        .url-style:hover {
+            text-decoration: underline;
+            /* 鼠标悬停时显示下划线 */
+        }
     </style>
 </head>
 
@@ -615,52 +637,21 @@
         prevButton.innerHTML = `<a class="page-link" href="javascript:void(0);" onclick="loadUploadPage(${currentUploadedFileHistoryPage - 1})">&laquo;</a>`;
         pagination.appendChild(prevButton);
 
-        // 计算页码范围并处理省略号
-        let pagesToDisplay = [];
-        if (totalPages <= 7) {
-            // 总页数不多于7页，直接显示所有页码
-            pagesToDisplay = [...Array(totalPages).keys()].map(i => i + 1);
-        } else {
-            // 当总页数超过7页时，根据当前页来显示省略号
-            if (currentUploadedFileHistoryPage <= 4) {
-                // 如果当前页较小，显示前4页和最后2页
-                pagesToDisplay = [1, 2, 3, 4, '...', totalPages];
-            } else if (currentUploadedFileHistoryPage >= totalPages - 3) {
-                // 如果当前页较大，显示前2页和最后4页
-                pagesToDisplay = [1, '...', totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
-            } else {
-                // 否则，显示前2页，当前页及其前后2页，和最后2页
-                pagesToDisplay = [1, '...', currentUploadedFileHistoryPage - 1, currentUploadedFileHistoryPage, currentUploadedFileHistoryPage + 1, '...', totalPages];
-            }
-        }
-
-        // 创建数字页码按钮
-        pagesToDisplay.forEach(page => {
-            const li = document.createElement('li');
-            if (page === '...') {
-                li.classList.add('page-item', 'disabled');
-                li.innerHTML = `<span class="page-link">...</span>`;
-            } else {
-                li.classList.add('page-item');
-                if (page === currentUploadedFileHistoryPage) {
-                    li.classList.add('active');
-                }
-                li.innerHTML = `<a class="page-link" href="javascript:void(0);" onclick="loadUploadPage(${page})">${page}</a>`;
-            }
-            pagination.appendChild(li);
-        });
+        // 添加当前页 / 总页数文本
+        const pageInfo = document.createElement('li');
+        pageInfo.classList.add('page-item', 'disabled');
+        pageInfo.innerHTML = `<span class="page-link">第 ${currentUploadedFileHistoryPage} 页 / 共 ${totalPages} 页</span>`;
+        pagination.appendChild(pageInfo);
 
         // 创建 "下一页" 按钮
         const nextButton = document.createElement('li');
         nextButton.classList.add('page-item');
         if (currentUploadedFileHistoryPage === totalPages || totalPages === 0) {
-            nextButton.classList.add('disabled'); // 如果是第末页，禁用下一页按钮
+            nextButton.classList.add('disabled'); // 如果是最后一页，禁用下一页按钮
         }
         nextButton.innerHTML = `<a class="page-link" href="javascript:void(0);" onclick="loadUploadPage(${currentUploadedFileHistoryPage + 1})">&raquo;</a>`;
         pagination.appendChild(nextButton);
     }
-
-
     // 更新下载记录分页
     function updateDownloadPagination(totalRecords) {
         const totalPages = Math.ceil(totalRecords / recordsPerPage);
@@ -676,48 +667,19 @@
         prevButton.innerHTML = `<a class="page-link" href="javascript:void(0);" onclick="loadDownloadPage(${currentDownloadedFileHistoryPage - 1})">&laquo;</a>`;
         pagination.appendChild(prevButton);
 
-        // 计算页码范围并处理省略号
-        let pagesToDisplay = [];
-        if (totalPages <= 7) {
-            // 总页数不多于7页，直接显示所有页码
-            pagesToDisplay = [...Array(totalPages).keys()].map(i => i + 1);
-        } else {
-            // 当总页数超过7页时，根据当前页来显示省略号
-            if (currentDownloadedFileHistoryPage <= 4) {
-                // 如果当前页较小，显示前4页和最后2页
-                pagesToDisplay = [1, 2, 3, 4, '...', totalPages];
-            } else if (currentDownloadedFileHistoryPage >= totalPages - 3) {
-                // 如果当前页较大，显示前2页和最后4页
-                pagesToDisplay = [1, '...', totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
-            } else {
-                // 否则，显示前2页，当前页及其前后2页，和最后2页
-                pagesToDisplay = [1, '...', currentDownloadedFileHistoryPage - 1, currentDownloadedFileHistoryPage, currentDownloadedFileHistoryPage + 1, '...', totalPages];
-            }
-        }
-
-        // 创建数字页码按钮
-        pagesToDisplay.forEach(page => {
-            const li = document.createElement('li');
-            if (page === '...') {
-                li.classList.add('page-item', 'disabled');
-                li.innerHTML = `<span class="page-link">...</span>`;
-            } else {
-                li.classList.add('page-item');
-                if (page === currentDownloadedFileHistoryPage) {
-                    li.classList.add("active");
-                }
-                li.innerHTML = `<a class="page-link" href="javascript:void(0);" onclick="loadUploadPage(${page})">${page}</a>`;
-            }
-            pagination.appendChild(li);
-        });
+        // 添加当前页 / 总页数文本
+        const pageInfo = document.createElement('li');
+        pageInfo.classList.add('page-item', 'disabled');
+        pageInfo.innerHTML = `<span class="page-link">第 ${currentDownloadedFileHistoryPage} 页 / 共 ${totalPages} 页</span>`;
+        pagination.appendChild(pageInfo);
 
         // 创建 "下一页" 按钮
         const nextButton = document.createElement('li');
         nextButton.classList.add('page-item');
         if (currentDownloadedFileHistoryPage === totalPages || totalPages === 0) {
-            nextButton.classList.add('disabled'); // 如果是第末页，禁用下一页按钮
+            nextButton.classList.add('disabled'); // 如果是最后一页，禁用下一页按钮
         }
-        nextButton.innerHTML = `<a class="page-link" href="javascript:void(0);" onclick="loadUploadPage(${currentDownloadedFileHistoryPage + 1})">&raquo;</a>`;
+        nextButton.innerHTML = `<a class="page-link" href="javascript:void(0);" onclick="loadDownloadPage(${currentDownloadedFileHistoryPage + 1})">&raquo;</a>`;
         pagination.appendChild(nextButton);
     }
 
@@ -771,10 +733,10 @@
             const uploadedAt = toLocalTime(record.uploaded_at);
             const row = document.createElement('tr');
             row.innerHTML = `
-            <td>${record.filename}</td>
-            <td>${label}</td>
-            <td>${fullPath}</td>
-            <td>${uploadedAt}</td>
+        <td>${record.filename}</td>
+        <td><span class="label-style">${label}</span></td>
+        <td><a href="${fullPath}" class="url-style" target="_blank">${fullPath}</a></td>
+        <td>${uploadedAt}</td>
         `;
             uploadTableBody.appendChild(row);
         });
@@ -791,10 +753,10 @@
             const downloadedAt = toLocalTime(record.downloaded_at);
             const row = document.createElement('tr');
             row.innerHTML = `
-            <td>${record.filename}</td>
-            <td>${label}</td>
-            <td>${fullPath}</td>
-            <td>${downloadedAt}</td>
+        <td>${record.filename}</td>
+        <td><span class="label-style">${label}</span></td>
+        <td><a href="${fullPath}" class="url-style" target="_blank">${fullPath}</a></td>
+        <td>${downloadedAt}</td>
         `;
             downloadTableBody.appendChild(row);
         });
@@ -1434,14 +1396,15 @@
             const fullPath = label ? `${backend_yingwu}/files/download/${label}` : "";
             const uploadedAt = file.uploadedAt ? formatDateFull(file.uploadedAt) : "";
             $('#uploadTableLocal tbody').append(`
-        <tr>
-            <td>${fileName}</td>
-            <td>${label}</td>
-            <td>${fullPath}</td>
-            <td>${uploadedAt}</td>
-        </tr>`);
+            <tr>
+                <td>${fileName}</td>
+                <td><span class="label-style">${label}</span></td>
+                <td><a href="${fullPath}" class="url-style" target="_blank">${fullPath}</a></td>
+                <td>${uploadedAt}</td>
+            </tr>`);
         });
     }
+
     // 渲染下载记录
     const renderDownloadedHistory = (files) => {
         const downloadTableBody = document.getElementById('downloadTableLocal').getElementsByTagName('tbody')[0];
@@ -1452,14 +1415,15 @@
             const fullPath = label ? `${backend_yingwu}/files/download/${label}` : "";
             const downloadedAt = file.downloadedAt ? formatDateFull(file.downloadedAt) : "";
             $('#downloadTableLocal tbody').append(`
-        <tr>
-            <td>${fileName}</td>
-            <td>${label}</td>
-            <td>${fullPath}</td>
-            <td>${downloadedAt}</td>
-        </tr>`);
+            <tr>
+                <td>${fileName}</td>
+                <td><span class="label-style">${label}</span></td>
+                <td><a href="${fullPath}" class="url-style" target="_blank">${fullPath}</a></td>
+                <td>${downloadedAt}</td>
+            </tr>`);
         });
     }
+
 
     $(document).ready(function () {
         changePage(currentUploadedPage);

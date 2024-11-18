@@ -23,6 +23,24 @@ function formatDateFull(isoString) {
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }
 
+const toLocalTime = (isoDateString) => {
+    // 创建 Date 对象
+    const date = new Date(isoDateString);
+    // 转换为 '年月日 时分秒' 格式
+    const formattedDate = date.toLocaleString('zh-CN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false  // 24小时制
+    });
+
+    return formattedDate;  // 输出：2024/11/15 22:51:49
+}
+
+
 
 function isJSON(str) {
     try {

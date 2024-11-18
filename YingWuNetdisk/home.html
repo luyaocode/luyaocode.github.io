@@ -347,7 +347,7 @@
 
                 <h6 class="mt-2">文件下载排名</h6>
                 <div class="file-list">
-                    <canvas id="downloadChart" width="400" height="200"></canvas>
+                    <canvas id="downloadChart" width="400" height="300"></canvas>
                 </div>
 
             </div>
@@ -471,6 +471,19 @@
                             <!-- 分页按钮将动态添加到这里 -->
                         </ul>
                     </nav>
+                    <table class="table table-bordered" id="uploadTableLocal">
+                        <thead>
+                            <tr>
+                                <th>文件名</th>
+                                <th>文件标识</th>
+                                <th>文件链接</th>
+                                <th>上传时间</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- 上传记录列表 -->
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -505,6 +518,19 @@
                             <!-- 分页按钮将动态添加到这里 -->
                         </ul>
                     </nav>
+                    <table class="table table-bordered" id="downloadTableLocal">
+                        <thead>
+                            <tr>
+                                <th>文件名</th>
+                                <th>文件标识</th>
+                                <th>文件链接</th>
+                                <th>下载时间</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- 下载记录列表 -->
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -1400,14 +1426,14 @@
 
     // 渲染上传记录
     const renderUploadedHistory = (files) => {
-        // const uploadTableBody = document.getElementById('uploadTable').getElementsByTagName('tbody')[0];
-        // uploadTableBody.innerHTML = ''; // 清空现有记录
+        const uploadTableBody = document.getElementById('uploadTableLocal').getElementsByTagName('tbody')[0];
+        uploadTableBody.innerHTML = ''; // 清空现有记录
         files.forEach(function (file) {
             const fileName = file.fileName ? file.fileName : "";
             const label = file.label ? file.label.substring(file.label.lastIndexOf("_") + 1) : ""; // 获取文件标识
             const fullPath = label ? `${backend_yingwu}/files/download/${label}` : "";
             const uploadedAt = file.uploadedAt ? formatDateFull(file.uploadedAt) : "";
-            $('#uploadTable tbody').append(`
+            $('#uploadTableLocal tbody').append(`
         <tr>
             <td>${fileName}</td>
             <td>${label}</td>
@@ -1418,14 +1444,14 @@
     }
     // 渲染下载记录
     const renderDownloadedHistory = (files) => {
-        // const downloadTableBody = document.getElementById('downloadTable').getElementsByTagName('tbody')[0];
-        // downloadTableBody.innerHTML = ''; // 清空现有记录
+        const downloadTableBody = document.getElementById('downloadTableLocal').getElementsByTagName('tbody')[0];
+        downloadTableBody.innerHTML = ''; // 清空现有记录
         files.forEach(function (file) {
             const fileName = file.fileName ? file.fileName : "";
             const label = file.label ? file.label.substring(file.label.lastIndexOf("_") + 1) : ""; // 获取文件标识
             const fullPath = label ? `${backend_yingwu}/files/download/${label}` : "";
             const downloadedAt = file.downloadedAt ? formatDateFull(file.downloadedAt) : "";
-            $('#downloadTable tbody').append(`
+            $('#downloadTableLocal tbody').append(`
         <tr>
             <td>${fileName}</td>
             <td>${label}</td>

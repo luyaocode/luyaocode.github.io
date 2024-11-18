@@ -882,23 +882,6 @@
         });
     }
 
-    // async function loadFiles() {
-    //     uploadFileList.innerHTML = '';
-    //     let uploads;
-    //     try {
-    //         const uploadResponse = await fetch(`${backend_yingwu}/allfiles`, {
-    //             credentials: 'include'
-    //         });
-    //         if (!uploadResponse.ok) {
-    //             return;
-    //         }
-    //         uploads = await uploadResponse.json();
-    //     } catch (error) {
-    //         return;
-    //     }
-    //     renderUploadedFiles(uploads);
-    // }
-
     async function removeUploadedFile(element) {
         const listItem = element.parentNode;
         const fileName = listItem.firstChild.textContent.split(' - ')[0];
@@ -1081,11 +1064,14 @@
     // 关闭图片预览
     document.getElementById('closePreview-img').addEventListener('click', closePreview);
 </script>
+
+<!--注册回调、鉴权  -->
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         document.getElementById("btn_logout").onclick = () => logout();
         document.getElementById("btn_login_github").onclick = () => openAuthPopup();
     });
+    authorize();
 </script>
 
 </html>

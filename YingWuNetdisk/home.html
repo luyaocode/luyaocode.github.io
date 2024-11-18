@@ -120,7 +120,7 @@
         }
 
         /* 上传加载框 */
-        #loadingModal {
+        #waitingModal {
             display: none;
             justify-content: center;
             align-items: center;
@@ -219,8 +219,8 @@
             vertical-align: middle;
         }
 
-        /* 加载弹窗 */
-        #waitingModal {
+        /* 无文本加载弹窗 */
+        #loadingModal {
             display: none;
             position: fixed;
             top: 0;
@@ -350,7 +350,7 @@
             </div>
         </div>
 
-        <div id="loadingModal" class="modal" tabindex="-1" role="dialog">
+        <div id="waitingModal" class="modal" tabindex="-1" role="dialog">
             <div class="modal-dialog" role="document">
                 <div id="loading-content" class="modal-content text-center">
                     <div class="modal-body">
@@ -476,7 +476,7 @@
     </div>
 
     <!-- 加载弹窗的HTML -->
-    <div id="waitingModal">
+    <div id="loadingModal">
         <div class="waiting-spinner">
             <div class="spinner-border" role="status">
                 <span class="sr-only"></span>
@@ -745,7 +745,7 @@
         }
         const formData = new FormData();
         selectedFiles.forEach(file => formData.append('files', file));
-        $('#loadingModal').modal('show');
+        $('#waitingModal').modal('show');
         try {
             const response = await fetch(`${backend_yingwu}/files/upload`, {
                 method: 'POST',
@@ -761,9 +761,9 @@
                     fileInput.value = '';
 
                     // 修改文本为上传成功
-                    const spinnerText = $('#loadingModal .loading-spinner div:nth-child(2)');
+                    const spinnerText = $('#waitingModal .loading-spinner div:nth-child(2)');
                     spinnerText.text('上传成功！');
-                    $('#loadingModal').modal('hide');
+                    $('#waitingModal').modal('hide');
                     if (successFiles && successFiles.length > 0) {
                         renderSuccessFiles(successFiles);
                     }
@@ -777,15 +777,15 @@
             }
             else {
                 // 修改文本为上传失败
-                const spinnerText = $('#loadingModal .loading-spinner div:nth-child(2)');
+                const spinnerText = $('#waitingModal .loading-spinner div:nth-child(2)');
                 spinnerText.text('上传失败！');
-                $('#loadingModal').modal('hide');
+                $('#waitingModal').modal('hide');
             }
         } catch (error) {
             console.error(error);
-            const spinnerText = $('#loadingModal .loading-spinner div:nth-child(2)');
+            const spinnerText = $('#waitingModal .loading-spinner div:nth-child(2)');
             spinnerText.text('上传失败！');
-            $('#loadingModal').modal('hide');
+            $('#waitingModal').modal('hide');
         }
     };
 

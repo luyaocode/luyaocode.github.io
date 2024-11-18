@@ -620,7 +620,7 @@
     // 加载下载记录页面数据
     async function loadDownloadPage(pageNum) {
         try {
-            const response = await fetch(`/api/download/records?page=${pageNum}&limit=${recordsPerPage}`, {
+            const response = await fetch(`${backend_yingwu}/files/downloads?page=${pageNum}&limit=${recordsPerPage}`, {
                 credentials: 'include'
             });
 

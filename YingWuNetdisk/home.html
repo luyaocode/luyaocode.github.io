@@ -328,6 +328,7 @@
                             <tr>
                                 <th>文件名</th>
                                 <th>大小</th>
+                                <th>上传者</th>
                                 <th>过期时间</th>
                                 <th>操作</th>
                             </tr>
@@ -1265,6 +1266,12 @@
             const size = (file.size / (1024 * 1024)).toFixed(2);
             let strExpired = "";
             let color = "white";
+            if (file.uploaded_by < 0) {
+                uploadedBy = "匿名"
+            }
+            else {
+                uploadedBy = "用户 " + file.uploaded_by
+            }
             if (file.expired_at) {
                 if (!file.expired_at.Valid) {
                     strExpired = "永久有效";
@@ -1272,6 +1279,7 @@
                     row.innerHTML = `
                         <td><a href="javascript:void(0);" onclick="previewFile('${file.hash}')">${file.filename}</a></td>
                         <td>${size} MB</td>
+                        <td>${uploadedBy}</td>
                         <td style="color:${color};">${strExpired}</td>
                         <td>
                             <button class="btn btn-success btn-sm" onclick="downloadFile('${file.hash}')">下载</button>
@@ -1293,6 +1301,7 @@
                         row.innerHTML = `
                             <td><a href="javascript:void(0);" onclick="previewFile('${file.hash}')">${file.filename}</a></td>
                             <td>${size} MB</td>
+                            <td>${uploadedBy}</td>
                             <td style="color:${color};">${strExpired}</td>
                             <td>
                                 <button class="btn btn-success btn-sm" onclick="downloadFile('${file.hash}')">下载</button>

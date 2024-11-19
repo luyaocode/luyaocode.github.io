@@ -398,10 +398,10 @@
             <div id="pdf-content">
                 <div class="d-flex justify-content-center">
                     <div class="d-flex flex-row align-items-center border p-3 rounded">
-                        <button id="prevPage" class="btn btn-sm btn-primary mb-2 mx-2">
+                        <button id="prevPage_preview" class="btn btn-sm btn-primary mb-2 mx-2">
                             <i class="bi bi-arrow-left-circle"></i>
                         </button>
-                        <button id="nextPage" class="btn btn-sm btn-primary mb-2 mx-2">
+                        <button id="nextPage_preview" class="btn btn-sm btn-primary mb-2 mx-2">
                             <i class="bi bi-arrow-right-circle"></i>
                         </button>
                         <button id="closePreview-pdf" class="btn btn-sm btn-danger mb-2 mx-2">
@@ -1014,6 +1014,7 @@
     }
 
     const previewFile = async (fileID) => {
+        document.getElementById('preview-container').style.display = 'flex'; // 显示预览容器
         try {
             const downloadResponse = await fetch(`${backend_yingwu}/files/preview/${fileID}`, {
                 credentials: 'include'
@@ -1049,7 +1050,6 @@
                     // 创建 Blob URL
                     const blobUrl = URL.createObjectURL(blob);
                     let fileExtension = fileName.substring(fileName.lastIndexOf('.') + 1);
-                    document.getElementById('preview-container').style.display = 'flex'; // 显示预览容器
                     openPreview(fileExtension, blobUrl);
                     setTimeout(() => URL.revokeObjectURL(blobUrl), 60000);
                 }
@@ -1566,8 +1566,8 @@
     }
 
     // 绑定翻页按钮事件
-    document.getElementById('prevPage').addEventListener('click', goToPrevPage);
-    document.getElementById('nextPage').addEventListener('click', goToNextPage);
+    document.getElementById('prevPage_preview').addEventListener('click', goToPrevPage);
+    document.getElementById('nextPage_preview').addEventListener('click', goToNextPage);
 
     // 关闭pdf预览
     document.getElementById('closePreview-pdf').addEventListener('click', closePreview);

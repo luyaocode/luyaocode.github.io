@@ -728,7 +728,7 @@
         uploadTableBody.innerHTML = ''; // 清空现有记录
 
         records.forEach(record => {
-            const label = record.hash.substring(0, 6);
+            const label = record.hash;
             const fullPath = `${backend_yingwu}/files/download/${label}`;
             const uploadedAt = toLocalTime(record.uploaded_at);
             const row = document.createElement('tr');
@@ -748,7 +748,7 @@
         downloadTableBody.innerHTML = ''; // 清空现有记录
 
         records.forEach(record => {
-            const label = record.hash.substring(0, 6);
+            const label = record.hash;
             const fullPath = `${backend_yingwu}/files/download/${label}`;
             const downloadedAt = toLocalTime(record.downloaded_at);
             const row = document.createElement('tr');

@@ -1013,7 +1013,7 @@
 
     const previewFile = async (fileID) => {
         try {
-            const downloadResponse = await fetch(`${backend_yingwu}/files/download/${fileID}`, {
+            const downloadResponse = await fetch(`${backend_yingwu}/files/preview/${fileID}`, {
                 credentials: 'include'
             });
 

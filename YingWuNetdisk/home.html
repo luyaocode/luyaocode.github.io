@@ -261,6 +261,35 @@
             text-decoration: underline;
             /* 鼠标悬停时显示下划线 */
         }
+
+        /* closePreview-pdf btn */
+        #closePreview-pdf {
+            margin-left: 2rem;
+        }
+
+        #pdf-content {
+            display: flex;
+            flex-direction: column;
+            background-color: white;
+            width: 100%;
+            height: 100vh;
+            /* 使用全屏高度 */
+            overflow: scroll;
+        }
+
+        /* pdf操作栏 */
+        #pdf-toolbar {
+            position: sticky;
+            /* 固定在顶部 */
+            top: 0;
+            z-index: 1000;
+            background-color: #f1f1f1;
+        }
+
+        #pdf-canvas {
+            flex-grow: 1;
+            /* 使 canvas 占据剩余空间 */
+        }
     </style>
 </head>
 
@@ -396,15 +425,25 @@
     <div class="preview-container" id="preview-container">
         <div class="preview-content" id="preview-content">
             <div id="pdf-content">
-                <div class="d-flex justify-content-center">
-                    <div class="d-flex flex-row align-items-center border p-3 rounded">
+                <div id="pdf-toolbar" class="d-flex justify-content-center">
+                    <div class="d-flex flex-row align-items-center p-2 rounded">
+                        <!-- 页码显示和跳转 -->
+                        <span id="page-info" class="mb-2 mx-2 d-flex align-items-center">第 <input id="page-input"
+                                type="number" value="1" min="1" style="width: 100px;"> 页
+                            <button id="go-to-page" class="btn btn-sm btn-secondary">跳转</button>
+                            / 共 <span id="total-pages">0</span> 页
+                        </span>
                         <button id="prevPage_preview" class="btn btn-sm btn-primary mb-2 mx-2">
                             <i class="bi bi-arrow-left-circle"></i>
                         </button>
                         <button id="nextPage_preview" class="btn btn-sm btn-primary mb-2 mx-2">
                             <i class="bi bi-arrow-right-circle"></i>
                         </button>
-                        <button id="closePreview-pdf" class="btn btn-sm btn-danger mb-2 mx-2">
+                        <!-- 全屏按钮 -->
+                        <button id="fullscreen-pdf" class="btn btn-sm btn-info mb-2 mx-2">
+                            <i class="bi bi-arrows-fullscreen"></i>
+                        </button>
+                        <button id="closePreview-pdf" class="btn btn-sm btn-danger mb-2 ">
                             <i class="bi bi-x-circle"></i>
                         </button>
                     </div>
@@ -1508,6 +1547,11 @@
 
             // 渲染页面到 canvas
             await page.render({ canvasContext: ctx, viewport }).promise;
+
+            // 更新页码显示
+            currentPage = pageNumber;
+            document.getElementById('page-input').value = currentPage;
+            document.getElementById('total-pages').textContent = totalPages;
         } catch (error) {
             console.error("渲染页面失败：", error);
         }
@@ -1538,7 +1582,7 @@
                 cMapPacked: true,          // 如果使用打包的 .bcmap 文件，设置为 true
             }).promise;
             totalPages = pdfDoc.numPages;
-            renderPdf(currentPage); // 渲染第一页
+            renderPdf(1);
         } catch (error) {
             closePreview();
             console.error("加载PDF失败：", error);
@@ -1560,6 +1604,86 @@
             renderPdf(currentPage);
         }
     }
+
+    // 获取按钮和输入框元素
+    const goToPageButton = document.getElementById('go-to-page');
+    const pageInput = document.getElementById('page-input');
+    // 跳转到指定页
+    goToPageButton.addEventListener('click', () => {
+        const inputPage = parseInt(document.getElementById('page-input').value, 10);
+        if (inputPage >= 1 && inputPage <= totalPages) {
+            currentPage = inputPage;
+            renderPdf(currentPage);
+        } else {
+            alert("请输入有效的页码范围！");
+        }
+    });
+    // 监听输入框的键盘事件
+    pageInput.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') {  // 检查是否按下的是 Enter 键
+            event.preventDefault();
+            goToPageButton.click();
+        }
+    });
+    // 全屏显示功能
+    const pdfContainer = document.getElementById('pdf-content');
+    const fullscreenButton = document.getElementById('fullscreen-pdf');
+    // 全屏切换函数
+    function toggleFullScreen() {
+        if (!document.fullscreenElement) {
+            // 进入全屏
+            if (pdfContainer.requestFullscreen) {
+                pdfContainer.requestFullscreen();
+            } else if (pdfContainer.webkitRequestFullscreen) { // Safari
+                pdfContainer.webkitRequestFullscreen();
+            } else if (pdfContainer.msRequestFullscreen) { // IE/Edge
+                pdfContainer.msRequestFullscreen();
+            }
+        } else {
+            // 退出全屏
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) { // Safari
+                document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) { // IE/Edge
+                document.msExitFullscreen();
+            }
+        }
+    }
+    // 全屏按钮点击事件
+    fullscreenButton.addEventListener('click', toggleFullScreen);
+    // 添加全屏事件监听器，切换按钮文本和背景颜色
+    // 监听全屏状态变化
+    document.addEventListener('fullscreenchange', () => {
+        if (document.fullscreenElement === pdfContainer) {
+            // 进入全屏
+            pdfContainer.style.backgroundColor = 'white';
+            fullscreenButton.innerHTML = '<i class="bi bi-arrows-collapse"></i>';  // 使用退出全屏图标
+            fullscreenButton.classList.remove('btn-info');
+            fullscreenButton.classList.add('btn-secondary');
+        } else {
+            // 退出全屏
+            pdfContainer.style.backgroundColor = '';
+            fullscreenButton.innerHTML = '<i class="bi bi-arrows-fullscreen"></i>';  // 使用全屏图标
+            fullscreenButton.classList.remove('btn-secondary');
+            fullscreenButton.classList.add('btn-info');
+        }
+    });
+
+    // Safari 兼容性
+    document.addEventListener('webkitfullscreenchange', () => {
+        if (document.webkitFullscreenElement === pdfContainer) {
+            pdfContainer.style.backgroundColor = 'white';
+            fullscreenButton.innerHTML = '<i class="bi bi-arrows-collapse"></i>';  // 使用退出全屏图标
+            fullscreenButton.classList.remove('btn-info');
+            fullscreenButton.classList.add('btn-secondary');
+        } else {
+            pdfContainer.style.backgroundColor = '';
+            fullscreenButton.innerHTML = '<i class="bi bi-arrows-fullscreen"></i>';  // 使用全屏图标
+            fullscreenButton.classList.remove('btn-secondary');
+            fullscreenButton.classList.add('btn-info');
+        }
+    });
 
     function closePreview() {
         $("#preview-container").css("display", "none");

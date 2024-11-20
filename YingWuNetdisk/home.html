@@ -1532,7 +1532,11 @@
         $("#pdf-content").css("display", "flex");
         try {
             // 加载 PDF
-            pdfDoc = await pdfjsLib.getDocument(pdfUrl).promise;
+            pdfDoc = await pdfjsLib.getDocument({
+                url: pdfUrl,
+                cMapUrl: './bcmaps/', // CMap 文件所在目录
+                cMapPacked: true,          // 如果使用打包的 .bcmap 文件，设置为 true
+            }).promise;
             totalPages = pdfDoc.numPages;
             renderPdf(currentPage); // 渲染第一页
         } catch (error) {

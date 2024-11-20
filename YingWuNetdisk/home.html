@@ -263,9 +263,6 @@
         }
 
         /* closePreview-pdf btn */
-        #closePreview-pdf {
-            margin-left: 2rem;
-        }
 
         #pdf-content {
             display: flex;
@@ -426,7 +423,7 @@
         <div class="preview-content" id="preview-content">
             <div id="pdf-content">
                 <div id="pdf-toolbar" class="d-flex justify-content-center">
-                    <div class="d-flex flex-row align-items-center p-2 rounded">
+                    <div class="btn-group p-2 rounded mx-3">
                         <!-- 页码显示和跳转 -->
                         <span id="page-info" class="mb-2 mx-2 d-flex align-items-center">第 <input id="page-input"
                                 type="number" value="1" min="1" style="width: 100px;"> 页
@@ -439,29 +436,47 @@
                         <button id="nextPage_preview" class="btn btn-sm btn-primary mb-2 mx-2">
                             <i class="bi bi-arrow-right-circle"></i>
                         </button>
+                    </div>
+                    <div class="btn-group p-2 rounded mx-3">
+                        <!-- 放大按钮 -->
+                        <button id="zoom-in" class="btn btn-sm btn-success mb-2 mx-2">
+                            <i class="bi bi-plus-circle"></i>
+                        </button>
+                        <!-- 缩小按钮 -->
+                        <button id="zoom-out" class="btn btn-sm btn-warning mb-2 mx-2">
+                            <i class="bi bi-dash-circle"></i>
+                        </button>
+                        <!-- 还原按钮 -->
+                        <button id="reset-zoom" class="btn btn-sm btn-secondary mb-2 mx-2">
+                            <i class="bi bi-arrow-counterclockwise"></i>
+                        </button>
                         <!-- 全屏按钮 -->
                         <button id="fullscreen-pdf" class="btn btn-sm btn-info mb-2 mx-2">
                             <i class="bi bi-arrows-fullscreen"></i>
                         </button>
+                    </div>
+                    <div class="btn-group p-2 rounded mx-3">
                         <button id="closePreview-pdf" class="btn btn-sm btn-danger mb-2 ">
                             <i class="bi bi-x-circle"></i>
                         </button>
                     </div>
                 </div>
                 <canvas id="pdf-canvas"></canvas>
-            </div>
-            <!-- 图片显示区域 -->
-            <div id="image-content">
-                <div class="d-flex justify-content-end">
-                    <div class="d-flex flex-row align-items-center border p-3 rounded">
-                        <button id="closePreview-img" class="btn btn-sm btn-danger mb-2 mx-2">
-                            <i class="bi bi-x-circle"></i>
-                        </button>
-                    </div>
-                </div>
-                <img id="image-preview" class="img-fluid" alt="img-preview" style="max-height: 100%; width: auto;">
+
             </div>
         </div>
+        <!-- 图片显示区域 -->
+        <div id="image-content">
+            <div class="d-flex justify-content-end">
+                <div class="d-flex flex-row align-items-center border p-3 rounded">
+                    <button id="closePreview-img" class="btn btn-sm btn-danger mb-2 mx-2">
+                        <i class="bi bi-x-circle"></i>
+                    </button>
+                </div>
+            </div>
+            <img id="image-preview" class="img-fluid" alt="img-preview" style="max-height: 100%; width: auto;">
+        </div>
+    </div>
     </div>
 
     <!-- 上传结果模态框 -->
@@ -1530,6 +1545,35 @@
     let totalPages = 0;  // 总页数
     const canvas = document.getElementById('pdf-canvas');
     const ctx = canvas.getContext('2d');
+    let zoomLevel = 1; // 初始缩放比例
+    const zoomInButton = document.getElementById('zoom-in');
+    const zoomOutButton = document.getElementById('zoom-out');
+    const resetZoomButton = document.getElementById('reset-zoom');
+
+    // 放大功能
+    zoomInButton.addEventListener('click', function () {
+        zoomLevel += 0.25; // 每次放大
+        updateCanvasZoom();
+    });
+
+    // 缩小功能
+    zoomOutButton.addEventListener('click', function () {
+        if (zoomLevel > 0.2) { // 防止缩小到不可见
+            zoomLevel -= 0.25; // 每次缩小
+            updateCanvasZoom();
+        }
+    });
+    // 还原缩放
+    resetZoomButton.addEventListener('click', function () {
+        zoomLevel = 1; // 还原为初始值
+        updateCanvasZoom();
+    });
+
+    // 更新 canvas 缩放
+    function updateCanvasZoom() {
+        canvas.style.transform = `scale(${zoomLevel})`; // 使用 transform 缩放
+        canvas.style.transformOrigin = 'center top'; // 设置缩放的起始点为中间
+    }
 
     // 渲染 PDF 页面
     async function renderPdf(pageNumber) {
@@ -1538,7 +1582,7 @@
             const page = await pdfDoc.getPage(pageNumber);
 
             // 设置缩放比例
-            const scale = 1.5;
+            const scale = 1.2;
             const viewport = page.getViewport({ scale });
 
             // 设置 canvas 尺寸
@@ -1702,6 +1746,8 @@
         $("#pdf-content").css("display", "none");
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         exitFullscreen();
+        zoomLevel = 1;
+        canvas.style.transform = `scale(${zoomLevel})`; // 使用 transform 缩放
     }
 
     // 绑定翻页按钮事件

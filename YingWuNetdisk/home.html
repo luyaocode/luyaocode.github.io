@@ -1650,6 +1650,16 @@
             }
         }
     }
+    function exitFullscreen() {
+        // 退出全屏
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) { // Safari
+            document.webkitExitFullscreen();
+        } else if (document.msExitFullscreen) { // IE/Edge
+            document.msExitFullscreen();
+        }
+    }
     // 全屏按钮点击事件
     fullscreenButton.addEventListener('click', toggleFullScreen);
     // 添加全屏事件监听器，切换按钮文本和背景颜色
@@ -1691,6 +1701,7 @@
         $("#image-content").css("display", "none");
         $("#pdf-content").css("display", "none");
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        exitFullscreen();
     }
 
     // 绑定翻页按钮事件

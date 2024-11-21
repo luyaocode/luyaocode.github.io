@@ -878,9 +878,9 @@
 
         const records = [];
         Array.from(rows).forEach(row => {
-            const filename = row.cells[0].textContent.trim();
-            const hash = row.cells[1].querySelector('.label-style').textContent.trim();
-            const uploadedAt = row.cells[2].textContent.trim();
+            const filename = row.cells[1].textContent.trim();
+            const hash = row.cells[2].querySelector('.label-style').textContent.trim();
+            const uploadedAt = row.cells[3].textContent.trim();
 
             records.push({
                 filename: filename,

@@ -276,6 +276,14 @@
         }
 
         /* pdf操作栏 */
+        #pdf-toolbar-top {
+            position: sticky;
+            /* 固定在底部 */
+            top: 0;
+            z-index: 1000;
+            background-color: #f7f7f7;
+        }
+
         #pdf-toolbar {
             position: sticky;
             /* 固定在底部 */
@@ -434,37 +442,42 @@
         <div class="preview-content" id="preview-content">
             <div id="pdf-content">
                 <div style="position: relative; height: 100vh; display: flex; flex-direction: column;">
+                    <div id="pdf-toolbar-top" class="d-flex flex-wrap justify-content-between align-items-center p-2">
+                        <span id="page-info-top" class="d-flex align-items-center me-2">
+                            <span class="ms-2"><span id="current-page-top">0</span> </span>
+                            <span>/<span id="total-pages-top">0</span></span>
+                        </span>
+                        <button id="closePreview-pdf" class="btn btn-sm btn-danger px-2 py-1">
+                            <i class="bi bi-x-circle"></i>
+                        </button>
+                    </div>
                     <div id="pdf-canvas-container">
                         <canvas id="pdf-canvas"></canvas>
                     </div>
                     <div id="pdf-toolbar" class="d-flex flex-wrap justify-content-center align-items-center p-2">
                         <!-- 页码显示和跳转 -->
-                        <span id="page-info" class="d-flex align-items-center me-2">
-                            <input id="page-input" type="number" value="1" min="1"
-                                style="width: 80px; height: 30px; margin-right: 5px;">
-                            <button id="go-to-page" class="btn btn-sm btn-secondary px-2 py-1">跳转</button>
-                            <span class="ms-2">/<span id="total-pages">0</span></span>
-                        </span>
                         <button id="prevPage_preview" class="btn btn-sm btn-primary px-2 py-1 me-1">
                             <i class="bi bi-arrow-left-circle"></i>
                         </button>
                         <button id="nextPage_preview" class="btn btn-sm btn-primary px-2 py-1 me-2">
                             <i class="bi bi-arrow-right-circle"></i>
                         </button>
-                        <button id="zoom-in" class="btn btn-sm btn-primary px-2 py-1 me-1">
+                        <span id="page-info" class="d-flex align-items-center me-2">
+                            <input id="page-input" type="number" value="1" min="1"
+                                style="width: 80px; height: 30px; margin-right: 5px;">
+                            <button id="go-to-page" class="btn btn-sm btn-secondary px-2 py-1">跳转</button>
+                        </span>
+                        <button id="zoom-in" class="btn btn-sm btn-info px-2 py-1 me-1">
                             <i class="bi bi-plus-circle"></i>
                         </button>
-                        <button id="zoom-out" class="btn btn-sm btn-primary px-2 py-1 me-1">
+                        <button id="zoom-out" class="btn btn-sm btn-info px-2 py-1 me-1">
                             <i class="bi bi-dash-circle"></i>
                         </button>
-                        <button id="reset-zoom" class="btn btn-sm btn-secondary px-2 py-1 me-1">
+                        <button id="reset-zoom" class="btn btn-sm btn-info px-2 py-1 me-1">
                             <i class="bi bi-arrow-counterclockwise"></i>
                         </button>
-                        <button id="fullscreen-pdf" class="btn btn-sm btn-primary px-2 py-1 me-2">
+                        <button id="fullscreen-pdf" class="btn btn-sm btn-info px-2 py-1 me-2">
                             <i class="bi bi-arrows-fullscreen"></i>
-                        </button>
-                        <button id="closePreview-pdf" class="btn btn-sm btn-danger px-2 py-1">
-                            <i class="bi bi-x-circle"></i>
                         </button>
                     </div>
                 </div>
@@ -1602,7 +1615,8 @@
             // 更新页码显示
             currentPage = pageNumber;
             document.getElementById('page-input').value = currentPage;
-            document.getElementById('total-pages').textContent = totalPages;
+            document.getElementById('current-page-top').textContent = currentPage;
+            document.getElementById('total-pages-top').textContent = totalPages;
         } catch (error) {
             console.error("渲染页面失败：", error);
         }

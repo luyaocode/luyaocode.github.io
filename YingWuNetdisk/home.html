@@ -918,9 +918,9 @@
             const { successFiles, failureCount } = data.result;
             if (successFiles.length > 0) {
                 const uploadRecords = extractUploadRecords();
-                const updatedRecords = uploadRecords.filter(record => !successIDs.includes(record.hash));
+                const updatedRecords = uploadRecords.filter(record => !successFiles.includes(record.hash));
                 renderUploadRecords(updatedRecords);
-                if (failureCount) {
+                if (!failureCount) {
                     showToast("删除成功");
                 }
                 else {

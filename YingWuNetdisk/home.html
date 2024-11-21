@@ -155,6 +155,7 @@
             align-items: center;
             height: 100vh;
             background-color: rgba(0, 0, 0, 0.5);
+            max-height: 100%;
         }
 
         #loading-content {
@@ -330,6 +331,11 @@
             flex-grow: 1;
             /* 使 canvas 占据剩余空间 */
         }
+
+        /*  */
+        #cache-list {
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 
@@ -353,6 +359,10 @@
                 <button id="btnDownloadRecord" class="btn btn-outline-light btn-sm mx-1 no-focus" data-toggle="tooltip"
                     title="下载记录" data-placement="bottom">
                     <i class="bi bi-download"></i>
+                </button>
+                <button id="btnOpenConfirmClearModal" class="btn btn-outline-light btn-sm mx-1 no-focus"
+                    data-toggle="tooltip" title="清理缓存" data-placement="bottom">
+                    <i class="bi bi-trash"></i>
                 </button>
                 <button id="auth-btn_homepage" class="btn btn-outline-light btn-sm mx-1 no-focus" data-toggle="tooltip"
                     title="登录" data-placement="bottom" data-bs-toggle="modal" data-bs-target="#loginModal">
@@ -450,22 +460,6 @@
 
             </div>
         </div>
-
-        <div id="waitingModal" class="modal" tabindex="-1" role="dialog">
-            <div class="modal-dialog" role="document">
-                <div id="loading-content" class="modal-content text-center">
-                    <div class="modal-body">
-                        <div class="loading-spinner">
-                            <div class="spinner-border" role="status">
-                                <span class="visually-hidden">正在加载...</span>
-                            </div>
-                            <div>正在上传文件...</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
     </div>
     <!-- 预览容器（背景蒙版与内容容器组合） -->
     <div class="preview-container" id="preview-container">
@@ -532,7 +526,6 @@
                 </div>
             </div>
         </div>
-    </div>
     </div>
 
     <!-- 上传结果模态框 -->
@@ -705,7 +698,7 @@
         </div>
     </div>
 
-    <!-- 加载弹窗的HTML -->
+    <!-- 加载页面弹窗的HTML -->
     <div id="loadingModal">
         <div class="waiting-spinner">
             <div class="spinner-border" role="status">
@@ -713,7 +706,47 @@
             </div>
         </div>
     </div>
+    <!-- 上传文件等待弹窗 -->
+    <div id="waitingModal" class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div id="loading-content" class="modal-content text-center">
+                <div class="modal-body">
+                    <div class="loading-spinner">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">正在加载...</span>
+                        </div>
+                        <div>正在上传文件...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <!-- 清理缓存警告模态框 -->
+    <div class="modal" id="confirmClearCacheModal" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmModalLabel">确认操作</h5>
+                </div>
+                <div class="modal-body">
+                    您确定要清理所有缓存吗？此操作不可撤销。
+                </div>
+                <div class="container mt-2">
+                    <p id="total-cache-size" class="text-muted">加载中...</p>
+                    <ul id="cache-list" class="list-group">
+                        <!-- 动态生成的列表将插入到这里 -->
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="btnCancelClearCache" class="btn btn-secondary"
+                        data-dismiss="modal">取消</button>
+                    <button type="button" id="btnConfirmClearCache" class="btn btn-danger">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </body>
 <script src="../js/jquery.min.js"></script>
@@ -896,6 +929,7 @@
         $(".modal-content").toggleClass("modal-night-mode");
         $(".table").toggleClass("modal-night-mode");
         $(".page-link").toggleClass("night-mode");
+        $(".list-group-item").toggleClass("night-mode");
 
         // 更新按钮图标和样式
         if (nightModeActive) {
@@ -1153,8 +1187,38 @@
 
     const previewFile = async (fileID) => {
         document.getElementById('preview-container').style.display = 'flex'; // 显示预览容器
+        const requestUrl = `${backend_yingwu}/files/preview/${fileID}`;
+        let cache = null;
         try {
-            const downloadResponse = await fetch(`${backend_yingwu}/files/preview/${fileID}`, {
+            cache = await caches.open('file-cache'); // 打开缓存
+            // 尝试从缓存中获取文件
+            const cachedResponse = await cache.match(requestUrl); // 根据 fileID 查找缓存中的文件
+
+            if (cachedResponse) {
+                // 如果缓存中有文件，直接获取 Blob 和文件名
+                const cachedBlob = await cachedResponse.blob();
+                const fileExtension = cachedResponse.headers.get('X-File-Extension') || '';
+                const cacheTimestamp = cachedResponse.headers.get('X-Cache-Timestamp');
+                const currentTime = Date.now();
+                const expirationTime = 30 * 24 * 60 * 60 * 1000;  // 设置过期时间（30天，单位：毫秒）
+                // 判断缓存是否过期
+                if (cacheTimestamp && (currentTime - parseInt(cacheTimestamp)) > expirationTime) {
+                    // 如果缓存已过期，删除缓存并返回空
+                    await cache.delete(requestUrl);
+                    console.log("缓存过期，已删除");
+                    return;
+                }
+                const blobUrl = URL.createObjectURL(cachedBlob);
+                openPreview(fileExtension, blobUrl);
+                setTimeout(() => URL.revokeObjectURL(blobUrl), 60000 * 30);
+                return;
+            }
+        } catch (error) {
+            console.log("缓存错误");
+        }
+
+        try {
+            const downloadResponse = await fetch(requestUrl, {
                 credentials: 'include'
             });
 
@@ -1189,14 +1253,28 @@
                     const blobUrl = URL.createObjectURL(blob);
                     let fileExtension = fileName.substring(fileName.lastIndexOf('.') + 1);
                     openPreview(fileExtension, blobUrl);
-                    setTimeout(() => URL.revokeObjectURL(blobUrl), 60000);
+                    setTimeout(() => URL.revokeObjectURL(blobUrl), 60000 * 30);
+
+                    // 将 Blob 数据和文件名一起存储到缓存
+                    if (cache) {
+                        const responseWithMetadata = new Response(blob, {
+                            headers: {
+                                'X-File-Extension': fileExtension, // 存储文件扩展名
+                                'X-Cache-Timestamp': Date.now().toString()
+                            }
+                        });
+
+                        // 将 Response 存入缓存
+                        await cache.put(requestUrl, responseWithMetadata);
+                    }
                 }
             }
             else {
                 showToast("文件不存在", 'top-right', 'bg-warning');
             }
         } catch (error) {
-            showToast("发送请求失败");
+            showToast("错误");
+            console.log(error);
         }
     }
 
@@ -1417,8 +1495,8 @@
                     color = "green";
                     row.innerHTML = `
                         <td><a href="javascript:void(0);" onclick="previewFile('${file.hash}')">${file.filename}</a></td>
-                        <td>${size} MB</td>
-                        <td>${uploadedBy}</td>
+                        <td><small>${size} MB</small></td>
+                        <td><small>${uploadedBy}</small></td>
                         <td>
                             <span style="color:${color}" class="expired-time">${strExpired}</span>
                         </td>
@@ -1441,8 +1519,8 @@
                         color = "red";
                         row.innerHTML = `
                             <td><a href="javascript:void(0);" onclick="previewFile('${file.hash}')">${file.filename}</a></td>
-                            <td>${size} MB</td>
-                            <td>${uploadedBy}</td>
+                            <td><small>${size} MB</small></td>
+                            <td><small>${uploadedBy}</small></td>
                             <td>
                                 <span style="color:${color}" class="expired-time">${strExpired}</span>
                             </td>
@@ -1459,7 +1537,7 @@
                         color = "gray";
                         row.innerHTML = `
                             <td><a href="javascript:void(0);" onclick="previewFile('${file.hash}')">${file.filename}</a></td>
-                            <td>${size} MB</td>
+                            <td><small>${size} MB</small></td>
                             <td>
                                 <span style="color:${color}" class="expired-time">${strExpired}</span>
                             </td>
@@ -1579,6 +1657,102 @@
     }
 
 
+    const confirmClearCacheModal = new bootstrap.Modal(document.getElementById('confirmClearCacheModal'), {
+        backdrop: 'static',  // 禁止点击外部区域关闭模态框
+        keyboard: false      // 禁止按下 ESC 键关闭模态框
+    });
+
+    function openConfirmClearCacheModal() {
+        confirmClearCacheModal.show();
+        renderCacheDetails();
+    }
+
+    const clearCache = async () => {
+        const cache = await caches.open('file-cache');
+        const cacheKeys = await cache.keys();
+        for (const request of cacheKeys) {
+            await cache.delete(request);
+        }
+        showToast("缓存已清理");
+        confirmClearCacheModal.hide();
+    };
+
+    async function getCacheDetails() {
+        try {
+            const cacheNames = await caches.keys(); // 获取所有缓存名称
+            let totalSize = 0; // 记录总大小
+            const cacheDetails = []; // 存储每个缓存的详细信息
+
+            for (const cacheName of cacheNames) {
+                const cache = await caches.open(cacheName); // 打开缓存
+                const requests = await cache.keys(); // 获取所有请求
+                let cacheSize = 0; // 单个缓存大小
+
+                for (const request of requests) {
+                    const response = await cache.match(request); // 匹配缓存
+                    if (response) {
+                        const blob = await response.blob(); // 转为 Blob 对象
+                        cacheSize += blob.size; // 累计缓存大小
+                    }
+                }
+
+                // 累计总大小
+                totalSize += cacheSize;
+
+                // 添加当前缓存信息到结果数组
+                cacheDetails.push({
+                    cacheName,
+                    itemCount: requests.length,
+                    sizeMB: (cacheSize / (1024 * 1024)).toFixed(2),
+                });
+            }
+
+            return {
+                totalSizeMB: (totalSize / (1024 * 1024)).toFixed(2),
+                caches: cacheDetails,
+            };
+        } catch (error) {
+            console.error("获取缓存信息时出错:", error);
+            return { error: "无法获取缓存信息" };
+        }
+    }
+
+    async function renderCacheDetails() {
+        let isNightMode = false;
+        const user_attr = JSON.parse(localStorage.getItem('USER_ATTR'));
+        if (user_attr && user_attr.custom_style === CustomStyle.NightMode) isNightMode = true;
+
+        const cacheInfo = await getCacheDetails(); // 获取缓存数据
+        const listContainer = document.getElementById("cache-list"); // 获取容器
+
+        // 清空列表
+        listContainer.innerHTML = "";
+
+        if (cacheInfo.error) {
+            listContainer.innerHTML = `<div class="text-danger">${cacheInfo.error}</div>`;
+            return;
+        }
+
+        // 渲染缓存总大小
+        const totalSize = document.getElementById("total-cache-size");
+        totalSize.textContent = `总缓存占用: ${cacheInfo.totalSizeMB} MB`;
+
+        // 渲染每个缓存项目
+        cacheInfo.caches.forEach(cache => {
+            const listItem = `
+            <li class="list-group-item d-flex justify-content-between align-items-center
+            ${isNightMode ? "night-mode" : ""}">
+                <span>${cache.cacheName}</span>
+                <span>
+                    <span class="badge bg-primary rounded-pill">${cache.itemCount} 项</span>
+                    <span class="badge bg-secondary rounded-pill">${cache.sizeMB} MB</span>
+                </span>
+            </li>
+        `;
+            listContainer.insertAdjacentHTML("beforeend", listItem);
+        });
+    }
+
     $(document).ready(function () {
         changePage(currentUploadedPage);
         requestDownloadedFilesRank();
@@ -1627,6 +1801,10 @@
             downloadedFilesModal.show();
         });
         document.getElementById('btnToggleNightMode').onclick = toggleNightMode;
+
+        $("#btnOpenConfirmClearModal").click(openConfirmClearCacheModal);
+        $("#btnConfirmClearCache").click(clearCache);
+        $("#btnCancelClearCache").click(() => confirmClearCacheModal.hide());
     });
 
 </script>
@@ -1804,13 +1982,15 @@
         }
     }
     function exitFullscreen() {
-        // 退出全屏
-        if (document.exitFullscreen) {
-            document.exitFullscreen();
-        } else if (document.webkitExitFullscreen) { // Safari
-            document.webkitExitFullscreen();
-        } else if (document.msExitFullscreen) { // IE/Edge
-            document.msExitFullscreen();
+        if (document.fullscreenElement) {
+            // 退出全屏
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) { // Safari
+                document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) { // IE/Edge
+                document.msExitFullscreen();
+            }
         }
     }
     // 全屏按钮点击事件

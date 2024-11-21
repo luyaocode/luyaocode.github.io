@@ -581,16 +581,22 @@
                     <table class="table table-bordered" id="uploadTable">
                         <thead>
                             <tr>
+                                <th><input type="checkbox" id="selectAllUploadedHistory" class="form-check-input"></th>
+                                <!-- 全选框 -->
                                 <th>文件名</th>
                                 <th>文件标识</th>
-                                <th>文件链接</th>
                                 <th>上传时间</th>
+                                <th>操作</th>
                             </tr>
                         </thead>
                         <tbody>
                             <!-- 上传记录列表 -->
                         </tbody>
                     </table>
+                    <!-- 批量删除按钮 -->
+                    <button type="button" id="btnBatchDeleteUploadedHistory" class="btn btn-danger btn-sm">
+                        批量删除
+                    </button>
                     <!-- 分页控件 -->
                     <nav aria-label="Page navigation">
                         <ul class="pagination justify-content-center" id="uploadedFileHistoryPagination">
@@ -602,7 +608,6 @@
                             <tr>
                                 <th>文件名</th>
                                 <th>文件标识</th>
-                                <th>文件链接</th>
                                 <th>上传时间</th>
                             </tr>
                         </thead>
@@ -867,6 +872,72 @@
         }
     }
 
+    function extractUploadRecords() {
+        const uploadTableBody = document.getElementById('uploadTable').getElementsByTagName('tbody')[0];
+        const rows = uploadTableBody.getElementsByTagName('tr');
+
+        const records = [];
+        Array.from(rows).forEach(row => {
+            const filename = row.cells[0].textContent.trim();
+            const hash = row.cells[1].querySelector('.label-style').textContent.trim();
+            const uploadedAt = row.cells[2].textContent.trim();
+
+            records.push({
+                filename: filename,
+                hash: hash,
+                uploaded_at: uploadedAt
+            });
+        });
+
+        return records;
+    }
+
+    // 全选框点击事件
+    document.getElementById('selectAllUploadedHistory').addEventListener('change', function () {
+        const checkboxes = document.querySelectorAll('.file-checkbox');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = this.checked;
+        });
+    });
+
+    // 批量删除按钮点击事件
+    document.getElementById('btnBatchDeleteUploadedHistory').addEventListener('click', async function () {
+        const selectedFiles = [];
+        const checkboxes = document.querySelectorAll('.file-checkbox:checked');
+        checkboxes.forEach(checkbox => {
+            selectedFiles.push(checkbox.dataset.hash);
+        });
+
+        if (selectedFiles.length > 0) {
+            const response = await deleteFiles(selectedFiles);
+            if (response.ok) {
+                const data = response.json();
+                const { successFiles, failureCount } = data.result;
+                let msg = "";
+                if (successFiles.length > 0) {
+                    const uploadRecords = extractUploadRecords();
+                    const updatedRecords = uploadRecords.filter(record => !successIDs.includes(record.hash));
+                    renderUploadRecords(updatedRecords);
+                    if (failureCount) {
+                        showToast("删除成功");
+                    }
+                    else {
+                        showToast("成功 " + successFiles.length + "个，失败 " + failureCount + "个");
+                    }
+                }
+                else {
+                    showToast("删除失败", "top-right", "bg-warning");
+                }
+            }
+            else {
+                showToast("删除失败", "top-right", "bg-warning");
+            }
+
+        } else {
+            showToast("请选择要删除的文件", "top-right", 'bg-info');
+        }
+    });
+
     // 渲染上传记录到表格
     function renderUploadRecords(records) {
         const uploadTableBody = document.getElementById('uploadTable').getElementsByTagName('tbody')[0];
@@ -874,14 +945,15 @@
 
         records.forEach(record => {
             const label = record.hash;
-            const fullPath = `${backend_yingwu}/files/download/${label}`;
             const uploadedAt = toLocalTime(record.uploaded_at);
             const row = document.createElement('tr');
             row.innerHTML = `
         <td>${record.filename}</td>
         <td><span class="label-style">${label}</span></td>
-        <td><a href="${fullPath}" class="url-style" target="_blank">${fullPath}</a></td>
         <td>${uploadedAt}</td>
+        <td>
+            <button class="btn btn-primary btn-sm" onclick="deleteFile('${file.hash}')">删除</button>
+        </td>
         `;
             uploadTableBody.appendChild(row);
         });
@@ -1035,7 +1107,7 @@
     function handleFiles(files) {
         for (let i = 0; i < files.length; i++) {
             if (files[i].size > maxFileSize) {
-                alert(`${files[i].name} 超过最大上传限制 (100MB)`);
+                showToast(`${files[i].name} 超过最大上传限制 (100MB)`, "top-right", "bg-warning");
                 continue;
             }
             // 检查文件名是否重复
@@ -1125,6 +1197,22 @@
         sessionStorage.setItem('downloaded_files', JSON.stringify(mergedFiles));
     }
 
+    async function deleteFiles(fileIDs) {
+        try {
+            const response = await fetch(`${backend_yingwu}/files/delete`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    files: fileIDS
+                }),
+                credentials: 'include',
+            });
+            return response;
+        } catch (error) {
+            console.error(error);
+            showToast("删除失败", 'top-right', 'bg-warning');
+            return [];
+        }
+    }
 
     const downloadFile = async (fileID) => {
         try {
@@ -1138,7 +1226,8 @@
                 if (contentType && contentType.includes('application/json')) {
                     const respJson = await downloadResponse.json();
                     if (respJson) {
-                        alert(respJson.error);
+                        console.log(respJson);
+                        showToast("下载失败", 'top-right', 'bg-warning');
                         return;
                     }
                 } else {
@@ -1181,7 +1270,7 @@
                 showToast("下载失败", 'top-right', 'bg-warning');
             }
         } catch (error) {
-            console.error();
+            showToast("下载失败", 'top-right', 'bg-warning');
         }
     }
 
@@ -1228,7 +1317,7 @@
                 if (contentType && contentType.includes('application/json')) {
                     const respJson = await downloadResponse.json();
                     if (respJson) {
-                        alert(respJson.error);
+                        showToast("文件下载失败", 'top-right', 'bg-warning');
                         return;
                     }
                 } else {
@@ -1273,8 +1362,8 @@
                 showToast("文件不存在", 'top-right', 'bg-warning');
             }
         } catch (error) {
-            showToast("错误");
-            console.log(error);
+            console.error(error);
+            showToast("文件下载失败", 'top-right', 'bg-warning');
         }
     }
 
@@ -1302,7 +1391,7 @@
 
     const uploadFile = async () => {
         if (selectedFiles.length === 0) {
-            alert("请拖拽或选择文件上传");
+            showToast("请拖拽或选择文件上传", "top-right", "bg-info");
             return;
         }
         const formData = new FormData();
@@ -1631,7 +1720,6 @@
             <tr>
                 <td>${fileName}</td>
                 <td><span class="label-style">${label}</span></td>
-                <td><a href="${fullPath}" class="url-style" target="_blank">${fullPath}</a></td>
                 <td>${uploadedAt}</td>
             </tr>`);
         });

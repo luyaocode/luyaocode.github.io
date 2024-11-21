@@ -1898,6 +1898,16 @@
             uploadedFilesModal.show();
         });
 
+        $('#uploadFilesHistoryModal').on('hidden.bs.modal', function () {
+            // 取消全选和所有选中
+            const selectAllCheckbox = document.getElementById('selectAllUploadedHistory');
+            selectAllCheckbox.checked = false;  // 取消全选框选中状态
+            const fileCheckboxes = document.querySelectorAll('.file-select');
+            fileCheckboxes.forEach(checkbox => {
+                checkbox.checked = false;  // 取消所有文件的选中状态
+            });
+        });
+
         // 点击下载记录按钮，显示下载记录
         $('#btnDownloadRecord').click(function () {
             const status = localStorage.getItem("blog_website_login");

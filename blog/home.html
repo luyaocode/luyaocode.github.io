@@ -339,6 +339,11 @@
 		color: white;
 	}
 
+	.page-link.active {
+		background-color: #007bff;
+		color: white;
+	}
+
 	#blog-pagination {
 		margin-top: 10px;
 	}
@@ -825,6 +830,7 @@
 				anchor.toggleClass('night-mode');
 			}
 		});
+		$('.page-link').toggleClass('night-mode');
 
 		// 更新按钮图标和样式
 		if (nightModeActive) {

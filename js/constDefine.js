@@ -21,3 +21,14 @@ const Page_Yingwu_Home = "/YingWuNetdisk/home";
 const StatusCode = {
     Unauthorized:401,
 }
+
+// 样式
+const SettingType = {
+    StylePreference: 1
+
+}
+
+const CustomStyle = {
+    WhiteMode: 1,
+    NightMode: 2,
+}

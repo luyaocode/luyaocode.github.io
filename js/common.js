@@ -205,3 +205,27 @@ function showToast(message, position = 'top-right', bgColor = 'bg-success', text
         document.body.removeChild(toastElement);
     });
 }
+
+
+// 设置本地localStorge
+function setCustomStyle(s) {
+    let user_attr = JSON.parse(localStorage.getItem("USER_ATTR"));
+    if (user_attr) {
+        user_attr.custom_style = s;
+    }
+    else {
+        user_attr = {
+            custom_style: s
+        }
+    }
+    localStorage.setItem('USER_ATTR', JSON.stringify(user_attr));
+}
+function setLocalStorge(t,s){
+    switch (t) {
+        case SettingType.StylePreference:
+            setCustomStyle(s);
+            break;
+        default:
+            break;
+    }
+}

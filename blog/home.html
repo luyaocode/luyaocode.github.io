@@ -19,6 +19,7 @@
 	<link href="../css/bootstrap.min.css" rel="stylesheet">
 	<script src="../js/bootstrap.bundle.min.js"></script>
 	<link href="../css/all.min.css" rel="stylesheet">
+	<link href="../css/bootstrap-icons.css" rel="stylesheet">
 </head>
 <style>
 	* {
@@ -55,6 +56,7 @@
 		/* 内容上边距统一为60px */
 		margin-top: 60px;
 		max-width: 98%;
+		margin-bottom: 20px;
 	}
 
 	/* tags */
@@ -80,7 +82,7 @@
 		/* 添加边框 */
 		border-radius: 4px;
 		/* 圆角边框 */
-		margin-bottom: 8px;
+		margin-bottom: 4px;
 		/* 添加底部间距 */
 		transition: background-color 0.3s, transform 0.3s;
 		/* 动效 */
@@ -89,7 +91,7 @@
 	.list-group-item:hover {
 		background-color: #f7f7f7;
 		/* 鼠标悬浮时背景颜色 */
-		transform: translateY(-2px);
+		transform: translateY(-1px);
 		/* 鼠标悬浮时上移效果 */
 	}
 
@@ -122,7 +124,7 @@
 	.blog-span-container {
 		display: flex;
 		justify-content: flex-end;
-		flex-wrap: wrap;
+		flex-wrap: nowrap;
 		gap: 2px;
 		max-width: 60%;
 	}
@@ -130,7 +132,6 @@
 	.blog-span-container span {
 		white-space: nowrap;
 		max-width: 100%;
-		margin-right: 40px;
 	}
 
 	.login-btn {
@@ -175,7 +176,6 @@
 	#auth-btn {
 		text-decoration: none;
 		color: #ffffff;
-		background-color: #333;
 		padding: 8px 4px;
 		border-radius: 5px;
 		transition: background-color 0.3s;
@@ -339,16 +339,28 @@
 	<!-- 导航栏 -->
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
 		<div class="container-fluid">
+			<!-- 左侧按钮组 -->
 			<div class="btn-group rounded mx-2">
 				<a class="navbar-brand" href="/">主页</a>
 				<a class="navbar-brand" href="../YingWuNetdisk/home">网盘</a>
 			</div>
+
+			<!-- 夜间模式按钮始终在最右 -->
+			<div class="btn-group rounded mx-2 ms-auto">
+				<button id="btnToggleNightMode" class="btn btn-outline-light btn-sm mx-1 no-focus" data-toggle="tooltip"
+					title="夜间模式" data-placement="bottom">
+					<i class="bi bi-moon"></i>
+				</button>
+			</div>
+
+			<!-- 响应式切换按钮 -->
 			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
 				aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
 				<span class="navbar-toggler-icon"></span>
 			</button>
-			<div class="collapse navbar-collapse" id="navbarNav">
-				<ul class="navbar-nav ms-auto ">
+			<!-- 可折叠导航栏内容 -->
+			<div class="collapse navbar-collapse flex-grow-0" id="navbarNav">
+				<ul class="navbar-nav ms-auto">
 					<li class="nav-item">
 						<a class="nav-link" id="d-write-blog" href="">创作</a>
 					</li>
@@ -364,6 +376,7 @@
 			</div>
 		</div>
 	</nav>
+
 	<div class="container">
 		<div class="row">
 			<div class="col-md-2 col-12">
@@ -447,9 +460,12 @@
 			const endIndex = startIndex + itemsPerPage;
 			const currentBlogs = allBlogs.slice(startIndex, endIndex);
 
+			let isNightMode = false;
+			const user_attr = JSON.parse(localStorage.getItem('USER_ATTR'));
+			if (user_attr && user_attr.custom_style === CustomStyle.NightMode) isNightMode = true;
 			currentBlogs.forEach(blog => {
 				const blogItem = document.createElement('li');
-				blogItem.className = "list-group-item d-flex justify-content-between align-items-center";
+				blogItem.className = `list-group-item d-flex justify-content-between align-items-center ${isNightMode ? "night-mode" : ""}`;
 				const container = document.createElement('div');
 				container.className = "d-flex justify-content-end align-items-center";
 
@@ -457,7 +473,7 @@
 				aElement.id = blog.id;
 				aElement.href = `${Page_Blog_Blog}?id=` + blog.id;
 				aElement.textContent = blog.title === '' ? '无标题' : blog.title;
-				aElement.className = "text-decoration-none";
+				aElement.className = `text-decoration-none ${isNightMode ? "night-mode" : ""}`;
 
 				// 标签
 				if (blog.Tags && blog.Tags.length > 0) {
@@ -486,22 +502,26 @@
 			renderPagination(totalPages);
 		};
 
+		function onPageLinkClicked(event, i) {
+			event.preventDefault();
+			currentPage = i;
+			renderBlogs(blogs); // 重新渲染博客
+		}
 
 		const renderPagination = (totalPages) => {
 			const paginationDiv = document.getElementById("blog-pagination");
 			paginationDiv.innerHTML = '';
 
+
+			let isNightMode = false;
+			const user_attr = JSON.parse(localStorage.getItem('USER_ATTR'));
+			if (user_attr && user_attr.custom_style === CustomStyle.NightMode) isNightMode = true;
 			for (let i = 1; i <= totalPages; i++) {
 				const pageLink = document.createElement('a');
-				pageLink.className = "page-link";
+				pageLink.className = `page-link ${isNightMode ? "night-mode" : ""}`;
 				pageLink.textContent = i;
 				pageLink.href = "#";
-				pageLink.addEventListener('click', (event) => {
-					event.preventDefault();
-					currentPage = i;
-					renderBlogs(blogs); // 重新渲染博客
-				});
-
+				pageLink.onclick = (event) => onPageLinkClicked(event, i);
 				const li = document.createElement('li');
 				li.className = "page-item";
 				li.appendChild(pageLink);
@@ -712,10 +732,45 @@
 	</script>
 </body>
 <script>
+	// 白夜模式切换
+	function toggleNightMode() {
+		const nightModeActive = $('body').hasClass('night-mode');
+		$('body').toggleClass('night-mode');
+		$('.list-group').toggleClass('night-mode');
+		$('.list-group-item').toggleClass('night-mode');
+		$('.list-group-item').each(function () {
+			const anchor = $(this).find('a');
+			if (anchor.length > 0) {
+				anchor.toggleClass('night-mode');
+			}
+		});
+
+		// 更新按钮图标和样式
+		if (nightModeActive) {
+			$('#btnToggleNightMode i').removeClass('bi-sun').addClass('bi-moon');
+			$('#btnToggleNightMode').attr('title', '白天模式');
+			setLocalStorge(SettingType.StylePreference, CustomStyle.WhiteMode);
+		} else {
+			$('#btnToggleNightMode i').removeClass('bi-moon').addClass('bi-sun');
+			$('#btnToggleNightMode').attr('title', '夜间模式');
+			setLocalStorge(SettingType.StylePreference, CustomStyle.NightMode);
+		}
+	}
+
+
 	document.addEventListener('DOMContentLoaded', () => {
 		document.querySelector('#setting-btn').href = `${Page_Blog_Setting}`;
 		document.querySelector('#d-write-blog').href = `${Page_Blog_Write}`;
+
+		document.getElementById('btnToggleNightMode').onclick = toggleNightMode;
+		// 应用样式
+		const user_attr = JSON.parse(localStorage.getItem('USER_ATTR'));
+		if (user_attr && user_attr.custom_style === CustomStyle.NightMode) {
+			toggleNightMode();
+		}
 	});
+
+
 </script>
 
 </html>

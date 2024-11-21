@@ -10,7 +10,26 @@
     <link rel="stylesheet" href="../css/bootstrap.min.css">
     <link href="../css/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="../css/all.min.css">
+    <link rel="stylesheet" href="./css/common.css">
     <style>
+        body {
+            transition: background-color 0.5s, color 0.5s;
+        }
+
+        .btn {
+            white-space: nowrap;
+            /* 防止文本换行 */
+        }
+
+        .page-item {
+            padding: 2px;
+        }
+
+        .page-link {
+            padding: 5px 10px;
+            font-size: 14px;
+        }
+
         .navbar {
             margin: 0;
         }
@@ -118,6 +137,12 @@
             margin-bottom: 10px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             border: 1px solid white;
+        }
+
+        .expired-time {
+            font-size: 12px;
+            white-space: nowrap;
+            padding: 1px;
         }
 
         /* 上传加载框 */
@@ -314,11 +339,14 @@
             </div>
             <div class="ml-auto d-flex">
                 <!-- 按钮 -->
+                <button id="btnToggleNightMode" class="btn btn-outline-light btn-sm mx-1 no-focus" data-toggle="tooltip"
+                    title="夜间模式" data-placement="bottom">
+                    <i class="bi bi-moon"></i>
+                </button>
                 <button id="btnUploadRecord" class="btn btn-outline-light btn-sm mx-1 no-focus" data-toggle="tooltip"
                     title="上传记录" data-placement="bottom">
                     <i class="bi bi-upload"></i>
                 </button>
-
                 <button id="btnDownloadRecord" class="btn btn-outline-light btn-sm mx-1 no-focus" data-toggle="tooltip"
                     title="下载记录" data-placement="bottom">
                     <i class="bi bi-download"></i>
@@ -348,8 +376,8 @@
 
         <div class="row g-3">
             <!-- 上传文件列表 -->
-            <div class="col-md-8 upload-area">
-                <table class="table">
+            <div id="upload-area" class="col-md-8 upload-area">
+                <table id="upload-files-table" class="table">
                     <thead>
                         <tr>
                             <th>文件名</th>
@@ -363,11 +391,11 @@
                     </tbody>
                 </table>
                 <div class="text-right">
-                    <button id="uploadFileButton" class="btn btn-success btn-sm">上传文件</button>
+                    <button id="uploadFileButton" class="btn btn-primary btn-sm">上传文件</button>
                 </div>
                 <h6 class="mt-2">已上传文件</h6>
-                <div class="file-list">
-                    <table class="table">
+                <div id="uploaded-files-table-container" class="file-list">
+                    <table id="uploaded-files-table" class="table">
                         <thead>
                             <tr>
                                 <th>文件名</th>
@@ -381,7 +409,7 @@
                     </table>
                 </div>
                 <!-- 分页控件 -->
-                <ul class="pagination" id="uploaded_files_pagination">
+                <ul class="pagination align-items-center" id="uploaded_files_pagination">
                     <li class="page-item" id="prevPage">
                         <a class="page-link" href="javascript:void(0);" onclick="changePage(currentUploadedPage - 1)"
                             aria-label="Previous">
@@ -402,18 +430,18 @@
 
 
             <!-- 下载文件区域 -->
-            <div class="col-md-4 download-area">
+            <div id="download-area" class="col-md-4 download-area">
                 <h6 class="mt-2">下载文件</h6>
                 <div class="input-group mb-3">
                     <input type="text" id="fileId" class="form-control form-control-sm" placeholder="输入文件标识" required
                         data-bs-toggle="tooltip" data-bs-placement="bottom" title="请输入文件标识">
                     <div class="input-group-append">
-                        <button id="downloadButton" class="btn btn-success btn-sm ms-2">下载</button>
+                        <button id="downloadButton" class="btn btn-primary btn-sm ms-2">下载</button>
                     </div>
                 </div>
 
                 <h6 class="mt-2">文件下载排名</h6>
-                <div class="file-list">
+                <div id="downloadedRank" class="file-list">
                     <canvas id="downloadChart" width="400" height="300"></canvas>
                 </div>
 
@@ -850,6 +878,34 @@
         const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
         return Math.round(bytes / Math.pow(1024, i)) + ' ' + sizes[i];
     }
+
+    // 白夜模式切换
+    function toggleNightMode() {
+        const nightModeActive = $('body').hasClass('night-mode');
+        $('body').toggleClass('night-mode');
+        $("#dropZone").toggleClass("night-mode");
+        $("#upload-area").toggleClass("night-mode");
+        $("#uploaded-files-table-container").toggleClass("night-mode");
+        $("#uploaded_files_pagination").toggleClass("night-mode");
+        $("#download-area").toggleClass("night-mode");
+        $("#downloadedRank").toggleClass("night-mode");
+        $("#fileId").toggleClass("night-mode");
+        $(".modal-content").toggleClass("modal-night-mode");
+        $(".table").toggleClass("modal-night-mode");
+        $(".page-link").toggleClass("night-mode");
+
+        // 更新按钮图标和样式
+        if (nightModeActive) {
+            $('#btnToggleNightMode i').removeClass('bi-sun').addClass('bi-moon');
+            $('#btnToggleNightMode').attr('title', '白天模式');
+            setLocalStorge(SettingType.StylePreference, CustomStyle.WhiteMode);
+        } else {
+            $('#btnToggleNightMode i').removeClass('bi-moon').addClass('bi-sun');
+            $('#btnToggleNightMode').attr('title', '夜间模式');
+            setLocalStorge(SettingType.StylePreference, CustomStyle.NightMode);
+        }
+    }
+
 </script>
 <script>
     // 分页参数
@@ -1360,9 +1416,11 @@
                         <td><a href="javascript:void(0);" onclick="previewFile('${file.hash}')">${file.filename}</a></td>
                         <td>${size} MB</td>
                         <td>${uploadedBy}</td>
-                        <td style="color:${color};">${strExpired}</td>
                         <td>
-                            <button class="btn btn-success btn-sm" onclick="downloadFile('${file.hash}')">下载</button>
+                            <span style="color:${color}" class="expired-time">${strExpired}</span>
+                        </td>
+                        <td>
+                            <button class="btn btn-primary btn-sm" onclick="downloadFile('${file.hash}')">下载</button>
                         </td>
                     `;
                 }
@@ -1382,9 +1440,11 @@
                             <td><a href="javascript:void(0);" onclick="previewFile('${file.hash}')">${file.filename}</a></td>
                             <td>${size} MB</td>
                             <td>${uploadedBy}</td>
-                            <td style="color:${color};">${strExpired}</td>
                             <td>
-                                <button class="btn btn-success btn-sm" onclick="downloadFile('${file.hash}')">下载</button>
+                                <span style="color:${color}" class="expired-time">${strExpired}</span>
+                            </td>
+                            <td>
+                                <button class="btn btn-primary btn-sm" onclick="downloadFile('${file.hash}')">下载</button>
                             </td>
                         `;
                     }
@@ -1397,7 +1457,9 @@
                         row.innerHTML = `
                             <td><a href="javascript:void(0);" onclick="previewFile('${file.hash}')">${file.filename}</a></td>
                             <td>${size} MB</td>
-                            <td style="color:${color};">${strExpired}</td>
+                            <td>
+                                <span style="color:${color}" class="expired-time">${strExpired}</span>
+                            </td>
                         `;
                     }
                 }
@@ -1561,6 +1623,7 @@
             const downloadedFilesModal = new bootstrap.Modal(document.getElementById('downloadedFilesHistoryModal'));
             downloadedFilesModal.show();
         });
+        document.getElementById('btnToggleNightMode').onclick = toggleNightMode;
     });
 
 </script>
@@ -1800,7 +1863,14 @@
     document.addEventListener('DOMContentLoaded', () => {
         document.getElementById("btn_logout").onclick = () => logout();
         document.getElementById("btn_login_github").onclick = () => openAuthPopup();
+
+        // 应用样式
+        const user_attr = JSON.parse(localStorage.getItem('USER_ATTR'));
+        if (user_attr && user_attr.custom_style === CustomStyle.NightMode) {
+            toggleNightMode();
+        }
     });
+
     authorize();
 </script>
 

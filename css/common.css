@@ -35,3 +35,16 @@ html {
     scrollbar-width: thin; /* 滚动条宽度为薄 */
     scrollbar-color: #888 #fff; /* 滚动条和轨道颜色：灰色滑块，白色轨道 */
 }
+
+/* 夜间模式 */
+.night-mode {
+    background-color: #1e1e1e !important;
+    color: rgb(186, 185, 185) !important;
+    transition: background-color 0.3s, color 0.3s !important;
+}
+
+.modal-night-mode {
+    background-color: rgb(54, 48, 48) !important;
+    color: rgb(215, 215, 215) !important;
+    transition: background-color 0.3s, color 0.3s !important;
+}

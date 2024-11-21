@@ -411,6 +411,7 @@
     </style>
     <script src="../../js/util.js"></script>
     <script src="../../js/constDefine.js"></script>
+    <script src="../../js/common.js"></script>
 </head>
 
 <body>
@@ -441,11 +442,11 @@
 
                 <button id="del-blog-btn" class="btn btn-outline-light mx-1 no-focus d-none" data-toggle="tooltip"
                     title="删除" data-placement="bottom">
-                    删除
+                    <i class="bi bi-trash"></i>
                 </button>
                 <button id="update-blog-btn" class="btn btn-outline-light mx-1 no-focus d-none" data-toggle="tooltip"
                     title="编辑" data-placement="bottom">
-                    编辑
+                    <i class="bi bi-file-earmark-text"></i>
                 </button>
             </div>
         </div>
@@ -837,7 +838,7 @@
 </body>
 <script>
     // 刷新状态
-    const freshPage = () => {
+    const freshDetailPage = () => {
         const status = localStorage.getItem('blog_website_login');
 
         if (status === 'true') { // 登录成功
@@ -876,6 +877,41 @@
         }
     }
 
+
+    function toggleButtons(n) {
+        const nightModeActive = $('#test-editormd-view').hasClass('night-mode');
+        $('body').toggleClass('night-mode');
+        $('#test-editormd-view').toggleClass('night-mode');
+        $('#title-container').toggleClass('night-mode');
+        $('#sidebar').toggleClass('night-mode');
+
+        // 更新按钮图标和样式
+        if (nightModeActive) {
+            $('#toggleNightMode i').removeClass('bi-sun').addClass('bi-moon');
+            $('#btnToggleNightMode i').removeClass('bi-sun').addClass('bi-moon');
+            $('#toggleNightMode').attr('data-original-title', '白天模式');
+            $('#btnToggleNightMode').attr('data-original-title', '白天模式');
+            setLocalStorge(SettingType.StylePreference, CustomStyle.WhiteMode);
+        } else {
+            $('#toggleNightMode i').removeClass('bi-moon').addClass('bi-sun');
+            $('#btnToggleNightMode i').removeClass('bi-moon').addClass('bi-sun');
+            $('#toggleNightMode').attr('data-original-title', '夜间模式');
+            $('#btnToggleNightMode').attr('data-original-title', '夜间模式');
+            setLocalStorge(SettingType.StylePreference, CustomStyle.NightMode);
+        }
+
+        switch (n) {
+            case 1:
+                $("#toggleNightMode").tooltip('hide').tooltip('show');
+                break;
+            case 2:
+                $("#btnToggleNightMode").tooltip('hide').tooltip('show');
+                break;
+            default:
+                break;
+        }
+    }
+
     let scale = 1; // 当前缩放比例
     let rotation = 0; // 当前旋转角度
 
@@ -885,7 +921,7 @@
     }
 
     $(document).ready(function () {
-        freshPage();
+        freshDetailPage();
         // 初始化工具提示，设置延时
         $('[data-toggle="tooltip"]').tooltip({
             delay: { "show": 0, "hide": 0 }
@@ -974,38 +1010,6 @@
         }).on('mouseleave', function () {
             $(this).tooltip('hide'); // 隐藏 tooltip
         });
-
-        function toggleButtons(n) {
-            const nightModeActive = $('#test-editormd-view').hasClass('night-mode');
-            $('body').toggleClass('night-mode');
-            $('#test-editormd-view').toggleClass('night-mode');
-            $('#title-container').toggleClass('night-mode');
-            $('#sidebar').toggleClass('night-mode');
-
-            // 更新按钮图标和样式
-            if (nightModeActive) {
-                $('#toggleNightMode i').removeClass('bi-sun').addClass('bi-moon');
-                $('#btnToggleNightMode i').removeClass('bi-sun').addClass('bi-moon');
-                $('#toggleNightMode').attr('data-original-title', '白天模式');
-                $('#btnToggleNightMode').attr('data-original-title', '白天模式');
-            } else {
-                $('#toggleNightMode i').removeClass('bi-moon').addClass('bi-sun');
-                $('#btnToggleNightMode i').removeClass('bi-moon').addClass('bi-sun');
-                $('#toggleNightMode').attr('data-original-title', '夜间模式');
-                $('#btnToggleNightMode').attr('data-original-title', '夜间模式');
-            }
-
-            switch (n) {
-                case 1:
-                    $("#toggleNightMode").tooltip('hide').tooltip('show');
-                    break;
-                case 2:
-                    $("#btnToggleNightMode").tooltip('hide').tooltip('show');
-                    break;
-                default:
-                    break;
-            }
-        }
 
         document.getElementById('toggleNightMode').addEventListener('click', () => toggleButtons(1));
         document.getElementById('btnToggleNightMode').addEventListener('click', () => toggleButtons(2));
@@ -1135,6 +1139,13 @@
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         document.querySelector('#blog-homepage').href = `${Page_Blog_Home}`;
+
+
+        // 应用样式
+        const user_attr = JSON.parse(localStorage.getItem('USER_ATTR'));
+        if (user_attr && user_attr.custom_style === CustomStyle.NightMode) {
+            toggleButtons();
+        }
     });
 </script>
 

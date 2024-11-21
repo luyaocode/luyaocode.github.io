@@ -914,7 +914,7 @@
     async function handleDeleteFiles(fileIDs) {
         const response = await deleteFiles(fileIDs);
         if (response.ok) {
-            const data = response.json();
+            const data = await response.json();
             const { successFiles, failureCount } = data.result;
             if (successFiles.length > 0) {
                 const uploadRecords = extractUploadRecords();

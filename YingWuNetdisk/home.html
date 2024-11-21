@@ -1380,10 +1380,12 @@
             }
             else {
                 showToast("文件不存在", 'top-right', 'bg-warning');
+                closePreview();
             }
         } catch (error) {
             console.error(error);
             showToast("文件下载失败", 'top-right', 'bg-warning');
+            closePreview();
         }
     }
 

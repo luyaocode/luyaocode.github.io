@@ -149,7 +149,7 @@
             height: 100%;
             justify-content: center;
             align-items: center;
-            z-index: 20;
+            z-index: 2000;
             /* 确保容器位于蒙版之上 */
             background: rgba(0, 0, 0, 0.6);
             /* 半透明背景蒙版 */
@@ -160,6 +160,7 @@
             width: 90%;
             max-width: 1000px;
             max-height: 90%;
+            margin-top: 50px;
             background-color: #fff;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             /* 添加阴影 */
@@ -173,8 +174,8 @@
 
         /* 内嵌的图片和 PDF 内容容器 */
         .preview-content img {
-            max-width: 100%;
-            max-height: 100%;
+            width: auto;
+            max-height: 60vh;
             object-fit: contain;
         }
 
@@ -182,7 +183,6 @@
         .preview-content canvas {
             display: block;
             max-width: 100%;
-            max-height: 100%;
             margin: 0 auto;
         }
 
@@ -194,11 +194,11 @@
         #image-content {
             display: none;
             flex-direction: column;
+            max-height: 80vh;
         }
 
         .image-preview {
-            max-height: 40vh;
-            width: auto;
+            max-height: 10%;
         }
 
         .hidden {
@@ -266,22 +266,29 @@
         /* closePreview-pdf btn */
 
         #pdf-content {
-            display: flex;
+            display: none;
             flex-direction: column;
             background-color: white;
             width: 100%;
             height: 100vh;
             /* 使用全屏高度 */
-            overflow: scroll;
+            overflow: hidden;
         }
 
         /* pdf操作栏 */
         #pdf-toolbar {
             position: sticky;
-            /* 固定在顶部 */
-            top: 0;
+            /* 固定在底部 */
+            bottom: 0;
             z-index: 1000;
-            background-color: #f1f1f1;
+            background-color: #f7f7f7;
+        }
+
+        #pdf-canvas-container {
+            flex-grow: 1;
+            overflow: auto;
+            position: relative;
+            padding-bottom: 60px;
         }
 
         #pdf-canvas {
@@ -426,59 +433,55 @@
     <div class="preview-container" id="preview-container">
         <div class="preview-content" id="preview-content">
             <div id="pdf-content">
-                <div id="pdf-toolbar" class="d-flex justify-content-center">
-                    <div class="btn-group p-2 rounded mx-3">
+                <div style="position: relative; height: 100vh; display: flex; flex-direction: column;">
+                    <div id="pdf-canvas-container">
+                        <canvas id="pdf-canvas"></canvas>
+                    </div>
+                    <div id="pdf-toolbar" class="d-flex flex-wrap justify-content-center align-items-center p-2">
                         <!-- 页码显示和跳转 -->
-                        <span id="page-info" class="mb-2 mx-2 d-flex align-items-center">第 <input id="page-input"
-                                type="number" value="1" min="1" style="width: 100px;"> 页
-                            <button id="go-to-page" class="btn btn-sm btn-secondary">跳转</button>
-                            / 共 <span id="total-pages">0</span> 页
+                        <span id="page-info" class="d-flex align-items-center me-2">
+                            <input id="page-input" type="number" value="1" min="1"
+                                style="width: 80px; height: 30px; margin-right: 5px;">
+                            <button id="go-to-page" class="btn btn-sm btn-secondary px-2 py-1">跳转</button>
+                            <span class="ms-2">/<span id="total-pages">0</span></span>
                         </span>
-                        <button id="prevPage_preview" class="btn btn-sm btn-primary mb-2 mx-2">
+                        <button id="prevPage_preview" class="btn btn-sm btn-primary px-2 py-1 me-1">
                             <i class="bi bi-arrow-left-circle"></i>
                         </button>
-                        <button id="nextPage_preview" class="btn btn-sm btn-primary mb-2 mx-2">
+                        <button id="nextPage_preview" class="btn btn-sm btn-primary px-2 py-1 me-2">
                             <i class="bi bi-arrow-right-circle"></i>
                         </button>
-                    </div>
-                    <div class="btn-group p-2 rounded mx-3">
-                        <!-- 放大按钮 -->
-                        <button id="zoom-in" class="btn btn-sm btn-success mb-2 mx-2">
+                        <button id="zoom-in" class="btn btn-sm btn-primary px-2 py-1 me-1">
                             <i class="bi bi-plus-circle"></i>
                         </button>
-                        <!-- 缩小按钮 -->
-                        <button id="zoom-out" class="btn btn-sm btn-warning mb-2 mx-2">
+                        <button id="zoom-out" class="btn btn-sm btn-primary px-2 py-1 me-1">
                             <i class="bi bi-dash-circle"></i>
                         </button>
-                        <!-- 还原按钮 -->
-                        <button id="reset-zoom" class="btn btn-sm btn-secondary mb-2 mx-2">
+                        <button id="reset-zoom" class="btn btn-sm btn-secondary px-2 py-1 me-1">
                             <i class="bi bi-arrow-counterclockwise"></i>
                         </button>
-                        <!-- 全屏按钮 -->
-                        <button id="fullscreen-pdf" class="btn btn-sm btn-info mb-2 mx-2">
+                        <button id="fullscreen-pdf" class="btn btn-sm btn-primary px-2 py-1 me-2">
                             <i class="bi bi-arrows-fullscreen"></i>
                         </button>
-                    </div>
-                    <div class="btn-group p-2 rounded mx-3">
-                        <button id="closePreview-pdf" class="btn btn-sm btn-danger mb-2 ">
+                        <button id="closePreview-pdf" class="btn btn-sm btn-danger px-2 py-1">
                             <i class="bi bi-x-circle"></i>
                         </button>
                     </div>
                 </div>
-                <canvas id="pdf-canvas"></canvas>
 
             </div>
-        </div>
-        <!-- 图片显示区域 -->
-        <div id="image-content">
-            <div class="d-flex justify-content-end">
-                <div class="d-flex flex-row align-items-center border p-3 rounded">
-                    <button id="closePreview-img" class="btn btn-sm btn-danger mb-2 mx-2">
-                        <i class="bi bi-x-circle"></i>
-                    </button>
+            <!-- 图片显示区域 -->
+            <div id="image-content">
+                <div class="d-flex flex-column">
+                    <div id="img-toolbar" class="d-flex justify-content-end flex-row align-items-center rounded"
+                        style="position: sticky; top:0">
+                        <button id="closePreview-img" class="btn btn-sm btn-danger">
+                            <i class="bi bi-x-circle"></i>
+                        </button>
+                    </div>
+                    <img id="image-preview" class="img-fluid" alt="img-preview">
                 </div>
             </div>
-            <img id="image-preview" class="img-fluid" alt="img-preview" style="max-height: 100%; width: auto;">
         </div>
     </div>
     </div>
@@ -1556,14 +1559,14 @@
 
     // 放大功能
     zoomInButton.addEventListener('click', function () {
-        zoomLevel += 0.25; // 每次放大
+        zoomLevel += 0.2; // 每次放大
         updateCanvasZoom();
     });
 
     // 缩小功能
     zoomOutButton.addEventListener('click', function () {
         if (zoomLevel > 0.2) { // 防止缩小到不可见
-            zoomLevel -= 0.25; // 每次缩小
+            zoomLevel -= 0.2; // 每次缩小
             updateCanvasZoom();
         }
     });
@@ -1663,7 +1666,7 @@
             currentPage = inputPage;
             renderPdf(currentPage);
         } else {
-            alert("请输入有效的页码范围！");
+            showToast("请输入有效的页码范围！");
         }
     });
     // 监听输入框的键盘事件
@@ -1750,8 +1753,8 @@
         $("#pdf-content").css("display", "none");
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         exitFullscreen();
-        zoomLevel = 1;
-        canvas.style.transform = `scale(${zoomLevel})`; // 使用 transform 缩放
+        // zoomLevel = 1;
+        // canvas.style.transform = `scale(${zoomLevel})`; // 使用 transform 缩放
     }
 
     // 绑定翻页按钮事件

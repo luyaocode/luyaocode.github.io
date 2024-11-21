@@ -50,6 +50,10 @@
             text-decoration: underline;
         }
 
+        small {
+            white-space: nowrap;
+        }
+
         .container {
             /* 内容上边距统一为60px */
             margin-top: 60px;
@@ -917,14 +921,15 @@
             const data = await response.json();
             const { successFiles, failureCount } = data.result;
             if (successFiles && successFiles.length > 0) {
-                const uploadRecords = extractUploadRecords();
-                const updatedRecords = uploadRecords.filter(record => !successFiles.includes(record.hash));
-                renderUploadRecords(updatedRecords);
                 if (!failureCount) {
                     showToast("删除成功");
                 }
                 else {
                     showToast("成功 " + successFiles.length + "个，失败 " + failureCount + "个");
+                }
+                const status = localStorage.getItem("blog_website_login");
+                if (status === "true") {
+                    loadUploadPage(currentUploadedFileHistoryPage);
                 }
             }
             else {
@@ -1856,6 +1861,19 @@
         });
     }
 
+    function requestUploadedHistory() {
+        const status = localStorage.getItem("blog_website_login");
+        if (status === "true") {
+            loadUploadPage(1);
+        }
+        let uploaded_files = sessionStorage.getItem("uploaded_files");
+        if (uploaded_files) {
+            uploaded_files = JSON.parse(uploaded_files);
+            const { successFiles } = uploaded_files;
+            renderUploadedHistory(successFiles);
+        }
+    }
+
     $(document).ready(function () {
         changePage(currentUploadedPage);
         requestDownloadedFilesRank();
@@ -1875,16 +1893,7 @@
 
         // 点击上传记录按钮，显示上传记录
         $('#btnUploadRecord').click(function () {
-            const status = localStorage.getItem("blog_website_login");
-            if (status === "true") {
-                loadUploadPage(1);
-            }
-            let uploaded_files = sessionStorage.getItem("uploaded_files");
-            if (uploaded_files) {
-                uploaded_files = JSON.parse(uploaded_files);
-                const { successFiles } = uploaded_files;
-                renderUploadedHistory(successFiles);
-            }
+            requestUploadedHistory();
             const uploadedFilesModal = new bootstrap.Modal(document.getElementById('uploadFilesHistoryModal'));
             uploadedFilesModal.show();
         });

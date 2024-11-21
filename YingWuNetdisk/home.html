@@ -10,7 +10,6 @@
     <link rel="stylesheet" href="../css/bootstrap.min.css">
     <link href="../css/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="../css/all.min.css">
-    <link rel="stylesheet" href="./css/common.css">
     <style>
         body {
             transition: background-color 0.5s, color 0.5s;
@@ -1695,6 +1694,20 @@
 
     // 打开预览（示例，点击按钮时）
     function openPreview(contentType, contentSrc) {
+        const nightModeActive = $('body').hasClass('night-mode');
+        if (nightModeActive) {
+            $("#preview-content").addClass("night-mode");
+            $("#pdf-content").addClass("night-mode");
+            $("#pdf-toolbar-top").addClass("night-mode");
+            $("#pdf-toolbar").addClass("night-mode");
+        }
+        else {
+            $("#preview-content").removeClass("night-mode");
+            $("#pdf-content").removeClass("night-mode");
+            $("#pdf-toolbar-top").removeClass("night-mode");
+            $("#pdf-toolbar").removeClass("night-mode");
+        }
+
         if (contentType === 'pdf') {
             showPdfPreview(contentSrc);
         }

@@ -916,7 +916,7 @@
         if (response.ok) {
             const data = await response.json();
             const { successFiles, failureCount } = data.result;
-            if (successFiles.length > 0) {
+            if (successFiles && successFiles.length > 0) {
                 const uploadRecords = extractUploadRecords();
                 const updatedRecords = uploadRecords.filter(record => !successFiles.includes(record.hash));
                 renderUploadRecords(updatedRecords);

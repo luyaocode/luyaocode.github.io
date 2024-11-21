@@ -442,9 +442,15 @@
             <div id="pdf-content">
                 <div style="position: relative; height: 100vh; display: flex; flex-direction: column;">
                     <div id="pdf-toolbar-top" class="d-flex flex-wrap justify-content-between align-items-center p-2">
-                        <span id="page-info-top" class="d-flex align-items-center me-2">
+                        <span id="page-info-top" class="d-flex align-items-center me-2"
+                            style="color:#0056b3;font-weight: bold;">
                             <span class="ms-2"><span id="current-page-top">0</span> </span>
                             <span>/<span id="total-pages-top">0</span></span>
+                        </span>
+                        <span id="page-info-top" class="d-flex align-items-center me-2"
+                            style="color:#0056b3;font-weight: bold;">
+                            <span class="ms-2"><span id="current-zoom-scale">1</span></span>
+                            <span>:<span id="total-pages-top">1</span></span>
                         </span>
                         <button id="closePreview-pdf" class="btn btn-sm btn-danger px-2 py-1">
                             <i class="bi bi-x-circle"></i>
@@ -1564,7 +1570,7 @@
     let totalPages = 0;  // 总页数
     const canvas = document.getElementById('pdf-canvas');
     const ctx = canvas.getContext('2d');
-    let zoomLevel = 1; // 初始缩放比例
+    let zoomLevel = 1.0; // 初始缩放比例
     const zoomInButton = document.getElementById('zoom-in');
     const zoomOutButton = document.getElementById('zoom-out');
     const resetZoomButton = document.getElementById('reset-zoom');
@@ -1572,6 +1578,7 @@
     // 放大功能
     zoomInButton.addEventListener('click', function () {
         zoomLevel += 0.2; // 每次放大
+        zoomLevel = parseFloat(zoomLevel.toFixed(1));
         updateCanvasZoom();
     });
 
@@ -1579,12 +1586,13 @@
     zoomOutButton.addEventListener('click', function () {
         if (zoomLevel > 0.2) { // 防止缩小到不可见
             zoomLevel -= 0.2; // 每次缩小
+            zoomLevel = parseFloat(zoomLevel.toFixed(1));
             updateCanvasZoom();
         }
     });
     // 还原缩放
     resetZoomButton.addEventListener('click', function () {
-        zoomLevel = 1; // 还原为初始值
+        zoomLevel = 1.0; // 还原为初始值
         updateCanvasZoom();
     });
 
@@ -1592,6 +1600,7 @@
     function updateCanvasZoom() {
         canvas.style.transform = `scale(${zoomLevel})`; // 使用 transform 缩放
         canvas.style.transformOrigin = 'center top'; // 设置缩放的起始点为中间
+        document.getElementById('current-zoom-scale').textContent = zoomLevel;
     }
 
     // 渲染 PDF 页面

@@ -911,35 +911,36 @@
         return selectedHashes;
     }
 
-    // 批量删除按钮点击事件
-    document.getElementById('btnBatchDeleteUploadedHistory').addEventListener('click', async function () {
-        const selectedFiles = getSelectedFileHashes();
-
-        if (selectedFiles.length > 0) {
-            const response = await deleteFiles(selectedFiles);
-            if (response.ok) {
-                const data = response.json();
-                const { successFiles, failureCount } = data.result;
-                let msg = "";
-                if (successFiles.length > 0) {
-                    const uploadRecords = extractUploadRecords();
-                    const updatedRecords = uploadRecords.filter(record => !successIDs.includes(record.hash));
-                    renderUploadRecords(updatedRecords);
-                    if (failureCount) {
-                        showToast("删除成功");
-                    }
-                    else {
-                        showToast("成功 " + successFiles.length + "个，失败 " + failureCount + "个");
-                    }
+    async function handleDeleteFiles(fileIDs) {
+        const response = await deleteFiles(fileIDs);
+        if (response.ok) {
+            const data = response.json();
+            const { successFiles, failureCount } = data.result;
+            if (successFiles.length > 0) {
+                const uploadRecords = extractUploadRecords();
+                const updatedRecords = uploadRecords.filter(record => !successIDs.includes(record.hash));
+                renderUploadRecords(updatedRecords);
+                if (failureCount) {
+                    showToast("删除成功");
                 }
                 else {
-                    showToast("删除失败", "top-right", "bg-warning");
+                    showToast("成功 " + successFiles.length + "个，失败 " + failureCount + "个");
                 }
             }
             else {
                 showToast("删除失败", "top-right", "bg-warning");
             }
+        }
+        else {
+            showToast("删除失败", "top-right", "bg-warning");
+        }
+    }
 
+    // 批量删除按钮点击事件
+    document.getElementById('btnBatchDeleteUploadedHistory').addEventListener('click', async function () {
+        const selectedFiles = getSelectedFileHashes();
+        if (selectedFiles.length > 0) {
+            handleDeleteFiles(selectedFiles);
         } else {
             showToast("请选择要删除的文件", "top-right", 'bg-info');
         }
@@ -1208,7 +1209,7 @@
     async function deleteFile(fileID) {
         let fileIDs = [];
         fileIDs.push(fileID);
-        return deleteFiles(fileIDs);
+        return handleDeleteFiles(fileIDs);
     }
 
     async function deleteFiles(fileIDs) {

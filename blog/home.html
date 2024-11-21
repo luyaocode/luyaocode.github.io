@@ -332,6 +332,12 @@
 	#setting-btn {
 		margin-right: 10px;
 	}
+
+	/*  */
+	.page-link.active {
+		background-color: #007bff;
+		color: white;
+	}
 </style>
 
 <body>
@@ -392,7 +398,8 @@
 				<ul id="blogs" class="list-group">
 					<!-- Blogs will be rendered here -->
 				</ul>
-				<div id="blog-pagination" class="pagination"></div>
+				<ul class="pagination justify-content-left" id="blog-pagination">
+				</ul>
 			</div>
 		</div>
 	</div>
@@ -502,10 +509,31 @@
 			renderPagination(totalPages);
 		};
 
+		// 更新分页按钮的高亮
+		function updatePagination() {
+			const pageButtons = document.querySelectorAll('.page-link');
+
+			// 移除所有页码的高亮
+			pageButtons.forEach(button => {
+				button.classList.remove('active');
+			});
+
+			// 给当前页码添加高亮
+			const currentButton = document.querySelector(`#page-${currentPage}`);
+			if (currentButton) {
+				currentButton.classList.add('active');
+			}
+		}
+
 		function onPageLinkClicked(event, i) {
 			event.preventDefault();
+			const totalPages = Math.ceil(blogs.length / itemsPerPage);
+			if (i < 1 || i > totalPages) {
+				return;
+			}
 			currentPage = i;
 			renderBlogs(blogs); // 重新渲染博客
+			updatePagination();
 		}
 
 		const renderPagination = (totalPages) => {
@@ -516,17 +544,43 @@
 			let isNightMode = false;
 			const user_attr = JSON.parse(localStorage.getItem('USER_ATTR'));
 			if (user_attr && user_attr.custom_style === CustomStyle.NightMode) isNightMode = true;
+
+			// 前一页
+			let pageButton = document.createElement('button');
+			pageButton.className = `page-link ${isNightMode ? "night-mode" : ""}`; // 可以添加自定义的 class
+			pageButton.textContent = "上一页";
+			pageButton.type = "button";  // 设置按钮类型
+			pageButton.onclick = (event) => onPageLinkClicked(event, currentPage - 1);
+
+			let li = document.createElement('li');
+			li.className = "page-item";
+			li.appendChild(pageButton);
+			paginationDiv.appendChild(li);
+
 			for (let i = 1; i <= totalPages; i++) {
 				const pageLink = document.createElement('a');
 				pageLink.className = `page-link ${isNightMode ? "night-mode" : ""}`;
 				pageLink.textContent = i;
 				pageLink.href = "#";
 				pageLink.onclick = (event) => onPageLinkClicked(event, i);
+				pageLink.id = `page-${i}`;
 				const li = document.createElement('li');
 				li.className = "page-item";
 				li.appendChild(pageLink);
 				paginationDiv.appendChild(li);
 			}
+
+			// 前一页
+			pageButton = document.createElement('button');
+			pageButton.className = `page-link ${isNightMode ? "night-mode" : ""}`; // 可以添加自定义的 class
+			pageButton.textContent = "下一页";
+			pageButton.type = "button";  // 设置按钮类型
+			pageButton.onclick = (event) => onPageLinkClicked(event, currentPage + 1);
+
+			li = document.createElement('li');
+			li.className = "page-item";
+			li.appendChild(pageButton);
+			paginationDiv.appendChild(li);
 		};
 
 		const renderAllBtn = () => {

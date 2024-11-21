@@ -952,7 +952,7 @@
         <td><span class="label-style">${label}</span></td>
         <td>${uploadedAt}</td>
         <td>
-            <button class="btn btn-primary btn-sm" onclick="deleteFile('${file.hash}')">删除</button>
+            <button class="btn btn-primary btn-sm" onclick="deleteFile('${record.hash}')">删除</button>
         </td>
         `;
             uploadTableBody.appendChild(row);
@@ -1195,6 +1195,12 @@
 
         // 将合并后的数据保存回 sessionStorage
         sessionStorage.setItem('downloaded_files', JSON.stringify(mergedFiles));
+    }
+
+    async function deleteFile(fileID) {
+        let fileIDs = [];
+        fileIDs.push(fileID);
+        return deleteFiles(fileIDs);
     }
 
     async function deleteFiles(fileIDs) {

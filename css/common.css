@@ -40,11 +40,11 @@ html {
 .night-mode {
     background-color: #1e1e1e !important;
     color: rgb(186, 185, 185) !important;
-    transition: background-color 0.3s, color 0.3s !important;
+    transition: background-color 1s, color 1s !important;
 }
 
 .modal-night-mode {
     background-color: rgb(54, 48, 48) !important;
     color: rgb(215, 215, 215) !important;
-    transition: background-color 0.3s, color 0.3s !important;
+    transition: background-color 0.5s, color 0.5s !important;
 }

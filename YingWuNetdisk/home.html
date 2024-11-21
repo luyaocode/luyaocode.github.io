@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="../css/all.min.css">
     <style>
         body {
-            transition: background-color 0.5s, color 0.5s;
+            transition: background-color 1s, color 1s;
         }
 
         .btn {
@@ -1881,12 +1881,16 @@
         document.getElementById("btn_logout").onclick = () => logout();
         document.getElementById("btn_login_github").onclick = () => openAuthPopup();
 
+    });
+
+    function initTheme() {
         // 应用样式
         const user_attr = JSON.parse(localStorage.getItem('USER_ATTR'));
         if (user_attr && user_attr.custom_style === CustomStyle.NightMode) {
             toggleNightMode();
         }
-    });
+    }
+    window.onload = initTheme();
 
     authorize();
 </script>

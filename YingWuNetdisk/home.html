@@ -894,19 +894,26 @@
 
     // 全选框点击事件
     document.getElementById('selectAllUploadedHistory').addEventListener('change', function () {
-        const checkboxes = document.querySelectorAll('.file-checkbox');
-        checkboxes.forEach(checkbox => {
-            checkbox.checked = this.checked;
+        const isChecked = event.target.checked;
+        const fileCheckboxes = document.querySelectorAll('.file-select');
+        fileCheckboxes.forEach(checkbox => {
+            checkbox.checked = isChecked;
         });
     });
 
+    // 获取所有选中的文件哈希
+    function getSelectedFileHashes() {
+        const selectedHashes = [];
+        const fileCheckboxes = document.querySelectorAll('.file-select:checked');
+        fileCheckboxes.forEach(checkbox => {
+            selectedHashes.push(checkbox.getAttribute('data-hash'));
+        });
+        return selectedHashes;
+    }
+
     // 批量删除按钮点击事件
     document.getElementById('btnBatchDeleteUploadedHistory').addEventListener('click', async function () {
-        const selectedFiles = [];
-        const checkboxes = document.querySelectorAll('.file-checkbox:checked');
-        checkboxes.forEach(checkbox => {
-            selectedFiles.push(checkbox.dataset.hash);
-        });
+        const selectedFiles = getSelectedFileHashes();
 
         if (selectedFiles.length > 0) {
             const response = await deleteFiles(selectedFiles);
@@ -948,13 +955,14 @@
             const uploadedAt = toLocalTime(record.uploaded_at);
             const row = document.createElement('tr');
             row.innerHTML = `
-        <td>${record.filename}</td>
-        <td><span class="label-style">${label}</span></td>
-        <td>${uploadedAt}</td>
-        <td>
-            <button class="btn btn-primary btn-sm" onclick="deleteFile('${record.hash}')">删除</button>
-        </td>
-        `;
+                <td><input type="checkbox" class="file-select" data-hash="${record.hash}"></td>
+                <td>${record.filename}</td>
+                <td><span class="label-style">${label}</span></td>
+                <td>${uploadedAt}</td>
+                <td>
+                <button class="btn btn-primary btn-sm" onclick="deleteFile('${record.hash}')">删除</button>
+                </td>
+                `;
             uploadTableBody.appendChild(row);
         });
     }

@@ -716,7 +716,7 @@
         </div>
     </div>
     <!-- 上传文件等待弹窗 -->
-    <div id="waitingModal" class="modal" tabindex="-1" role="dialog">
+    <div id="waitingModal" class="modal" tabindex="-1" role="dialog" data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog" role="document">
             <div id="loading-content" class="modal-content text-center">
                 <div class="modal-body">
@@ -2197,6 +2197,7 @@
     window.onload = initTheme();
 
     authorize();
+
 </script>
 
 </html>

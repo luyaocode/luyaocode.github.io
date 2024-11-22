@@ -809,8 +809,11 @@
 <script src="../js/common.js"></script>
 <script src="../js/util.js"></script>
 <script src="../js/bootstrap.bundle.min.js"></script>
-<script src="./js/pdf.min.js"></script>
-<script src="./js/pdf.worker.min.js"></script>
+<!-- <script src="./js/pdf.min.js"></script>
+<script src="./js/pdf.worker.min.js"></script> -->
+<script type="module">
+    import pdfjsDist from 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.8.69/+esm'
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0/dist/chartjs-plugin-datalabels.min.js">
@@ -1978,7 +1981,9 @@
     });
 
 </script>
-<script>// 预览文件
+<script type="module">// 预览文件
+    import * as pdfjsLib from './js/pdf.mjs';
+    pdfjsLib.GlobalWorkerOptions.workerSrc = './js/pdf.worker.mjs';
     let pdfDoc = null;  // PDF 文档对象
     let currentPage = 1; // 当前页数
     let totalPages = 0;  // 总页数
@@ -2051,7 +2056,12 @@
             canvas.height = viewport.height;
 
             // 渲染页面到 canvas
-            await page.render({ canvasContext: ctx, viewport }).promise;
+            await page.render({
+                canvasContext: ctx,
+                viewport,
+                renderInteractiveForms: true,  // 启用表单交互
+                imageLayer: true               // 启用更高质量的图像渲染
+            }).promise;
 
             // 更新页码显示
             currentPage = pageNumber;
@@ -2099,6 +2109,7 @@
         $("#pdf-content").css("display", "flex");
         try {
             // 加载 PDF
+            pdfjsLib.GlobalWorkerOptions.workerSrc = './js/pdf.worker.min.js'; // 使用 CDN
             pdfDoc = await pdfjsLib.getDocument({
                 url: pdfUrl,
                 cMapUrl: './bcmaps/', // CMap 文件所在目录

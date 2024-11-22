@@ -409,6 +409,24 @@
             position: relative;
         }
 
+        #resizer {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 5px;
+            /* 调节条宽度 */
+            height: 100%;
+            cursor: ew-resize;
+            /* 鼠标悬浮时显示左右拖动图标 */
+            background-color: transparent;
+            /* 初始透明 */
+        }
+
+        #resizer:hover {
+            background-color: rgba(0, 0, 0, 0.1);
+            /* 悬浮时的视觉效果 */
+        }
+
         .toggle-pdf-outline-btn {
             position: absolute;
             top: 50%;
@@ -639,6 +657,7 @@
                             <button id="btnTogglePdfOutline" class="toggle-pdf-outline-btn">
                                 <i class="fas fa-chevron-left"></i>
                             </button>
+                            <div id="resizer"></div>
                         </div>
                         <div id="pdf-canvas-container">
                             <canvas id="pdf-canvas"></canvas>
@@ -2232,6 +2251,40 @@
         }
 
     }
+
+    // 目录宽度调节器
+    const outlineContainer = document.getElementById('outline-container');
+    const resizer = document.getElementById('resizer');
+    let isResizing = false;
+    const onMouseMove = (e) => {
+        if (!isResizing) return;
+
+        // 计算新的宽度，限制范围
+        const newWidth = Math.max(200, Math.min(window.innerWidth * 0.8, e.clientX));
+        outlineContainer.style.width = `${newWidth}px`;
+    };
+
+    const onMouseUp = () => {
+        if (isResizing) {
+            isResizing = false;
+            document.body.style.cursor = ''; // 恢复鼠标光标
+            document.body.style.userSelect = ''; // 恢复文本选择
+
+            // 移除事件监听器
+            document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('mouseup', onMouseUp);
+        }
+    };
+
+    resizer.addEventListener('mousedown', (e) => {
+        isResizing = true;
+        document.body.style.cursor = 'ew-resize'; // 改变鼠标光标
+        document.body.style.userSelect = 'none'; // 禁止选中文本
+
+        // 添加事件监听器
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
+    });
 
     // 渲染 PDF 页面
     async function renderPdf(pageNumber) {

@@ -295,21 +295,20 @@ body {
 }
 
 .card-front__tp--city {
-    background: linear-gradient(to bottom, #2c3e50, #34495e); /* 暗蓝灰到蓝灰色 */
+    background: linear-gradient(to bottom, #e74c3c, #f39c12); /* 草莓红到橙色 */
 }
 
 .card-front__tp--ski {
-    background: linear-gradient(to bottom, #2c3e50, #34495e); /* 使用与上面相同的色调 */
+    background: linear-gradient(to bottom, #f39c12, #f1c40f); /* 橙色到金黄色 */
 }
 
 .card-front__tp--beach {
-    background: linear-gradient(to bottom, #2c3e50, #34495e); /* 使用与上面相同的色调 */
+    background: linear-gradient(to bottom, #f1c40f, #f39c12); /* 金黄色到橙色 */
 }
 
 .card-front__tp--camping {
-    background: linear-gradient(to bottom, #2c3e50, #34495e); /* 使用与上面相同的色调 */
+    background: linear-gradient(to bottom, #e67e22, #d35400); /* 橙色到深橙色 */
 }
-
 
 /* Front card's bottom section */
 
@@ -393,4 +392,39 @@ body {
     color: #fff;
     font-size: 1.2rem;
     text-align: center;
+}
+
+
+/*  */
+/* 气泡容器 */
+#bubbles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    pointer-events: none; /* 确保不会影响点击事件 */
+}
+
+/* 每个气泡的样式 */
+.bubble {
+    position: absolute;
+    bottom: -50px; /* 从屏幕底部开始 */
+    border-radius: 50%;
+    background-color: #fff;
+    opacity: 0.8;
+    animation: floatBubble 5s ease-in infinite;
+}
+
+/* 气泡的浮动和消失动画 */
+@keyframes floatBubble {
+    0% {
+        transform: translateX(0) translateY(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translateX(var(--random-x)) translateY(-100vh);
+        opacity: 0;
+    }
 }

@@ -809,11 +809,6 @@
 <script src="../js/common.js"></script>
 <script src="../js/util.js"></script>
 <script src="../js/bootstrap.bundle.min.js"></script>
-<!-- <script src="./js/pdf.min.js"></script>
-<script src="./js/pdf.worker.min.js"></script> -->
-<script type="module">
-    import pdfjsDist from 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.8.69/+esm'
-</script>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0/dist/chartjs-plugin-datalabels.min.js">
@@ -1981,6 +1976,10 @@
     });
 
 </script>
+<!-- 旧版本 -->
+<script src="./js/pdf.min.js"></script>
+<script src="./js/pdf.worker.min.js"></script>
+<!-- 新版本 -->
 <script type="module">// 预览文件
     import * as pdfjsLib from './js/pdf.mjs';
     pdfjsLib.GlobalWorkerOptions.workerSrc = './js/pdf.worker.mjs';
@@ -2051,7 +2050,7 @@
             const page = await pdfDoc.getPage(pageNumber);
 
             // 设置缩放比例
-            const scale = 1.2;
+            const scale = 8;
             const viewport = page.getViewport({ scale });
 
             // 设置 canvas 尺寸
@@ -2065,6 +2064,14 @@
                 renderInteractiveForms: true,  // 启用表单交互
                 imageLayer: true               // 启用更高质量的图像渲染
             }).promise;
+
+            // 调整 Canvas 显示尺寸
+            const screenHeight = window.innerHeight; // 屏幕高度
+            const aspectRatio = canvas.width / canvas.height; // 原始宽高比
+
+            // 高度占满屏幕，宽度按比例缩放
+            canvas.style.height = `${screenHeight}px`;
+            canvas.style.width = `${screenHeight * aspectRatio}px`;
 
             // 更新页码显示
             currentPage = pageNumber;

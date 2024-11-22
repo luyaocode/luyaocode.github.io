@@ -192,7 +192,7 @@
         .preview-content {
             width: 90%;
             max-width: 1000px;
-            max-height: 90%;
+            max-height: 96vh;
             background-color: #fff;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             /* 添加阴影 */
@@ -307,10 +307,16 @@
             overflow: hidden;
         }
 
+        #pdf-container {
+            display: flex;
+            flex-direction: row;
+            overflow: scroll;
+            width: 100%;
+        }
+
         /* pdf操作栏 */
         #pdf-toolbar-top {
             position: sticky;
-            /* 固定在底部 */
             top: 0;
             z-index: 1000;
             background-color: #f7f7f7;
@@ -318,22 +324,117 @@
 
         #pdf-toolbar {
             position: sticky;
-            /* 固定在底部 */
+            margin-top: 40px;
             bottom: 0;
             z-index: 1000;
             background-color: #f7f7f7;
         }
 
+        #outline-container {
+            background-color: #f4f4f4;
+            overflow-y: scroll;
+            padding: 20px;
+            border-right: 1px solid #ccc;
+            width: 30%;
+            max-width: 400px;
+            position: relative;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
         #pdf-canvas-container {
+            width: 70%;
             flex-grow: 1;
             overflow: auto;
             position: relative;
-            padding-bottom: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: start;
         }
 
         #pdf-canvas {
             flex-grow: 1;
-            /* 使 canvas 占据剩余空间 */
+        }
+
+        .outline-item {
+            margin-bottom: 10px;
+            cursor: pointer;
+            font-size: 12PX;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            /* 左右分布 */
+            align-items: center;
+            /* 垂直居中 */
+            border-bottom: 1px solid #ddd;
+            /* 添加分隔线 */
+        }
+
+        .outline-item:hover {
+            color: #007BFF;
+        }
+
+        /* 标题样式 */
+        .outline-title {
+            flex-grow: 1;
+            /* 占用剩余空间 */
+            font-size: 14px;
+            overflow: hidden;
+            /* 溢出隐藏 */
+            text-overflow: ellipsis;
+            /* 溢出显示省略号 */
+            white-space: nowrap;
+            /* 禁止换行 */
+        }
+
+        /* 页码样式 */
+        .outline-page-number {
+            flex-shrink: 0;
+            /* 防止被压缩 */
+            width: 50px;
+            /* 固定宽度 */
+            text-align: right;
+            /* 文本右对齐 */
+            font-size: 14px;
+            color: #888;
+            /* 浅色 */
+        }
+
+        .nested {
+            margin-left: 20px;
+        }
+
+        #toggle-outline-btn-container {
+            position: relative;
+        }
+
+        .toggle-pdf-outline-btn {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            transform: translateY(-100%);
+            background-color: rgba(129, 129, 129, 0.2);
+            border: none;
+            padding: 10px 4px;
+            cursor: pointer;
+            font-size: 16px;
+            color: #cacaca;
+            border-radius: 3px;
+            z-index: 1000;
+        }
+
+        .toggle-pdf-outline-btn i {
+            transition: transform 0.3s ease;
+        }
+
+        .toggle-pdf-outline-btn.collapsed i {
+            transform: rotate(180deg);
+        }
+
+        /* 在目录折叠时隐藏内容 */
+        .collapsed #outline-list {
+            display: none;
         }
 
         /*  */
@@ -528,8 +629,20 @@
                             <i class="bi bi-x-circle"></i>
                         </button>
                     </div>
-                    <div id="pdf-canvas-container">
-                        <canvas id="pdf-canvas"></canvas>
+                    <div id="pdf-container">
+                        <div id="outline-container">
+                            <h3>目录</h3>
+                            <!-- 目录项会在这里渲染 -->
+                            <div id="outline-list"></div>
+                        </div>
+                        <div id="toggle-outline-btn-container">
+                            <button id="btnTogglePdfOutline" class="toggle-pdf-outline-btn">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                        </div>
+                        <div id="pdf-canvas-container">
+                            <canvas id="pdf-canvas"></canvas>
+                        </div>
                     </div>
                     <div id="pdf-toolbar" class="d-flex flex-wrap justify-content-center align-items-center p-2">
                         <!-- 页码显示和跳转 -->
@@ -1053,6 +1166,7 @@
         $(".modal-content").toggleClass("modal-night-mode");
         $(".table").toggleClass("modal-night-mode");
         $(".page-link").toggleClass("night-mode");
+        $(".list-group-item").toggleClass("night-mode");
         $(".list-group-item").toggleClass("night-mode");
 
         // 更新按钮图标和样式
@@ -1971,8 +2085,8 @@
 
 </script>
 <!-- 旧版本2.10.377 -->
-<!-- <script src="./js/pdf.min.js"></script>
-<script src="./js/pdf.worker.min.js"></script> -->
+<script src="./js/pdf.min.js"></script>
+<script src="./js/pdf.worker.min.js"></script>
 <!-- 新版本4.8.69 -->
 <script type="module">// 预览文件
     import * as pdfjsLib from './js/pdf.mjs';
@@ -2032,9 +2146,91 @@
 
     function getPreviewPdfPageNum(fileID) {
         const k = ItemKey.Preview_File_Info;
-        let v = localStorage.getItem(k);
-        let r = v ? JSON.parse(v)[fileID]["pageNum"] : null;
+        const v = localStorage.getItem(k);
+        const i = v ? JSON.parse(v)[fileID] : null;
+        const r = i ? i["pageNum"] : null;
         return r;
+    }
+
+    async function renderPdfOutline() {
+        // 获取大纲（目录）
+        const outline = await pdfDoc.getOutline();
+
+        // 显示大纲，递归展示子目录
+        const outlineContainer = document.getElementById('outline-list');
+
+        // 从 item.dest 中解析页码
+        async function getPageNumberFromItem(item) {
+            if (!item.dest) {
+                throw new Error("Item does not contain a valid destination.");
+            }
+
+            // 处理字符串目标
+            if (typeof item.dest === "string") {
+                const destination = await pdfDoc.getDestination(item.dest);
+                const pageRef = destination[0]; // 第一个元素是页面引用
+                const pageNumber = await pdfDoc.getPageIndex(pageRef);
+                return pageNumber + 1; // 页码从 1 开始
+            }
+
+            // 处理数组目标
+            if (Array.isArray(item.dest)) {
+                const pageRef = item.dest[0]; // 第一个元素通常是页面引用
+                const pageNumber = await pdfDoc.getPageIndex(pageRef);
+                return pageNumber + 1; // 页码从 1 开始
+            }
+
+            throw new Error("Unsupported item.dest format.");
+        }
+
+        const renderOutline = async (outlineItems, parentElement) => {
+            for (const item of outlineItems) {
+                const itemElement = document.createElement('div');
+                itemElement.classList.add('outline-item');
+                // 创建目录标题
+                const titleElement = document.createElement('span');
+                titleElement.textContent = item.title || '无标题';
+                titleElement.classList.add('outline-title');
+                // 创建页码元素
+                const pageNumberElement = document.createElement('span');
+                pageNumberElement.classList.add('outline-page-number');
+                pageNumberElement.textContent = '...'; // 默认显示加载状态
+                // 设置点击事件，跳转到对应页面
+                itemElement.onclick = async () => {
+                    // 从目标中获取页码
+                    const pageNumber = await getPageNumberFromItem(item);
+                    renderPdf(pageNumber);
+                };
+                // 异步加载页码
+                try {
+                    const pageNumber = await getPageNumberFromItem(item);
+                    pageNumberElement.textContent = pageNumber;
+                } catch (error) {
+                    console.error("Failed to load page number:", error);
+                    pageNumberElement.textContent = "N/A";
+                }
+                // 组合元素
+                itemElement.appendChild(titleElement);
+                itemElement.appendChild(pageNumberElement);
+                parentElement.appendChild(itemElement);
+
+                // 如果存在子目录项，递归处理
+                if (item.items && item.items.length > 0) {
+                    const nestedContainer = document.createElement('div');
+                    nestedContainer.classList.add('nested');
+                    renderOutline(item.items, nestedContainer); // 递归处理子目录
+                    parentElement.appendChild(nestedContainer);
+                }
+            };
+        };
+
+        // 渲染大纲
+        if (outline) {
+            renderOutline(outline, outlineContainer);
+        } else {
+            outlineContainer.textContent = '该 PDF 没有目录';
+        }
+
     }
 
     // 渲染 PDF 页面
@@ -2050,22 +2246,13 @@
             // 设置 canvas 尺寸
             canvas.width = viewport.width;
             canvas.height = viewport.height;
-
             // 渲染页面到 canvas
             await page.render({
                 canvasContext: ctx,
                 viewport,
                 renderInteractiveForms: true,  // 启用表单交互
-                imageLayer: true               // 启用更高质量的图像渲染
+                // imageLayer: true               // 启用更高质量的图像渲染
             }).promise;
-
-            // 调整 Canvas 显示尺寸
-            const screenHeight = window.innerHeight; // 屏幕高度
-            const aspectRatio = canvas.width / canvas.height; // 原始宽高比
-
-            // 高度占满屏幕，宽度按比例缩放
-            canvas.style.height = `${screenHeight}px`;
-            canvas.style.width = `${screenHeight * aspectRatio}px`;
 
             // 更新页码显示
             currentPage = pageNumber;
@@ -2086,12 +2273,14 @@
         if (nightModeActive) {
             $("#preview-content").addClass("night-mode");
             $("#pdf-content").addClass("night-mode");
+            $("#outline-container").addClass("night-mode");
             $("#pdf-toolbar-top").addClass("night-mode");
             $("#pdf-toolbar").addClass("night-mode");
         }
         else {
             $("#preview-content").removeClass("night-mode");
             $("#pdf-content").removeClass("night-mode");
+            $("#outline-container").removeClass("night-mode");
             $("#pdf-toolbar-top").removeClass("night-mode");
             $("#pdf-toolbar").removeClass("night-mode");
         }
@@ -2113,16 +2302,20 @@
         $("#pdf-content").css("display", "flex");
         try {
             // 加载 PDF
-            if (window.pdfjsLib) {
-                pdfDoc = await window.pdfjsLib.getDocument({
-                    url: pdfUrl,
-                    cMapUrl: './bcmaps/', // CMap 文件所在目录
-                    cMapPacked: true,          // 如果使用打包的 .bcmap 文件，设置为 true
-                }).promise;
-                totalPages = pdfDoc.numPages;
-                const pageNum = getPreviewPdfPageNum(previewFileID);
-                renderPdf(pageNum ? pageNum : 1);
-            }
+            // if (window.pdfjsLib) {
+            pdfDoc = await pdfjsLib.getDocument({
+                url: pdfUrl,
+                cMapUrl: './bcmaps/', // CMap 文件所在目录
+                cMapPacked: true,          // 如果使用打包的 .bcmap 文件，设置为 true
+            }).promise;
+
+            // 渲染目录
+            renderPdfOutline();
+
+            totalPages = pdfDoc.numPages;
+            const pageNum = getPreviewPdfPageNum(previewFileID);
+            renderPdf(pageNum ? pageNum : 1);
+            // }
         } catch (error) {
             closePreview();
             console.error("加载PDF失败：", error);
@@ -2169,7 +2362,8 @@
     const pdfContainer = document.getElementById('pdf-content');
     const fullscreenButton = document.getElementById('fullscreen-pdf');
     // 全屏切换函数
-    function toggleFullScreen() {
+
+    function enterFullScreen() {
         if (!document.fullscreenElement) {
             // 进入全屏
             if (pdfContainer.requestFullscreen) {
@@ -2179,20 +2373,19 @@
             } else if (pdfContainer.msRequestFullscreen) { // IE/Edge
                 pdfContainer.msRequestFullscreen();
             }
-        } else {
-            // 退出全屏
-            if (document.exitFullscreen) {
-                document.exitFullscreen();
-            } else if (document.webkitExitFullscreen) { // Safari
-                document.webkitExitFullscreen();
-            } else if (document.msExitFullscreen) { // IE/Edge
-                document.msExitFullscreen();
-            }
+            $("#pdf-toolbar").css("margin-top", "0px");
+        }
+    }
+    function toggleFullScreen() {
+        if (!document.fullscreenElement) {
+            enterFullScreen();
+        }
+        else {
+            exitFullscreen();
         }
     }
     function exitFullscreen() {
         if (document.fullscreenElement) {
-            // 退出全屏
             if (document.exitFullscreen) {
                 document.exitFullscreen();
             } else if (document.webkitExitFullscreen) { // Safari
@@ -2200,6 +2393,7 @@
             } else if (document.msExitFullscreen) { // IE/Edge
                 document.msExitFullscreen();
             }
+            $("#pdf-toolbar").css("margin-top", "40px");
         }
     }
     // 全屏按钮点击事件
@@ -2251,6 +2445,17 @@
     document.getElementById('prevPage_preview').addEventListener('click', goToPrevPage);
     document.getElementById('nextPage_preview').addEventListener('click', goToNextPage);
 
+
+    document.getElementById("btnTogglePdfOutline").addEventListener("click", function () {
+        this.classList.toggle('collapsed');
+        const pdfContainer = $("#outline-container");
+        if (this.classList.contains("collapsed")) {
+            pdfContainer.css("display", "none");
+        } else {
+            pdfContainer.css("display", "flex");
+        }
+    });
+
     // 关闭pdf预览
     document.getElementById('closePreview-pdf').addEventListener('click', closePreview);
 
@@ -2261,6 +2466,8 @@
     }
     // 关闭图片预览
     document.getElementById('closePreview-img').addEventListener('click', closePreview);
+
+    //
 </script>
 
 <!--注册回调、鉴权  -->

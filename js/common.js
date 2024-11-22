@@ -145,7 +145,7 @@ const authorize = async () => {
                 // 重定向到原始页面
                 window.location.href = baseUrl.toString();
                 return {
-                    userID: response.id?response.id:'Unknown'
+                    userID: response.id?response.id:''
                 };
             } catch (error) {
                 // AJAX 错误处理
@@ -165,7 +165,11 @@ const authorize = async () => {
             }
         }
         const status = localStorage.getItem('blog_website_login');
-        return status === "true";
+        return status === "false" ? 'false' :
+            {
+                userID: localStorage.getItem('blog_website_login_userid')?localStorage.getItem('blog_website_login_userid'):""
+            };
+
     } catch (err) {
         console.error("Unexpected error during authorization:", err);
         return false;

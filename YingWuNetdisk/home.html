@@ -340,6 +340,31 @@
         #cache-list {
             margin-bottom: 20px;
         }
+
+        /* 优化菜单项的布局 */
+        .dropdown-item {
+            font-size: 0.85rem;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+        }
+
+        /* 可选：禁用项的样式 */
+        .dropdown-item.disabled {
+            cursor: default;
+            font-weight: normal;
+        }
+
+        /* 图标和文字间距调整 */
+        .dropdown-item i {
+            font-size: 1rem;
+            margin-right: 0.5rem;
+        }
+
+        /*  */
+        #loginModal {
+            max-width: 50%;
+            transform: translateX(50%);
+        }
     </style>
 </head>
 
@@ -372,10 +397,34 @@
                     title="登录" data-placement="bottom" data-bs-toggle="modal" data-bs-target="#loginModal">
                     <i class="fas fa-sign-in-alt"></i>
                 </button>
-                <button id="btn_logout" class="btn btn-outline-light btn-sm mx-1 no-focus" data-toggle="tooltip"
-                    title="注销" data-placement="bottom" style="display: none;">
-                    <i class="fas fa-sign-out-alt"></i>
-                </button>
+
+                <!-- 用户菜单 -->
+                <div class="dropdown">
+                    <button id="userAvatarButton" class="btn btn-outline-light btn-sm dropdown-toggle no-focus"
+                        data-bs-toggle="dropdown" aria-expanded="false" title="用户菜单">
+                        <i class="fas fa-user-circle" style="font-size: 1rem;"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm text-start p-0">
+                        <li class="dropdown-item disabled text-muted small d-flex align-items-center px-3 py-2">
+                            <i class="fas fa-user me-2" style="width: 1.2rem; text-align: center;"></i>
+                            ID:&nbsp;<span id="user-id">0</span>
+                        </li>
+                        <!-- <li>
+                            <a class="dropdown-item small d-flex align-items-center px-3 py-2" onclick="viewProfile()">
+                                <i class="fas fa-id-card text-primary me-2"
+                                    style="width: 1.2rem; text-align: center;"></i>
+                                个人信息
+                            </a>
+                        </li> -->
+                        <li>
+                            <a class="dropdown-item small d-flex align-items-center px-3 py-2 text-danger"
+                                onclick="onLogoutClicked()">
+                                <i class="fas fa-sign-out-alt me-2" style="width: 1.2rem; text-align: center;"></i>
+                                注销
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
     </nav>
@@ -687,20 +736,17 @@
                             <i class="fab fa-github"></i> 使用 Github 登录
                         </button>
 
-                        <!-- Google 登录按钮 -->
-                        <button class="btn btn-danger mb-2 disabled">
+                        <!-- <button class="btn btn-danger mb-2 disabled">
                             <i class="fab fa-google"></i> 使用 Google 登录（暂不支持）
                         </button>
 
-                        <!-- 微信登录按钮 -->
                         <button class="btn btn-success mb-2 disabled">
                             <i class="fab fa-weixin"></i> 使用微信登录（暂不支持）
                         </button>
 
-                        <!-- 手机号登录按钮 -->
                         <button class="btn btn-info mb-2 disabled">
                             <i class="fas fa-phone"></i> 使用手机号登录（暂不支持）
-                        </button>
+                        </button> -->
                     </div>
                 </div>
             </div>
@@ -2181,23 +2227,38 @@
 
 <!--注册回调、鉴权  -->
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        document.getElementById("btn_logout").onclick = () => logout();
-        document.getElementById("btn_login_github").onclick = () => openAuthPopup();
+    function handleLoginResult(result) {
+        if (result) {
+            document.getElementById('auth-btn_homepage').style.display = 'none';
+            document.getElementById('userAvatarButton').style.display = 'inline-block';
+            document.getElementById('user-id').textContent = result.userID;
+        }
+        else {
+            document.getElementById('auth-btn_homepage').style.display = 'block';
+            document.getElementById('userAvatarButton').style.display = 'none';
+            document.getElementById('user-id').textContent = "";
+        }
+    }
 
+    function onLogoutClicked() {
+        logout();
+        document.getElementById('auth-btn_homepage').style.display = 'block';
+        document.getElementById('userAvatarButton').style.display = 'none';
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        document.getElementById("btn_login_github").onclick = () => openAuthPopup();
+        const result = await authorize();
+        handleLoginResult();
     });
 
     function initTheme() {
-        // 应用样式
         const user_attr = JSON.parse(localStorage.getItem('USER_ATTR'));
         if (user_attr && user_attr.custom_style === CustomStyle.NightMode) {
             toggleNightMode();
         }
     }
     window.onload = initTheme();
-
-    authorize();
-
 </script>
 
 </html>

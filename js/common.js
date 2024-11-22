@@ -12,6 +12,7 @@ function openAuthPopup() {
 
 function logout() {
     localStorage.setItem('blog_website_login', 'false');
+    localStorage.removeItem('blog_website_login_userid');
     freshPage();
     $.ajax({
         url: backend_url + '/logout',
@@ -25,7 +26,6 @@ function logout() {
             console.error(error);
         }
     });
-
 }
 
 const freshPage = () => {
@@ -81,44 +81,53 @@ const freshPage = () => {
     }
 }
 
-const authorize = () => {
-    freshPage();
-    // 获取 URL 参数
-    const urlParams = new URLSearchParams(window.location.search);
-    const code = urlParams.get('code');
-    const state = urlParams.get('state');
-    const prevState = localStorage.getItem("state");
-    if (state && state !== prevState) {
-        console.log("state changed.");
-        window.location.href=window.location.origin
-    }
-    // 检查参数是否存在
-    else if (code && state) {
-        const status = localStorage.getItem('blog_website_login');
-        if (status === 'true') return; // 如果已授权就返回
-        // 显示加载弹窗
-        const loadingModal = document.getElementById('loadingModal');
-        if (loadingModal) {
-            loadingModal.style.display = 'block';
+const authorize = async () => {
+    try {
+        freshPage();
+        // 获取 URL 参数
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+        const state = urlParams.get('state');
+        const prevState = localStorage.getItem("state");
+
+        if (state && state !== prevState) {
+            console.log("state changed.");
+            window.location.href = window.location.origin;
+            return false; // 状态校验失败，返回 false
         }
-        // 将参数发送给后端
-        const currentUrl = window.location.href;
-        const url = new URL(currentUrl); // 创建 URL 对象
-        const tempUrl = url.origin + url.pathname;
-        const baseUrl = tempUrl.endsWith('/') ? tempUrl.slice(0, -1) : tempUrl; // 如果末尾有 '/', 就去掉
-        $.ajax({
-            url: backend_url + '/auth',
-            type: 'POST',
-            xhrFields: {
-                withCredentials: true
-            },
-            data: {
-                code
-            },
-            success: function (data) {
-                const res = data ? 'true' : 'false';
+
+        // 检查参数是否存在
+        if (code && state) {
+            // 显示加载弹窗
+            const loadingModal = document.getElementById('loadingModal');
+            if (loadingModal) {
+                loadingModal.style.display = 'block';
+            }
+
+            // 准备后端 URL
+            const currentUrl = window.location.href;
+            const url = new URL(currentUrl); // 创建 URL 对象
+            const tempUrl = url.origin + url.pathname;
+            const baseUrl = tempUrl.endsWith('/') ? tempUrl.slice(0, -1) : tempUrl; // 如果末尾有 '/', 就去掉
+
+            // 调用后端接口
+            try {
+                const response = await $.ajax({
+                    url: backend_url + '/auth',
+                    type: 'POST',
+                    xhrFields: {
+                        withCredentials: true,
+                    },
+                    data: { code },
+                });
+
+                const res = response ? 'true' : 'false';
                 localStorage.setItem('blog_website_login', res);
+                if (response && response.id) {
+                    localStorage.setItem('blog_website_login_userid', response.id);
+                }
                 console.log('授权结果：' + res);
+
                 document.body.classList.add('disabled');
                 freshPage();
                 document.body.classList.remove('disabled');
@@ -127,28 +136,41 @@ const authorize = () => {
                 if (loadingModal) {
                     loadingModal.style.display = 'none';
                 }
-                if (!data) { // 授权失败
+
+                if (!response) { // 授权失败
                     alert("您不在白名单当中，请联系网站管理员");
+                    return false;
                 }
+
+                // 重定向到原始页面
                 window.location.href = baseUrl.toString();
-            },
-            error: function (xhr, status, error) {
+                return {
+                    userID: response.id?response.id:'Unknown'
+                };
+            } catch (error) {
+                // AJAX 错误处理
                 if (loadingModal) {
                     loadingModal.style.display = 'none';
                 }
-                if (xhr.status === 500) {
-                    console.error("服务器异常：", xhr.responseText);
-                    alert(xhr.responseText);
+
+                if (error.status === 500) {
+                    console.error("服务器异常：", error.responseText);
+                    alert(error.responseText);
                 } else {
-                    console.error("Error sending string:", error);
+                    console.error("Error sending string:", error.statusText || error.message);
                 }
+
                 window.location.href = baseUrl.toString();
+                return false;
             }
-        });
-
+        }
+        const status = localStorage.getItem('blog_website_login');
+        return status === "true";
+    } catch (err) {
+        console.error("Unexpected error during authorization:", err);
+        return false;
     }
-}
-
+};
 
 // 创建并显示气泡提示（Toast）
 function showToast(message, position = 'top-right', bgColor = 'bg-success', textColor = 'text-white', autoHideDelay = 3000) {

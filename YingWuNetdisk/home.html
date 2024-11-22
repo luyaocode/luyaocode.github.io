@@ -1984,6 +1984,9 @@
 <script type="module">// 预览文件
     import * as pdfjsLib from './js/pdf.mjs';
     pdfjsLib.GlobalWorkerOptions.workerSrc = './js/pdf.worker.mjs';
+    window.pdfjsLib = pdfjsLib;
+</script>
+<script>
     let pdfDoc = null;  // PDF 文档对象
     let currentPage = 1; // 当前页数
     let totalPages = 0;  // 总页数
@@ -2109,15 +2112,16 @@
         $("#pdf-content").css("display", "flex");
         try {
             // 加载 PDF
-            pdfjsLib.GlobalWorkerOptions.workerSrc = './js/pdf.worker.min.js'; // 使用 CDN
-            pdfDoc = await pdfjsLib.getDocument({
-                url: pdfUrl,
-                cMapUrl: './bcmaps/', // CMap 文件所在目录
-                cMapPacked: true,          // 如果使用打包的 .bcmap 文件，设置为 true
-            }).promise;
-            totalPages = pdfDoc.numPages;
-            const pageNum = getPreviewPdfPageNum(previewFileID);
-            renderPdf(pageNum ? pageNum : 1);
+            if (window.pdfjsLib) {
+                pdfDoc = await window.pdfjsLib.getDocument({
+                    url: pdfUrl,
+                    cMapUrl: './bcmaps/', // CMap 文件所在目录
+                    cMapPacked: true,          // 如果使用打包的 .bcmap 文件，设置为 true
+                }).promise;
+                totalPages = pdfDoc.numPages;
+                const pageNum = getPreviewPdfPageNum(previewFileID);
+                renderPdf(pageNum ? pageNum : 1);
+            }
         } catch (error) {
             closePreview();
             console.error("加载PDF失败：", error);

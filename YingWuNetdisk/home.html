@@ -1364,7 +1364,7 @@
                     return;
                 }
                 const blobUrl = URL.createObjectURL(cachedBlob);
-                openPreview(fileExtension, blobUrl);
+                openPreview(fileExtension, blobUrl, fileID);
                 setTimeout(() => URL.revokeObjectURL(blobUrl), 60000 * 30);
                 return;
             }
@@ -1407,7 +1407,7 @@
                     // 创建 Blob URL
                     const blobUrl = URL.createObjectURL(blob);
                     let fileExtension = fileName.substring(fileName.lastIndexOf('.') + 1);
-                    openPreview(fileExtension, blobUrl);
+                    openPreview(fileExtension, blobUrl, fileID);
                     setTimeout(() => URL.revokeObjectURL(blobUrl), 60000 * 30);
 
                     // 将 Blob 数据和文件名一起存储到缓存
@@ -1982,6 +1982,7 @@
     let pdfDoc = null;  // PDF 文档对象
     let currentPage = 1; // 当前页数
     let totalPages = 0;  // 总页数
+    let previewFileID = null;// 当前预览文件id
     const canvas = document.getElementById('pdf-canvas');
     const ctx = canvas.getContext('2d');
     let zoomLevel = 1.0; // 初始缩放比例
@@ -2017,6 +2018,24 @@
         document.getElementById('current-zoom-scale').textContent = zoomLevel;
     }
 
+    function setPreviewPdfPageNum(fileID, pageNum) {
+        const k = ItemKey.Preview_File_Info;
+        let v = localStorage.getItem(k);
+        v = v ? JSON.parse(v) : {};
+        v[fileID] = {
+            extType: "pdf",
+            pageNum,
+        }
+        localStorage.setItem(k, JSON.stringify(v));
+    }
+
+    function getPreviewPdfPageNum(fileID) {
+        const k = ItemKey.Preview_File_Info;
+        let v = localStorage.getItem(k);
+        let r = v ? JSON.parse(v)[fileID]["pageNum"] : null;
+        return r;
+    }
+
     // 渲染 PDF 页面
     async function renderPdf(pageNumber) {
         try {
@@ -2039,13 +2058,16 @@
             document.getElementById('page-input').value = currentPage;
             document.getElementById('current-page-top').textContent = currentPage;
             document.getElementById('total-pages-top').textContent = totalPages;
+            // 保存到本地
+            setPreviewPdfPageNum(previewFileID, pageNumber);
         } catch (error) {
             console.error("渲染页面失败：", error);
         }
     }
 
     // 打开预览（示例，点击按钮时）
-    function openPreview(contentType, contentSrc) {
+    function openPreview(contentType, contentSrc, fileID) {
+        previewFileID = fileID;
         const nightModeActive = $('body').hasClass('night-mode');
         if (nightModeActive) {
             $("#preview-content").addClass("night-mode");
@@ -2083,7 +2105,8 @@
                 cMapPacked: true,          // 如果使用打包的 .bcmap 文件，设置为 true
             }).promise;
             totalPages = pdfDoc.numPages;
-            renderPdf(1);
+            const pageNum = getPreviewPdfPageNum(previewFileID);
+            renderPdf(pageNum ? pageNum : 1);
         } catch (error) {
             closePreview();
             console.error("加载PDF失败：", error);
@@ -2205,8 +2228,7 @@
         $("#pdf-content").css("display", "none");
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         exitFullscreen();
-        // zoomLevel = 1;
-        // canvas.style.transform = `scale(${zoomLevel})`; // 使用 transform 缩放
+        previewFileID = null;
     }
 
     // 绑定翻页按钮事件

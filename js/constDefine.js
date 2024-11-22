@@ -32,3 +32,8 @@ const CustomStyle = {
     WhiteMode: 1,
     NightMode: 2,
 }
+
+// 缓存字段
+const ItemKey = {
+    Preview_File_Info:"xiaoeyu_pre_file_info",
+}

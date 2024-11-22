@@ -131,6 +131,7 @@
         }
 
         #test-editormd-view,
+        #disqus_thread,
         #test-editormd-view2 {
             max-width: 94%;
             padding-left: 320px;
@@ -139,6 +140,12 @@
             color: #585252;
             font-size: 16px;
             overflow-x: hidden;
+        }
+
+        #disqus_thread.night-mode {
+            background-color: #000000;
+            color: rgb(215, 215, 215);
+            transition: background-color 0.3s, color 0.3s;
         }
 
         #test-editormd-view.night-mode {
@@ -173,6 +180,7 @@
             }
 
             #test-editormd-view,
+            #disqus_thread,
             #test-editormd-view2 {
                 padding-left: 0;
                 margin-right: 2px;
@@ -180,6 +188,11 @@
         }
 
         #test-editormd-view.expand {
+            padding-left: 0;
+            transition: padding-left 0.3s;
+        }
+
+        #disqus_thread.expand {
             padding-left: 0;
             transition: padding-left 0.3s;
         }
@@ -592,6 +605,27 @@
         <!-- <div id="test-editormd-view2">
             <textarea id="append-test" style="display:none;"></textarea>
         </div> -->
+
+        <div id="disqus_thread"></div>
+        <script>
+            var disqus_config = function () {
+                const url = window.location.href;
+                this.page.url = url;  // Replace PAGE_URL with your page's canonical URL variable
+                const params = new URLSearchParams(new URL(url).search);
+                const id = params.get("id")?.split("#")[0]; // 分割并只取 id 部分
+                this.page.identifier = id; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+            };
+
+            (function () { // DON'T EDIT BELOW THIS LINE
+                var d = document, s = d.createElement('script');
+                s.src = 'https://xiaoeyu.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by
+                Disqus.</a>
+        </noscript>
     </div>
     <div id="floatingSidebar" class="card d-none d-md-block"
         style="position: fixed; right: 10px; bottom: 20px; width: 76px; z-index: 1000;">

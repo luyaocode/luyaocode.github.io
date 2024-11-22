@@ -165,7 +165,7 @@ const authorize = async () => {
             }
         }
         const status = localStorage.getItem('blog_website_login');
-        return status === "false" ? 'false' :
+        return status === "false" ? false :
             {
                 userID: localStorage.getItem('blog_website_login_userid')?localStorage.getItem('blog_website_login_userid'):""
             };

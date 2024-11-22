@@ -2249,7 +2249,7 @@
     document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById("btn_login_github").onclick = () => openAuthPopup();
         const result = await authorize();
-        handleLoginResult();
+        handleLoginResult(result);
     });
 
     function initTheme() {

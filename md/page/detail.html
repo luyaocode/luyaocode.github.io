@@ -916,6 +916,7 @@
         const nightModeActive = $('#test-editormd-view').hasClass('night-mode');
         $('body').toggleClass('night-mode');
         $('#test-editormd-view').toggleClass('night-mode');
+        $('#disqus_thread').toggleClass('night-mode');
         $('#title-container').toggleClass('night-mode');
         $('#sidebar').toggleClass('night-mode');
 
@@ -976,11 +977,13 @@
             if (isSidebarVisible) {
                 $("#sidebar").addClass("hidden");
                 $("#test-editormd-view").addClass("expand");
+                $("#disqus_thread").addClass("expand");
                 $(this).attr('data-original-title', '展开目录');
             }
             else {
                 $("#sidebar").removeClass("hidden");
                 $("#test-editormd-view").removeClass("expand");
+                $("#disqus_thread").removeClass("expand");
                 $(this).attr('data-original-title', '折叠目录');
             }
             $(this).tooltip('hide').tooltip('show'); // 重新显示 tooltip

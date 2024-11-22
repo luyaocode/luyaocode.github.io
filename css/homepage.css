@@ -49,22 +49,22 @@ body {
 
 .inside-page__heading--city,
 .card-front__text-view--city {
-    color: #ff62b2;
+    color: #474747;
 }
 
 .inside-page__heading--ski,
 .card-front__text-view--ski {
-    color: #2aaac1;
+    color: #474747;
 }
 
 .inside-page__heading--beach,
 .card-front__text-view--beach {
-    color: #fa7f67;
+    color: #474747;
 }
 
 .inside-page__heading--camping,
 .card-front__text-view--camping {
-    color: #00b97c;
+    color: #474747;
 }
 
 /* Front cover */
@@ -176,7 +176,7 @@ body {
 /* Layout Structure=========================================*/
 
 .main {
-    background: linear-gradient( to bottom right, #eee8dd, #e3d9c6);
+    background: linear-gradient(to top left, #ff6a00, #ee0979, #ff6a00, #3a7bd5);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -194,7 +194,6 @@ body {
     height: 100%;
     justify-content: space-evenly;
     padding: 1rem;
-    background-color: #322929;
 }
 
 /* 移动端样式 */
@@ -296,20 +295,21 @@ body {
 }
 
 .card-front__tp--city {
-    background: linear-gradient( to bottom, #ff73b9, #ff40a1);
+    background: linear-gradient(to bottom, #2c3e50, #34495e); /* 暗蓝灰到蓝灰色 */
 }
 
 .card-front__tp--ski {
-    background: linear-gradient( to bottom, #47c2d7, #279eb2);
+    background: linear-gradient(to bottom, #2c3e50, #34495e); /* 使用与上面相同的色调 */
 }
 
 .card-front__tp--beach {
-    background: linear-gradient( to bottom, #fb9b88, #f86647);
+    background: linear-gradient(to bottom, #2c3e50, #34495e); /* 使用与上面相同的色调 */
 }
 
 .card-front__tp--camping {
-    background: linear-gradient( to bottom, #00db93, #00b97d);
+    background: linear-gradient(to bottom, #2c3e50, #34495e); /* 使用与上面相同的色调 */
 }
+
 
 /* Front card's bottom section */
 
@@ -393,43 +393,4 @@ body {
     color: #fff;
     font-size: 1.2rem;
     text-align: center;
-}
-
-
-/* 光标闪烁动态输入 */
-/* Basic styles */
-h1 {
-    position: relative;
-    float: left;
-    color: #d7b94c;
-    font-family: 'Inconsolata', Consolas, monospace;
-    font-size: 4em;
-    margin:100px;
-}
-h1 span{
-    position: absolute;
-    top: 0;
-    right: 0;
-    background: #322929;
-    width: 100%;
-    border-left: .1em solid transparent;
-    -webkit-animation: typing 3s steps(16) forwards,
-                                        cursor 1s infinite;
-    animation: typing 3s steps(16) forwards,
-                        cursor 1s infinite;
-}
-/* Animation */
-@-webkit-keyframes typing{
-    from { width: 100%;}
-    to { width: 0;}
-}
-@-webkit-keyframes cursor{
-    50% { border-color: white;}
-}
-@keyframes typing{
-    from{ width: 100%;}
-    to{ width: 0;}
-}
-@keyframes cursor{
-    50% { border-color: white;}
 }

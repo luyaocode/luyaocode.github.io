@@ -27,23 +27,38 @@
 	<!-- Bootstrap CSS -->
 	<script src="./js/jquery.min.js"></script>
 	<link href="./css/bootstrap.min.css" rel="stylesheet">
-	<link href="./css/bootstrap-icons.css" rel="stylesheet">
 	<link href="./css/all.min.css" rel="stylesheet">
 	<script src="./js/bootstrap.bundle.min.js"></script>
+	<link href="./css/bootstrap-icons.css" rel="stylesheet">
 
 	<!-- <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,700'> -->
 	<style>
-		#welcomeTitle {
-			margin-top: 60px;
-			position: absolute;
-			display: none;
-			font-size: 28px;
+		/* 导航栏 */
+		.navbar-toggler {
+			padding: 10px 4px;
+		}
+
+		.navbar {
+			margin: 0;
+			padding: 5px 0;
+			background-color: transparent;
+		}
+
+		.navbar-brand {
+			font-size: 16px;
+			font-weight: bold;
+			margin-left: 0;
+			transition: color 0.3s;
+		}
+
+		.navbar-brand:hover {
+			text-decoration: underline;
 		}
 
 		.nav-item {
 			cursor: pointer;
 			font-size: 16px;
-			padding: 0.5rem;
+			padding-left: 4px;
 		}
 
 		/* 加载弹窗 */
@@ -69,16 +84,16 @@
 
 		.nav-link {
 			text-decoration: none;
-			color: #ffffff;
+			color: #bbbbbb;
 			background-color: transparent;
 			padding: 8px 4px;
 			border-radius: 5px;
-			transition: background-color 0.3s;
+			transition: color 0.3s;
 			cursor: pointer;
 		}
 
 		.nav-link:hover {
-			background-color: #c69d9d;
+			color: white;
 		}
 
 		.chart-container {
@@ -103,7 +118,7 @@
 
 <body>
 	<!-- 导航栏 -->
-	<nav class="navbar navbar-expand-lg navbar-dark bg-transparent fixed-top">
+	<nav class="navbar navbar-expand-lg navbar-dark fixed-top">
 		<div class="container-fluid">
 			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
 				aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -111,13 +126,11 @@
 			</button>
 			<div class="collapse navbar-collapse" id="navbarNav">
 				<ul class="navbar-nav ms-auto">
-					<!-- 监控按钮 -->
 					<li class="nav-item">
 						<a class="nav-link" data-bs-toggle="modal" data-bs-target="#statsModal">
 							<i class="fas fa-chart-line"></i> 监控
 						</a>
 					</li>
-					<!-- 登录按钮 -->
 					<li class="nav-item">
 						<a class="nav-link" id="auth-btn_homepage" data-bs-toggle="modal" data-bs-target="#loginModal">
 							<i class="fas fa-sign-in-alt"></i> 登录
@@ -132,11 +145,6 @@
 			</div>
 		</div>
 	</nav>
-
-
-	<div class="wrapper" id="welcomeTitle">
-		<h1>Hello, 这里是小饿鱼...<span>&nbsp;</span></h1>
-	</div>
 	<main class="main">
 
 		<section class="card-area">
@@ -489,45 +497,21 @@
 			</div>
 		</div>
 	</div>
-
-
 </body>
 <script src="./js/main.js"></script>
 <script src="./js/constDefine.js"></script>
 <script src="./js/common.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <script>
 	authorize();
 	document.addEventListener('DOMContentLoaded', () => {
 		document.querySelector('#into_blog').href = `${Page_Blog_Home}`;
 		document.querySelector('#into_yingwu').href = `${Page_Yingwu_Home}`;
-	});
-</script>
-<script>
-	const element = document.getElementById('welcomeTitle');
-
-	function adjustTitleDisplay() {
-		if ($(window).width() <= 768) {
-			element.style.display = "none";
-		} else {
-			element.style.display = "block";
-		}
-	}
-
-	// 初始调用以设置状态
-	adjustTitleDisplay();
-
-	// 监听窗口大小变化事件
-	$(window).resize(function () {
-		adjustTitleDisplay();
-	});
-
-	document.addEventListener('DOMContentLoaded', () => {
 		document.getElementById("btn_logout").onclick = () => logout();
 		document.getElementById("btn_login_github").onclick = () => openAuthPopup();
 	});
 </script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <script>
 	// WebSocket 连接
 	const socket = new WebSocket(ws_url);

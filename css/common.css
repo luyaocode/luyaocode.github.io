@@ -54,3 +54,10 @@ th{
     white-space: nowrap;
     font-size: 12px;
 }
+
+/* bootstrap */
+button:focus,
+.btn:focus {
+    outline: none;  /* 移除焦点的外边框 */
+    box-shadow: none;  /* 移除任何额外的阴影 */
+}

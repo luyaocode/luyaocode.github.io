@@ -57,7 +57,7 @@ ul{
 
     /* 适配移动端：解决li中的英文超出ul长度限制的问题，使英文长单词可以换行 */
     word-wrap:break-word;
-    
+
 }
 /* 图片格式 */
 ul>li>img{
@@ -84,7 +84,7 @@ ul>li>span>a:hover{
   color: #2BAE85;	/*铜绿*/
 }
 ul>li>span>a:active{
-  color: #F28E16;	/*杏黄*/	
+  color: #F28E16;	/*杏黄*/
 }
 li{
     color: #0F1423;				/*钢蓝*/
@@ -101,7 +101,7 @@ li>a{
 }
 li>a:visited{
   color: #404030;/*淡松烟*/
-  
+
 }/*指已经访问过的链接*/
 li>a:link{
   color: #57C3C2;	/*美蝶绿*/
@@ -110,7 +110,7 @@ li>a:hover{
     color: #2BAE85;	/*铜绿*/
 }/*鼠标悬停在上面的状态*/
 li>a:active{
-  color: #F28E16;	/*杏黄*/	
+  color: #F28E16;	/*杏黄*/
 }/*鼠标点击没有释放的状态颜色*/
 
 

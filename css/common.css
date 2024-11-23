@@ -48,3 +48,8 @@ html {
     color: rgb(215, 215, 215) !important;
     transition: background-color 0.3s, color 0.3s !important;
 }
+
+/* 表单设置 */
+th{
+    white-space: nowrap;
+}

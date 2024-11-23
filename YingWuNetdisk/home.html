@@ -247,9 +247,15 @@
         }
 
         /* 表格样式 */
+        .table {
+            width: 100%;
+            table-layout: auto;
+        }
+
         .table td,
         .table th {
             vertical-align: middle;
+            max-width: 100%;
         }
 
         /* 无文本加载弹窗 */
@@ -498,6 +504,16 @@
         .dropdown-item i {
             font-size: 1rem;
             margin-right: 0.5rem;
+        }
+
+        /* 列表 */
+        .file-name {
+            display: -webkit-box;
+            line-clamp: 3;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
     </style>
 </head>
@@ -841,7 +857,6 @@
                             <tr>
                                 <th>文件名</th>
                                 <th>文件标识</th>
-                                <th>文件链接</th>
                                 <th>下载时间</th>
                             </tr>
                         </thead>
@@ -860,7 +875,6 @@
                             <tr>
                                 <th>文件名</th>
                                 <th>文件标识</th>
-                                <th>文件链接</th>
                                 <th>下载时间</th>
                             </tr>
                         </thead>
@@ -1177,13 +1191,12 @@
 
         records.forEach(record => {
             const label = record.hash;
-            const fullPath = `${backend_yingwu}/files/download/${label}`;
+            // const fullPath = `${backend_yingwu}/files/download/${label}`;
             const downloadedAt = toLocalTime(record.downloaded_at);
             const row = document.createElement('tr');
             row.innerHTML = `
         <td>${record.filename}</td>
         <td><span class="label-style">${label}</span></td>
-        <td><a href="${fullPath}" class="url-style" target="_blank">${fullPath}</a></td>
         <td>${downloadedAt}</td>
         `;
             downloadTableBody.appendChild(row);
@@ -1332,8 +1345,11 @@
             const row = document.createElement('tr');
 
             const fileNameCell = document.createElement('td');
-            fileNameCell.textContent = files[i].name;
-            fileNameCell.style.color = 'gray';  // 设置文本颜色为灰色
+            const fileNameSpan = document.createElement('span');
+            fileNameSpan.style.color = 'gray';  // 设置文本颜色为灰色
+            fileNameSpan.classList.add('file-name');
+            fileNameSpan.textContent = files[i].name;
+            fileNameCell.appendChild(fileNameSpan);
 
             const fileSizeCell = document.createElement('td');
             fileSizeCell.textContent = `${(files[i].size / (1024 * 1024)).toFixed(2)} MB`;
@@ -1803,7 +1819,11 @@
                     strExpired = "永久有效";
                     color = "green";
                     row.innerHTML = `
-                        <td><a href="javascript:void(0);" onclick="previewFile('${file.hash}')">${file.filename}</a></td>
+                        <td>
+                            <a href="javascript:void(0);" onclick="previewFile('${file.hash}')">
+                                <span class="file-name">${file.filename}</span>
+                            </a>
+                        </td>
                         <td><small>${size} MB</small></td>
                         <td><small>${uploadedBy}</small></td>
                         <td>
@@ -1952,13 +1972,12 @@
         files.forEach(function (file) {
             const fileName = file.fileName ? file.fileName : "";
             const label = file.label ? file.label.substring(file.label.lastIndexOf("_") + 1) : ""; // 获取文件标识
-            const fullPath = label ? `${backend_yingwu}/files/download/${label}` : "";
+            // const fullPath = label ? `${backend_yingwu}/files/download/${label}` : "";
             const downloadedAt = file.downloadedAt ? formatDateFull(file.downloadedAt) : "";
             $('#downloadTableLocal tbody').append(`
             <tr>
                 <td>${fileName}</td>
                 <td><span class="label-style">${label}</span></td>
-                <td><a href="${fullPath}" class="url-style" target="_blank">${fullPath}</a></td>
                 <td>${downloadedAt}</td>
             </tr>`);
         });

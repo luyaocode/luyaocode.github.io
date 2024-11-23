@@ -165,10 +165,11 @@ const authorize = async () => {
             }
         }
         const status = localStorage.getItem('blog_website_login');
-        return status === "false" ? false :
+        return status === "true" ?
             {
-                userID: localStorage.getItem('blog_website_login_userid')?localStorage.getItem('blog_website_login_userid'):""
-            };
+                userID: localStorage.getItem('blog_website_login_userid') ? localStorage.getItem('blog_website_login_userid') : null
+            } :
+            false;
 
     } catch (err) {
         console.error("Unexpected error during authorization:", err);

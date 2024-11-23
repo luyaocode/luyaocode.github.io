@@ -2555,7 +2555,7 @@
 <!--注册回调、鉴权  -->
 <script>
     function handleLoginResult(result) {
-        if (result) {
+        if (result && result.userID) {
             document.getElementById('auth-btn_homepage').style.display = 'none';
             document.getElementById('userAvatarButton').style.display = 'inline-block';
             document.getElementById('user-id').textContent = result.userID;

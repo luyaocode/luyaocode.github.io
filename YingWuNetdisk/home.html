@@ -2519,6 +2519,8 @@
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         exitFullscreen();
         previewFileID = null;
+        const outlineContainer = document.getElementById('outline-list');
+        outlineContainer.innerHTML = ""; // 清空目录
     }
 
     // 绑定翻页按钮事件

@@ -22,7 +22,7 @@
     padding: 10px 20px;
     text-align: center;
     font-size: 14px;
-    z-index: 1000;
+    z-index: 99999999999;
     animation: slideInFromBottom 0.5s ease-out forwards; /* 应用动画 */
   }
 

@@ -242,6 +242,10 @@
             margin-left: 10%;
         }
 
+        .modal-body {
+            overflow: auto;
+        }
+
         .modal-content {
             word-break: break-all;
         }
@@ -953,13 +957,13 @@
                     <h5 class="modal-title" id="confirmModalLabel">确认操作</h5>
                 </div>
                 <div class="modal-body">
-                    您确定要清理所有缓存吗？此操作不可撤销。
-                </div>
-                <div class="container mt-2">
-                    <p id="total-cache-size" class="text-muted">加载中...</p>
-                    <ul id="cache-list" class="list-group">
-                        <!-- 动态生成的列表将插入到这里 -->
-                    </ul>
+                    <div class="container mt-2">
+                        <p>您确定要清理所有缓存吗？此操作不可撤销。</p>
+                        <ul id="cache-list" class="list-group">
+                            <!-- 动态生成的列表将插入到这里 -->
+                        </ul>
+                        <p id="total-cache-size" class="text-muted">加载中...</p>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" id="btnCancelClearCache" class="btn btn-secondary"
@@ -2062,7 +2066,7 @@
 
         // 渲染缓存总大小
         const totalSize = document.getElementById("total-cache-size");
-        totalSize.textContent = `总缓存占用: ${cacheInfo.totalSizeMB} MB`;
+        totalSize.textContent = `总缓存: ${cacheInfo.totalSizeMB} MB`;
 
         // 渲染每个缓存项目
         cacheInfo.caches.forEach(cache => {

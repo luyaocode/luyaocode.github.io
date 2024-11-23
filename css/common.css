@@ -52,4 +52,5 @@ html {
 /* 表单设置 */
 th{
     white-space: nowrap;
+    font-size: 12px;
 }

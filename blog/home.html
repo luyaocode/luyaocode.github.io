@@ -854,16 +854,6 @@
 		document.querySelector('#d-write-blog').href = `${Page_Blog_Write}`;
 
 		document.getElementById('btnToggleNightMode').onclick = toggleNightMode;
-		document.getElementById('auth-btn').onclick = (event) => {
-			const cookieConsent = getCookie('cookieConsent');
-			if (cookieConsent !== 'true') {
-				event.preventDefault();
-				// 调用震动效果函数
-				shakeCookieBanner();
-				return;
-			}
-			openAuthPopup();
-		}
 
 		// 应用样式
 		const user_attr = JSON.parse(localStorage.getItem('USER_ATTR'));

@@ -65,7 +65,13 @@ const freshPage = () => {
         }
         if (authBtn) {
             authBtn.innerHTML = '<i class="fab fa-github"></i> 登录';
-            authBtn.onclick = () => {
+            authBtn.onclick = (e) => {
+                e.preventDefault();
+                const cookieConsent = getCookie('cookieConsent');
+                if (cookieConsent !== 'true') {
+                    shakeCookieBanner();
+                    return;
+                }
                 openAuthPopup();
             };
         }

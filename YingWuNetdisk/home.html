@@ -339,7 +339,7 @@
             max-width: 400px;
             position: relative;
             height: 100%;
-            display: flex;
+            display: none;
             flex-direction: column;
         }
 
@@ -407,6 +407,42 @@
 
         #toggle-outline-btn-container {
             position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .tool-btn {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            transform: translateY(-100%);
+            background-color: rgba(129, 129, 129, 0.2);
+            border: none;
+            padding: 10px 4px;
+            cursor: pointer;
+            font-size: 16px;
+            color: #cacaca;
+            border-radius: 3px;
+            z-index: 1000;
+        }
+
+        #tool-sidebar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            border: none;
+            z-index: 1000;
+        }
+
+        #tool-sidebar button {
+            border: none;
+            color: #9c9c9c;
+            padding: 4px 2px;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 3px;
         }
 
         #resizer {
@@ -427,31 +463,16 @@
             /* 悬浮时的视觉效果 */
         }
 
-        .toggle-pdf-outline-btn {
-            position: absolute;
-            top: 50%;
-            left: 0;
-            transform: translateY(-100%);
-            background-color: rgba(129, 129, 129, 0.2);
-            border: none;
-            padding: 10px 4px;
-            cursor: pointer;
-            font-size: 16px;
-            color: #cacaca;
-            border-radius: 3px;
-            z-index: 1000;
-        }
-
-        .toggle-pdf-outline-btn i {
+        .tool-btn i {
             transition: transform 0.3s ease;
         }
 
-        .toggle-pdf-outline-btn.collapsed i {
+        .tool-btn.expand i {
             transform: rotate(180deg);
         }
 
         /* 在目录折叠时隐藏内容 */
-        .collapsed #outline-list {
+        .expand #outline-list {
             display: none;
         }
 
@@ -631,15 +652,19 @@
     <div class="preview-container" id="preview-container">
         <div class="preview-content" id="preview-content">
             <div id="pdf-content">
-                <div style="position: relative; height: 100vh; display: flex; flex-direction: column;">
+                <div style="
+                    position: relative;
+                    height: 100vh;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: space-between;
+                 ">
                     <div id="pdf-toolbar-top" class="d-flex flex-wrap justify-content-between align-items-center p-2">
-                        <span id="page-info-top" class="d-flex align-items-center me-2"
-                            style="color:#0056b3;font-weight: bold;">
+                        <span id="page-info-top" class="d-flex align-items-center me-2" style="color:#8a8989;">
                             <span class="ms-2"><span id="current-page-top">0</span> </span>
                             <span>/<span id="total-pages-top">0</span></span>
                         </span>
-                        <span id="page-info-top" class="d-flex align-items-center me-2"
-                            style="color:#0056b3;font-weight: bold;">
+                        <span id="page-info-top" class="d-flex align-items-center me-2" style="color:#8a8989;">
                             <span class="ms-2"><span id="current-zoom-scale">1</span></span>
                             <span>:<span id="total-pages-top">1</span></span>
                         </span>
@@ -654,9 +679,20 @@
                             <div id="outline-list"></div>
                         </div>
                         <div id="toggle-outline-btn-container">
-                            <button id="btnTogglePdfOutline" class="toggle-pdf-outline-btn">
-                                <i class="fas fa-chevron-left"></i>
+                            <button id="btnTogglePdfOutline" class="tool-btn">
+                                <i class="fas fa-chevron-right"></i>
                             </button>
+                            <div id="tool-sidebar">
+                                <button id="zoom-in">
+                                    <i class="bi bi-plus-circle"></i>
+                                </button>
+                                <button id="zoom-out">
+                                    <i class="bi bi-dash-circle"></i>
+                                </button>
+                                <button id="reset-zoom">
+                                    <i class="bi bi-arrow-counterclockwise"></i>
+                                </button>
+                            </div>
                             <div id="resizer"></div>
                         </div>
                         <div id="pdf-canvas-container">
@@ -676,15 +712,6 @@
                                 style="width: 80px; height: 30px; margin-right: 5px;">
                             <button id="go-to-page" class="btn btn-sm btn-secondary px-2 py-1">跳转</button>
                         </span>
-                        <button id="zoom-in" class="btn btn-sm btn-info px-2 py-1 me-1">
-                            <i class="bi bi-plus-circle"></i>
-                        </button>
-                        <button id="zoom-out" class="btn btn-sm btn-info px-2 py-1 me-1">
-                            <i class="bi bi-dash-circle"></i>
-                        </button>
-                        <button id="reset-zoom" class="btn btn-sm btn-info px-2 py-1 me-1">
-                            <i class="bi bi-arrow-counterclockwise"></i>
-                        </button>
                         <button id="fullscreen-pdf" class="btn btn-sm btn-info px-2 py-1 me-2">
                             <i class="bi bi-arrows-fullscreen"></i>
                         </button>
@@ -2500,12 +2527,12 @@
 
 
     document.getElementById("btnTogglePdfOutline").addEventListener("click", function () {
-        this.classList.toggle('collapsed');
+        this.classList.toggle('expand');
         const pdfContainer = $("#outline-container");
-        if (this.classList.contains("collapsed")) {
-            pdfContainer.css("display", "none");
-        } else {
+        if (this.classList.contains("expand")) {
             pdfContainer.css("display", "flex");
+        } else {
+            pdfContainer.css("display", "none");
         }
     });
 

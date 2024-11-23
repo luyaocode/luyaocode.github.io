@@ -1,0 +1,42 @@
+/* cookieConsent.css */
+
+/* 动画：从底部缓缓滑动出来 */
+@keyframes slideInFromBottom {
+    0% {
+      bottom: -100px; /* 从底部外开始 */
+      opacity: 0;     /* 初始透明 */
+    }
+    100% {
+      bottom: 0;      /* 最终位置 */
+      opacity: 1;     /* 完全可见 */
+    }
+  }
+
+  #cookieConsentBanner {
+    position: fixed;
+    bottom: -100px; /* 初始位置在视图外 */
+    left: 0;
+    right: 0;
+    background-color: #28a745; /* 修改为绿色背景 */
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    font-size: 14px;
+    z-index: 1000;
+    animation: slideInFromBottom 0.5s ease-out forwards; /* 应用动画 */
+  }
+
+  #cookieConsentBanner button {
+    background-color: #f1f1f1;
+    color: #333;
+    border: none;
+    padding: 5px 12px; /* 减小按钮大小 */
+    margin-left: 10px;
+    cursor: pointer;
+    font-size: 12px;  /* 缩小字体 */
+    border-radius: 3px; /* 圆角按钮 */
+  }
+
+  #cookieConsentBanner button:hover {
+    background-color: #ddd;
+  }

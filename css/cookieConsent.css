@@ -40,3 +40,30 @@
   #cookieConsentBanner button:hover {
     background-color: #ddd;
   }
+
+
+/* cookieConsent.css */
+/* 随机震动动画 */
+@keyframes shake {
+    0% {
+      transform: translate(0, 0); /* 初始位置 */
+    }
+    25% {
+      transform: translate(-10px, -10px); /* 向左上偏移 */
+    }
+    50% {
+      transform: translate(10px, 10px);  /* 向右下偏移 */
+    }
+    75% {
+      transform: translate(-15px, -5px); /* 向左偏移 */
+    }
+    100% {
+      transform: translate(5px, -10px);  /* 向右上偏移 */
+    }
+  }
+
+.shake {
+    animation: shake 1s ease-in-out !important; /* 增加动画时长 */
+}
+
+

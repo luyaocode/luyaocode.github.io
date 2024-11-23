@@ -549,7 +549,7 @@
                     <i class="bi bi-trash"></i>
                 </button>
                 <button id="auth-btn_homepage" class="btn btn-outline-light btn-sm mx-1 no-focus" data-toggle="tooltip"
-                    title="登录" data-placement="bottom" data-bs-toggle="modal" data-bs-target="#loginModal">
+                    title="登录" data-placement="bottom">
                     <i class="fas fa-sign-in-alt"></i>
                 </button>
 
@@ -2599,6 +2599,18 @@
 
     document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById("btn_login_github").onclick = () => openAuthPopup();
+        document.getElementById('auth-btn_homepage').onclick = (event) => {
+            const cookieConsent = getCookie('cookieConsent');
+            if (cookieConsent !== 'true') {
+                event.preventDefault();
+                // 调用震动效果函数
+                shakeCookieBanner();
+                return;
+            }
+            var loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+            loginModal.show();
+        }
+
         const result = await authorize();
         handleLoginResult(result);
     });

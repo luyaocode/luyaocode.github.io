@@ -32,7 +32,6 @@
 	<link href="./css/bootstrap-icons.css" rel="stylesheet">
 
 	<link href="./css/common.css">
-
 	<!-- <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,700'> -->
 	<style>
 		/* 导航栏 */
@@ -115,7 +114,7 @@
 			transform: translateX(50%);
 		}
 	</style>
-
+	<script src="./js/cookieConsent.js"></script>
 </head>
 
 <body>
@@ -134,7 +133,7 @@
 						</a>
 					</li>
 					<li class="nav-item">
-						<a class="nav-link" id="auth-btn_homepage" data-bs-toggle="modal" data-bs-target="#loginModal">
+						<a class="nav-link" id="auth-btn_homepage">
 							<i class="fas fa-sign-in-alt"></i> 登录
 						</a>
 					</li>
@@ -513,6 +512,18 @@
 		document.querySelector('#into_yingwu').href = `${Page_Yingwu_Home}`;
 		document.getElementById("btn_logout").onclick = () => logout();
 		document.getElementById("btn_login_github").onclick = () => openAuthPopup();
+
+		document.getElementById('auth-btn_homepage').onclick = (event) => {
+			const cookieConsent = getCookie('cookieConsent');
+			if (cookieConsent !== 'true') {
+				event.preventDefault();
+				// 调用震动效果函数
+				shakeCookieBanner();
+				return;
+			}
+			var loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+			loginModal.show();
+		}
 	});
 </script>
 <script>

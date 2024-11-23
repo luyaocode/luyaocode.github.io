@@ -21,7 +21,7 @@
 	<link href="../css/bootstrap-icons.css" rel="stylesheet">
 
 	<link rel="stylesheet" href="../css/common.css">
-
+	<script src="../js/cookieConsent.js"></script>
 </head>
 <style>
 	* {
@@ -385,7 +385,7 @@
 						<a class="nav-link" id="setting-btn" href="">管理</a>
 					</li>
 					<li class="nav-item">
-						<a class="nav-link" id="auth-btn" onclick="openAuthPopup()">
+						<a class="nav-link" id="auth-btn" href="javascript:void(0);">
 							<i class="fab fa-github"></i> 登录
 						</a>
 					</li>
@@ -854,6 +854,17 @@
 		document.querySelector('#d-write-blog').href = `${Page_Blog_Write}`;
 
 		document.getElementById('btnToggleNightMode').onclick = toggleNightMode;
+		document.getElementById('auth-btn').onclick = (event) => {
+			const cookieConsent = getCookie('cookieConsent');
+			if (cookieConsent !== 'true') {
+				event.preventDefault();
+				// 调用震动效果函数
+				shakeCookieBanner();
+				return;
+			}
+			openAuthPopup();
+		}
+
 		// 应用样式
 		const user_attr = JSON.parse(localStorage.getItem('USER_ATTR'));
 		if (user_attr && user_attr.custom_style === CustomStyle.NightMode) {

@@ -449,9 +449,9 @@
         #tool-sidebar button {
             border: none;
             color: #9c9c9c;
-            padding: 4px 2px;
+            padding: 8px 2px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 20px;
             border-radius: 3px;
         }
 
@@ -2199,7 +2199,7 @@
     // 更新 canvas 缩放
     function updateCanvasZoom() {
         canvas.style.transform = `scale(${zoomLevel})`; // 使用 transform 缩放
-        canvas.style.transformOrigin = 'center top'; // 设置缩放的起始点为中间
+        canvas.style.transformOrigin = 'left top'; // 设置缩放的起始点为中间
         document.getElementById('current-zoom-scale').textContent = zoomLevel;
     }
 

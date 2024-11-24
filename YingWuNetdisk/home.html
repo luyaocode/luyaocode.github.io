@@ -2178,11 +2178,11 @@
     let startX, startY;             // pdf起始位置
     let offsetX = 0, offsetY = 0;   // PDF 页面偏移量
     // 定义偏移量的最大和最小值
-    const minX = -500;  // 最小 X 偏移量（例如：页面左边界）
-    const maxX = 500;   // 最大 X 偏移量（例如：页面右边界）
-    const minY = -500;  // 最小 Y 偏移量（例如：页面上边界）
-    const maxY = 500;   // 最大 Y 偏移量（例如：页面下边界）
-    const dragFactor = 3;           // 拖动幅度倍数/拖拽灵敏度
+    const minX = -1500;  // 最小 X 偏移量（例如：页面左边界）
+    const maxX = 1500;   // 最大 X 偏移量（例如：页面右边界）
+    const minY = -1500;  // 最小 Y 偏移量（例如：页面上边界）
+    const maxY = 1500;   // 最大 Y 偏移量（例如：页面下边界）
+    const dragFactor = 4;           // 拖动幅度倍数/拖拽灵敏度
 
     const zoomInButton = document.getElementById('zoom-in');
     const zoomOutButton = document.getElementById('zoom-out');
@@ -2190,16 +2190,18 @@
 
     // 放大功能
     zoomInButton.addEventListener('click', function () {
-        zoomLevel += 0.2; // 每次放大
-        zoomLevel = parseFloat(zoomLevel.toFixed(1));
-        updateCanvasZoom();
+        if (zoomLevel < 2.0) {
+            zoomLevel += 0.25;
+            zoomLevel = parseFloat(zoomLevel.toFixed(2));
+            updateCanvasZoom();
+        }
     });
 
     // 缩小功能
     zoomOutButton.addEventListener('click', function () {
-        if (zoomLevel > 0.2) { // 防止缩小到不可见
-            zoomLevel -= 0.2; // 每次缩小
-            zoomLevel = parseFloat(zoomLevel.toFixed(1));
+        if (zoomLevel > 0.25) { // 防止缩小到不可见
+            zoomLevel -= 0.25; // 每次缩小
+            zoomLevel = parseFloat(zoomLevel.toFixed(2));
             updateCanvasZoom();
         }
     });
@@ -2214,7 +2216,7 @@
     // 更新 canvas 缩放
     function updateCanvasZoom() {
         canvas.style.transform = `scale(${zoomLevel})`; // 使用 transform 缩放
-        canvas.style.transformOrigin = 'left top'; // 设置缩放的起始点为中间
+        canvas.style.transformOrigin = 'center top'; // 设置缩放的起始点为中间
         renderPdf(currentPage);
         document.getElementById('current-zoom-scale').textContent = zoomLevel;
     }
@@ -2362,7 +2364,7 @@
             const page = await pdfDoc.getPage(pageNumber);
 
             // 设置缩放比例
-            const scale = initScale;
+            const scale = initScale * zoomLevel;
             const viewport = page.getViewport({ scale });
 
             // 设置 canvas 尺寸

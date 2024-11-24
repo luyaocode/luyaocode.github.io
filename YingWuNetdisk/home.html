@@ -314,7 +314,9 @@
             width: 100%;
             height: 100vh;
             /* 使用全屏高度 */
-            overflow: hidden;
+            overflow: auto;
+            position: relative;
+            justify-content: space-between;
         }
 
         #pdf-container {
@@ -365,6 +367,11 @@
 
         #pdf-canvas {
             flex-grow: 1;
+            cursor: grab;
+        }
+
+        #pdf-canvas:active {
+            cursor: grabbing;
         }
 
         .outline-item {
@@ -673,71 +680,64 @@
     <div class="preview-container" id="preview-container">
         <div class="preview-content" id="preview-content">
             <div id="pdf-content">
-                <div style="
-                    position: relative;
-                    height: 100vh;
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: space-between;
-                 ">
-                    <div id="pdf-toolbar-top" class="d-flex flex-wrap justify-content-between align-items-center p-2">
-                        <span id="page-info-top" class="d-flex align-items-center me-2" style="color:#8a8989;">
-                            <span class="ms-2"><span id="current-page-top">0</span> </span>
-                            <span>/<span id="total-pages-top">0</span></span>
-                        </span>
-                        <span id="page-info-top" class="d-flex align-items-center me-2" style="color:#8a8989;">
-                            <span class="ms-2"><span id="current-zoom-scale">1</span></span>
-                            <span>:<span id="total-pages-top">1</span></span>
-                        </span>
-                        <button id="closePreview-pdf" class="btn btn-sm btn-danger px-2 py-1">
-                            <i class="bi bi-x-circle"></i>
-                        </button>
+                <div id="pdf-toolbar-top" class="d-flex flex-wrap justify-content-between align-items-center p-2">
+                    <span id="page-info-top" class="d-flex align-items-center me-2" style="color:#8a8989;">
+                        <span class="ms-2"><span id="current-page-top">0</span> </span>
+                        <span>/<span id="total-pages-top">0</span></span>
+                    </span>
+                    <span id="page-info-top" class="d-flex align-items-center me-2" style="color:#8a8989;">
+                        <span class="ms-2"><span id="current-zoom-scale">1</span></span>
+                        <span>:<span id="total-pages-top">1</span></span>
+                    </span>
+                    <button id="closePreview-pdf" class="btn btn-sm btn-danger px-2 py-1">
+                        <i class="bi bi-x-circle"></i>
+                    </button>
+                </div>
+                <div id="pdf-container">
+                    <div id="outline-container">
+                        <h3>目录</h3>
+                        <!-- 目录项会在这里渲染 -->
+                        <div id="outline-list"></div>
                     </div>
-                    <div id="pdf-container">
-                        <div id="outline-container">
-                            <h3>目录</h3>
-                            <!-- 目录项会在这里渲染 -->
-                            <div id="outline-list"></div>
-                        </div>
-                        <div id="toggle-outline-btn-container">
-                            <button id="btnTogglePdfOutline" class="tool-btn">
-                                <i class="fas fa-chevron-right"></i>
+                    <div id="toggle-outline-btn-container">
+                        <button id="btnTogglePdfOutline" class="tool-btn">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                        <div id="tool-sidebar">
+                            <button id="zoom-in">
+                                <i class="bi bi-plus-circle"></i>
                             </button>
-                            <div id="tool-sidebar">
-                                <button id="zoom-in">
-                                    <i class="bi bi-plus-circle"></i>
-                                </button>
-                                <button id="zoom-out">
-                                    <i class="bi bi-dash-circle"></i>
-                                </button>
-                                <button id="reset-zoom">
-                                    <i class="bi bi-arrow-counterclockwise"></i>
-                                </button>
-                            </div>
-                            <div id="resizer"></div>
+                            <button id="zoom-out">
+                                <i class="bi bi-dash-circle"></i>
+                            </button>
+                            <button id="reset-zoom">
+                                <i class="bi bi-arrow-counterclockwise"></i>
+                            </button>
                         </div>
-                        <div id="pdf-canvas-container">
-                            <canvas id="pdf-canvas"></canvas>
-                        </div>
+                        <div id="resizer"></div>
                     </div>
-                    <div id="pdf-toolbar" class="d-flex flex-wrap justify-content-center align-items-center p-2">
-                        <!-- 页码显示和跳转 -->
-                        <button id="prevPage_preview" class="btn btn-sm btn-primary px-2 py-1 me-1">
-                            <i class="bi bi-arrow-left-circle"></i>
-                        </button>
-                        <button id="nextPage_preview" class="btn btn-sm btn-primary px-2 py-1 me-2">
-                            <i class="bi bi-arrow-right-circle"></i>
-                        </button>
-                        <span id="page-info" class="d-flex align-items-center me-2">
-                            <input id="page-input" type="number" value="1" min="1"
-                                style="width: 80px; height: 30px; margin-right: 5px;">
-                            <button id="go-to-page" class="btn btn-sm btn-secondary px-2 py-1">跳转</button>
-                        </span>
-                        <button id="fullscreen-pdf" class="btn btn-sm btn-info px-2 py-1 me-2">
-                            <i class="bi bi-arrows-fullscreen"></i>
-                        </button>
+                    <div id="pdf-canvas-container">
+                        <canvas id="pdf-canvas"></canvas>
                     </div>
                 </div>
+                <div id="pdf-toolbar" class="d-flex flex-wrap justify-content-center align-items-center p-2">
+                    <!-- 页码显示和跳转 -->
+                    <button id="prevPage_preview" class="btn btn-sm btn-primary px-2 py-1 me-1">
+                        <i class="bi bi-arrow-left-circle"></i>
+                    </button>
+                    <button id="nextPage_preview" class="btn btn-sm btn-primary px-2 py-1 me-2">
+                        <i class="bi bi-arrow-right-circle"></i>
+                    </button>
+                    <span id="page-info" class="d-flex align-items-center me-2">
+                        <input id="page-input" type="number" value="1" min="1"
+                            style="width: 80px; height: 30px; margin-right: 5px;">
+                        <button id="go-to-page" class="btn btn-sm btn-secondary px-2 py-1">跳转</button>
+                    </span>
+                    <button id="fullscreen-pdf" class="btn btn-sm btn-info px-2 py-1 me-2">
+                        <i class="bi bi-arrows-fullscreen"></i>
+                    </button>
+                </div>
+                <!-- </div> -->
 
             </div>
             <!-- 图片显示区域 -->
@@ -2171,6 +2171,18 @@
     const canvas = document.getElementById('pdf-canvas');
     const ctx = canvas.getContext('2d');
     let zoomLevel = 1.0; // 初始缩放比例
+
+    let isRendering = false;        // 用于标记是否正在渲染
+    let isDragging = false;         // 是否在拖拽pdf
+    let startX, startY;             // pdf起始位置
+    let offsetX = 0, offsetY = 0;   // PDF 页面偏移量
+    // 定义偏移量的最大和最小值
+    const minX = -500;  // 最小 X 偏移量（例如：页面左边界）
+    const maxX = 500;   // 最大 X 偏移量（例如：页面右边界）
+    const minY = -500;  // 最小 Y 偏移量（例如：页面上边界）
+    const maxY = 500;   // 最大 Y 偏移量（例如：页面下边界）
+    const dragFactor = 3;           // 拖动幅度倍数/拖拽灵敏度
+
     const zoomInButton = document.getElementById('zoom-in');
     const zoomOutButton = document.getElementById('zoom-out');
     const resetZoomButton = document.getElementById('reset-zoom');
@@ -2193,6 +2205,9 @@
     // 还原缩放
     resetZoomButton.addEventListener('click', function () {
         zoomLevel = 1.0; // 还原为初始值
+        // 坐标置零
+        startX = 0; startY = 0;
+        offsetX = 0; offsetY = 0;
         updateCanvasZoom();
     });
 
@@ -2200,6 +2215,7 @@
     function updateCanvasZoom() {
         canvas.style.transform = `scale(${zoomLevel})`; // 使用 transform 缩放
         canvas.style.transformOrigin = 'left top'; // 设置缩放的起始点为中间
+        renderPdf(currentPage);
         document.getElementById('current-zoom-scale').textContent = zoomLevel;
     }
 
@@ -2339,7 +2355,9 @@
 
     // 渲染 PDF 页面
     async function renderPdf(pageNumber) {
+        if (isRendering) return;  // 如果正在渲染，跳过当前渲染请求
         try {
+            isRendering = true;  // 标记为正在渲染
             // 获取页面对象
             const page = await pdfDoc.getPage(pageNumber);
 
@@ -2356,6 +2374,7 @@
                 viewport,
                 renderInteractiveForms: true,  // 启用表单交互
                 // imageLayer: true               // 启用更高质量的图像渲染
+                transform: [1, 0, 0, 1, offsetX, offsetY]  // 应用偏移量
             }).promise;
 
             // 更新页码显示
@@ -2367,6 +2386,8 @@
             setPreviewPdfPageNum(previewFileID, pageNumber);
         } catch (error) {
             console.error("渲染页面失败：", error);
+        } finally {
+            isRendering = false;  // 渲染完成或出错后，重置标志
         }
     }
 
@@ -2545,6 +2566,9 @@
         previewFileID = null;
         const outlineContainer = document.getElementById('outline-list');
         outlineContainer.innerHTML = ""; // 清空目录
+        // 坐标置零
+        startX = 0; startY = 0;
+        offsetX = 0; offsetY = 0;
     }
 
     // 绑定翻页按钮事件
@@ -2561,6 +2585,45 @@
             pdfContainer.css("display", "none");
         }
     });
+
+    // 开始拖动
+    canvas.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        canvas.style.cursor = 'grabbing';
+        e.preventDefault();
+    });
+
+    // 拖动中
+    canvas.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+
+        const dx = (e.clientX - startX) * dragFactor;  // 增加倍数因子
+        const dy = (e.clientY - startY) * dragFactor;
+
+        offsetX += dx;  // 更新当前偏移量
+        offsetY += dy;
+        // 限制偏移量在合理范围内
+        offsetX = Math.max(minX, Math.min(maxX, offsetX));  // 限制 X 偏移量
+        offsetY = Math.max(minY, Math.min(maxY, offsetY));  // 限制 Y 偏移量
+
+        // 重渲染 PDF 页面时应用当前的偏移量
+        renderPdf(currentPage);
+
+        // 更新起始点
+        startX = e.clientX;
+        startY = e.clientY;
+
+        e.preventDefault();
+    });
+
+    // 停止拖动
+    canvas.addEventListener('mouseup', () => {
+        isDragging = false;
+        canvas.style.cursor = 'grab';
+    });
+
 
     // 关闭pdf预览
     document.getElementById('closePreview-pdf').addEventListener('click', closePreview);

@@ -2171,7 +2171,7 @@
     const canvas = document.getElementById('pdf-canvas');
     const ctx = canvas.getContext('2d');
     let zoomLevel = 1.0; // 初始缩放比例
-    const initScale = 8;
+    let initScale = 2; // 初始canvas缩放比例
 
     let isRendering = false;        // 用于标记是否正在渲染
     let isDragging = false;         // 是否在拖拽pdf
@@ -2182,7 +2182,13 @@
     const maxX = 1500;   // 最大 X 偏移量（例如：页面右边界）
     const minY = -1500;  // 最小 Y 偏移量（例如：页面上边界）
     const maxY = 1500;   // 最大 Y 偏移量（例如：页面下边界）
-    const dragFactor = 4;           // 拖动幅度倍数/拖拽灵敏度
+    let dragFactor = 1;  // 初始拖动幅度倍数/拖拽灵敏度
+
+    // 高分屏适配
+    if (window.innerWidth > 768) {
+        initScale = 8;
+        dragFactor = 4;
+    }
 
     const zoomInButton = document.getElementById('zoom-in');
     const zoomOutButton = document.getElementById('zoom-out');
@@ -2606,42 +2612,65 @@
     });
 
     // 开始拖动
-    canvas.addEventListener('mousedown', (e) => {
+    function startDrag(e) {
         isDragging = true;
-        startX = e.clientX;
-        startY = e.clientY;
+        const point = getEventPoint(e);
+        startX = point.x;
+        startY = point.y;
         canvas.style.cursor = 'grabbing';
         e.preventDefault();
-    });
+    }
 
     // 拖动中
-    canvas.addEventListener('mousemove', (e) => {
+    function drag(e) {
         if (!isDragging) return;
 
-        const dx = (e.clientX - startX) * dragFactor;  // 增加倍数因子
-        const dy = (e.clientY - startY) * dragFactor;
+        const point = getEventPoint(e);
+        const dx = (point.x - startX) * dragFactor;
+        const dy = (point.y - startY) * dragFactor;
 
-        offsetX += dx;  // 更新当前偏移量
+        offsetX += dx;
         offsetY += dy;
+
         // 限制偏移量在合理范围内
-        offsetX = Math.max(minX, Math.min(maxX, offsetX));  // 限制 X 偏移量
-        offsetY = Math.max(minY, Math.min(maxY, offsetY));  // 限制 Y 偏移量
+        offsetX = Math.max(minX, Math.min(maxX, offsetX));
+        offsetY = Math.max(minY, Math.min(maxY, offsetY));
 
         // 重渲染 PDF 页面时应用当前的偏移量
         renderPdf(currentPage);
 
         // 更新起始点
-        startX = e.clientX;
-        startY = e.clientY;
+        startX = point.x;
+        startY = point.y;
 
         e.preventDefault();
-    });
+    }
 
     // 停止拖动
-    canvas.addEventListener('mouseup', () => {
+    function stopDrag(e) {
         isDragging = false;
         canvas.style.cursor = 'grab';
-    });
+        e.preventDefault();
+    }
+
+    // 获取事件的触点坐标（支持鼠标和触摸）
+    function getEventPoint(e) {
+        if (e.touches && e.touches[0]) {
+            return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        }
+        return { x: e.clientX, y: e.clientY };
+    }
+
+    // 添加事件监听
+    canvas.addEventListener('mousedown', startDrag);
+    canvas.addEventListener('mousemove', drag);
+    canvas.addEventListener('mouseup', stopDrag);
+    canvas.addEventListener('mouseleave', stopDrag); // 防止鼠标移出画布时未结束拖动
+
+    // 移动端触摸事件监听
+    canvas.addEventListener('touchstart', startDrag);
+    canvas.addEventListener('touchmove', drag);
+    canvas.addEventListener('touchend', stopDrag);
 
 
     // 关闭pdf预览

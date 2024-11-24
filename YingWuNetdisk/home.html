@@ -2171,6 +2171,7 @@
     const canvas = document.getElementById('pdf-canvas');
     const ctx = canvas.getContext('2d');
     let zoomLevel = 1.0; // 初始缩放比例
+    const initScale = 8;
 
     let isRendering = false;        // 用于标记是否正在渲染
     let isDragging = false;         // 是否在拖拽pdf
@@ -2204,11 +2205,10 @@
     });
     // 还原缩放
     resetZoomButton.addEventListener('click', function () {
-        zoomLevel = 1.0; // 还原为初始值
-        // 坐标置零
-        startX = 0; startY = 0;
-        offsetX = 0; offsetY = 0;
+        zoomLevel = 1.0;
+        initPdfOffset();
         updateCanvasZoom();
+        scrollToLeftTop();
     });
 
     // 更新 canvas 缩放
@@ -2362,7 +2362,7 @@
             const page = await pdfDoc.getPage(pageNumber);
 
             // 设置缩放比例
-            const scale = 8;
+            const scale = initScale;
             const viewport = page.getViewport({ scale });
 
             // 设置 canvas 尺寸
@@ -2447,11 +2447,26 @@
         }
     }
 
+    // 坐标置零
+    function initPdfOffset() {
+        startX = 0; startY = 0;
+        offsetX = 0; offsetY = 0;
+    }
+
+    // 重置滚动条位置
+    const pdfCanvasContainer = document.getElementById('pdf-canvas-container');
+    function scrollToLeftTop() {
+        pdfCanvasContainer.scrollTop = 0;  // 重置垂直滚动条
+        pdfCanvasContainer.scrollLeft = 0; // 重置水平滚动条
+    }
+
     // 翻到上一页
     function goToPrevPage() {
         if (currentPage > 1) {
             currentPage--;
+            initPdfOffset();
             renderPdf(currentPage);
+            scrollToLeftTop();
         }
     }
 
@@ -2459,7 +2474,9 @@
     function goToNextPage() {
         if (currentPage < totalPages) {
             currentPage++;
+            initPdfOffset();
             renderPdf(currentPage);
+            scrollToLeftTop();
         }
     }
 
@@ -2471,7 +2488,9 @@
         const inputPage = parseInt(document.getElementById('page-input').value, 10);
         if (inputPage >= 1 && inputPage <= totalPages) {
             currentPage = inputPage;
+            initPdfOffset();
             renderPdf(currentPage);
+            scrollToLeftTop();
         } else {
             showToast("请输入有效的页码范围！");
         }
@@ -2566,9 +2585,7 @@
         previewFileID = null;
         const outlineContainer = document.getElementById('outline-list');
         outlineContainer.innerHTML = ""; // 清空目录
-        // 坐标置零
-        startX = 0; startY = 0;
-        offsetX = 0; offsetY = 0;
+        initPdfOffset();
     }
 
     // 绑定翻页按钮事件

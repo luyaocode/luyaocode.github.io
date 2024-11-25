@@ -856,6 +856,7 @@
                                 <th>文件名</th>
                                 <th>文件标识</th>
                                 <th>上传时间</th>
+                                <th>状态</th>
                                 <th>操作</th>
                             </tr>
                         </thead>
@@ -1174,6 +1175,32 @@
         return selectedHashes;
     }
 
+    async function handleLockFiles(fileIDs, status) {
+        const response = await lockFiles(fileIDs, status);
+        if (response.ok) {
+            const data = await response.json();
+            const { successFiles, failureCount } = data.result;
+            if (successFiles && successFiles.length > 0) {
+                if (!failureCount) {
+                    showToast("操作成功");
+                }
+                else {
+                    showToast("成功 " + successFiles.length + "个，失败 " + failureCount + "个");
+                }
+                const status = localStorage.getItem("blog_website_login");
+                if (status === "true") {
+                    loadUploadPage(currentUploadedFileHistoryPage);
+                }
+            }
+            else {
+                showToast("操作失败", "top-right", "bg-warning");
+            }
+        }
+        else {
+            showToast("操作失败", "top-right", "bg-warning");
+        }
+    }
+
     async function handleDeleteFiles(fileIDs) {
         const response = await deleteFiles(fileIDs);
         if (response.ok) {
@@ -1218,12 +1245,29 @@
         records.forEach(record => {
             const label = record.hash;
             const uploadedAt = toLocalTime(record.uploaded_at);
+            const locked = record.locked;
+            let btnLock;
+            if (locked) {
+                btnLock = `
+                <button class="btn btn-success" onclick="lockFile(${record.hash},false)">
+                    <i class="bi bi-lock-open"></i>
+                </button>
+            `;
+            } else {
+                btnLock = `
+                    <button class="btn btn-danger" onclick="lockFile(${record.hash},true)">
+                        <i class="bi bi-lock"></i>
+                    </button>
+                `;
+            }
             const row = document.createElement('tr');
+
             row.innerHTML = `
                 <td><input type="checkbox" class="file-select" data-hash="${record.hash}"></td>
                 <td>${record.filename}</td>
                 <td><span class="label-style">${label}</span></td>
                 <td>${uploadedAt}</td>
+                <td>${btnLock}</td>
                 <td>
                 <button class="btn btn-primary btn-sm" onclick="deleteFile('${record.hash}')">删除</button>
                 </td>
@@ -1473,6 +1517,12 @@
         sessionStorage.setItem('downloaded_files', JSON.stringify(mergedFiles));
     }
 
+    async function lockFile(fileID, status) {
+        let fileIDs = [];
+        fileIDs.push(fileID);
+        return handleLockFiles(fileIDs, status);
+    }
+
     async function deleteFile(fileID) {
         let fileIDs = [];
         fileIDs.push(fileID);
@@ -1492,6 +1542,23 @@
         } catch (error) {
             console.error(error);
             showToast("删除失败", 'top-right', 'bg-danger');
+            return [];
+        }
+    }
+
+    async function lockFiles(fileIDs, status) {
+        try {
+            const response = await fetch(`${backend_yingwu}/files/lock/${status}`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    files: fileIDs
+                }),
+                credentials: 'include',
+            });
+            return response;
+        } catch (error) {
+            console.error(error);
+            showToast("操作失败", 'top-right', 'bg-danger');
             return [];
         }
     }

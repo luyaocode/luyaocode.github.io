@@ -422,12 +422,36 @@
             margin-left: 20px;
         }
 
+        #note-iframe {
+            display: none;
+            width: 100%;
+            height: 600;
+            border: none;
+        }
+
+        #toggle-note-btn-container,
         #toggle-outline-btn-container {
             position: relative;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
+        }
+
+        /* 开关笔记按钮 */
+        .btn-toggle-note {
+            position: absolute;
+            top: 50%;
+            right: 100%;
+            transform: translateY(-100%);
+            background-color: rgba(129, 129, 129, 0.2);
+            border: none;
+            padding: 10px 4px;
+            cursor: pointer;
+            font-size: 16px;
+            color: #cacaca;
+            border-radius: 3px;
+            z-index: 1000;
         }
 
         .tool-btn {
@@ -480,10 +504,12 @@
             /* 悬浮时的视觉效果 */
         }
 
+        .btn-toggle-note,
         .tool-btn i {
             transition: transform 0.3s ease;
         }
 
+        .btn-toggle-note.expand,
         .tool-btn.expand i {
             transform: rotate(180deg);
         }
@@ -719,6 +745,13 @@
                     <div id="pdf-canvas-container">
                         <canvas id="pdf-canvas"></canvas>
                     </div>
+                    <div id="toggle-note-btn-container">
+                        <button id="btnTogglePdfNote" class="btn-toggle-note">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                    </div>
+                    <iframe id="note-iframe">
+                    </iframe>
                 </div>
                 <div id="pdf-toolbar" class="d-flex flex-wrap justify-content-center align-items-center p-2">
                     <!-- 页码显示和跳转 -->
@@ -1517,6 +1550,7 @@
         document.getElementById('preview-container').style.display = 'flex'; // 显示预览容器
         const requestUrl = `${backend_yingwu}/files/preview/${fileID}`;
         let cache = null;
+        let cached = false;
         try {
             cache = await caches.open('file-cache'); // 打开缓存
             // 尝试从缓存中获取文件
@@ -1539,72 +1573,106 @@
                 const blobUrl = URL.createObjectURL(cachedBlob);
                 openPreview(fileExtension, blobUrl, fileID);
                 setTimeout(() => URL.revokeObjectURL(blobUrl), 60000 * 30);
-                return;
+                cached = true;
             }
         } catch (error) {
             console.log("缓存错误");
         }
 
+        if (!cached) {
+
+            try {
+                const downloadResponse = await fetch(requestUrl, {
+                    credentials: 'include'
+                });
+
+                // 检查响应状态
+                if (downloadResponse.ok) {
+                    const contentType = downloadResponse.headers.get('Content-Type');
+                    if (contentType && contentType.includes('application/json')) {
+                        const respJson = await downloadResponse.json();
+                        if (respJson) {
+                            showToast("文件下载失败", 'top-right', 'bg-warning');
+                            return;
+                        }
+                    } else {
+                        // 处理文件响应
+                        let fileName = '未命名文件';
+                        const contentDisposition = downloadResponse.headers.get('Content-Disposition');
+                        if (contentDisposition) {
+                            const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+                            if (filenameMatch && filenameMatch[1]) {
+                                // 去除引号
+                                fileName = filenameMatch[1].replace(/['"]/g, '');
+                                // 去除 UTF-8
+                                fileName = fileName.replace(/UTF-8/g, '').trim(); // 去除所有的 UTF-8 并去掉多余空格
+                                // 解码文件名
+                                fileName = decodeURIComponent(fileName);
+                            }
+                        }
+                        // 获取 Blob 数据
+                        const blob = await downloadResponse.blob();
+
+                        // 创建 Blob URL
+                        const blobUrl = URL.createObjectURL(blob);
+                        let fileExtension = fileName.substring(fileName.lastIndexOf('.') + 1);
+                        openPreview(fileExtension, blobUrl, fileID);
+                        setTimeout(() => URL.revokeObjectURL(blobUrl), 60000 * 30);
+
+                        // 将 Blob 数据和文件名一起存储到缓存
+                        if (cache) {
+                            const responseWithMetadata = new Response(blob, {
+                                headers: {
+                                    'X-File-Extension': fileExtension, // 存储文件扩展名
+                                    'X-Cache-Timestamp': Date.now().toString()
+                                }
+                            });
+
+                            // 将 Response 存入缓存
+                            await cache.put(requestUrl, responseWithMetadata);
+                        }
+                    }
+                }
+                else {
+                    showToast("文件不存在", 'top-right', 'bg-warning');
+                    closePreview();
+                    return;
+                }
+            } catch (error) {
+                console.error(error);
+                showToast("文件下载失败", 'top-right', 'bg-warning');
+                closePreview();
+                return;
+            }
+        }
+
+        // 请求笔记id
         try {
-            const downloadResponse = await fetch(requestUrl, {
+            const requrl = `${backend_yingwu}/files/note_info/${fileID}`;
+            const response = await fetch(requrl, {
                 credentials: 'include'
             });
 
             // 检查响应状态
-            if (downloadResponse.ok) {
-                const contentType = downloadResponse.headers.get('Content-Type');
-                if (contentType && contentType.includes('application/json')) {
-                    const respJson = await downloadResponse.json();
-                    if (respJson) {
-                        showToast("文件下载失败", 'top-right', 'bg-warning');
-                        return;
-                    }
-                } else {
-                    // 处理文件响应
-                    let fileName = '未命名文件';
-                    const contentDisposition = downloadResponse.headers.get('Content-Disposition');
-                    if (contentDisposition) {
-                        const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
-                        if (filenameMatch && filenameMatch[1]) {
-                            // 去除引号
-                            fileName = filenameMatch[1].replace(/['"]/g, '');
-                            // 去除 UTF-8
-                            fileName = fileName.replace(/UTF-8/g, '').trim(); // 去除所有的 UTF-8 并去掉多余空格
-                            // 解码文件名
-                            fileName = decodeURIComponent(fileName);
-                        }
-                    }
-                    // 获取 Blob 数据
-                    const blob = await downloadResponse.blob();
-
-                    // 创建 Blob URL
-                    const blobUrl = URL.createObjectURL(blob);
-                    let fileExtension = fileName.substring(fileName.lastIndexOf('.') + 1);
-                    openPreview(fileExtension, blobUrl, fileID);
-                    setTimeout(() => URL.revokeObjectURL(blobUrl), 60000 * 30);
-
-                    // 将 Blob 数据和文件名一起存储到缓存
-                    if (cache) {
-                        const responseWithMetadata = new Response(blob, {
-                            headers: {
-                                'X-File-Extension': fileExtension, // 存储文件扩展名
-                                'X-Cache-Timestamp': Date.now().toString()
-                            }
-                        });
-
-                        // 将 Response 存入缓存
-                        await cache.put(requestUrl, responseWithMetadata);
-                    }
+            if (response.ok) {
+                const resp = await response.json();
+                let { noteID, noteTitle } = resp.result;
+                noteTitle = noteTitle ? noteTitle + " 的笔记" : "笔记";
+                let badurl = window.location.origin;
+                if (badurl.endsWith("/")) {
+                    badurl = badurl + "404";
                 }
+                else {
+                    badurl = badurl + "/404";
+                }
+                const noteUrl = noteID ? `${backend_yingwu}${Page_Blog_Write_Through}?id=${noteID}&title=${noteTitle}` : badurl
+
+                // 获取 iframe 元素
+                const iframe = document.getElementById('note-iframe');
+                iframe.src = noteUrl;
             }
-            else {
-                showToast("文件不存在", 'top-right', 'bg-warning');
-                closePreview();
-            }
-        } catch (error) {
-            console.error(error);
-            showToast("文件下载失败", 'top-right', 'bg-warning');
-            closePreview();
+        } catch (err) {
+            console.error(err);
         }
     }
 
@@ -2600,6 +2668,16 @@
     document.getElementById('prevPage_preview').addEventListener('click', goToPrevPage);
     document.getElementById('nextPage_preview').addEventListener('click', goToNextPage);
 
+
+    document.getElementById("btnTogglePdfNote").addEventListener("click", function () {
+        this.classList.toggle('expand');
+        const noteContainer = $("#note-iframe");
+        if (this.classList.contains("expand")) {
+            noteContainer.css("display", "flex");
+        } else {
+            noteContainer.css("display", "none");
+        }
+    });
 
     document.getElementById("btnTogglePdfOutline").addEventListener("click", function () {
         this.classList.toggle('expand');

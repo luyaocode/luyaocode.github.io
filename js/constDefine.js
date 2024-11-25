@@ -8,13 +8,14 @@ const backend_yingwu = "https://api.chaosgomoku.fun:8080";
 // const backend_yingwu = "http://localhost:8080";
 
 // url
-const Homepage="/";
+const Homepage = "/";
+const NotFound = "404";
 const Page_Blog_Home = "/blog/home";
 const Page_Blog_Blog = "/md/page/detail";
 const Page_Blog_Setting = "/blog/setting";
 const Page_Blog_Update = "/md/page/update";
 const Page_Blog_Write = "/md/page/write";
-
+const Page_Blog_Write_Through = "/md/page/write-through";
 const Page_Yingwu_Home = "/YingWuNetdisk/home";
 
 // 服务器状态码

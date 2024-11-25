@@ -10,7 +10,6 @@
     <link rel="stylesheet" href="../css/editormd.css" />
     <link rel="shortcut icon" href="../../img/fav.ico" type="image/x-icon" />
 
-
     <link rel="stylesheet" href="../../css/common.css">
     <style>
         .title {
@@ -32,7 +31,7 @@
             /* 垂直靠底对齐 */
             width: 80%;
             background: transparent;
-            color: white;
+            /* color: white; */
         }
 
         .title:focus {
@@ -43,20 +42,30 @@
 
         #publish-btn,
         #return-btn {
-            width: 8%;
+            display: inline-block;
             margin-left: auto;
-            background-color: #2196F3;
-            border: none;
-            color: rgb(255, 255, 255);
-            font-size: 1.5rem;
-            padding: 2px;
+            background-color: #0d6efd;
+            /* Bootstrap的primary颜色 */
+            border: 1px solid transparent;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 400;
+            text-align: center;
+            vertical-align: middle;
             cursor: pointer;
+            padding: 0.375rem 0.75rem;
+            border-radius: 0.375rem;
+            /* 圆角 */
+            transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
         }
 
-        #publish-btn,
+        #publish-btn:hover,
         #return-btn:hover {
-            background-color: #1696ff;
+            background-color: #0b5ed7;
+            /* Hover状态 */
+            border-color: #0a58ca;
         }
+
 
         .editormd-preview-theme-dark {
             color: #777;
@@ -181,18 +190,19 @@
 </head>
 
 <body>
-    <div style="
-        background-image: url('../../img/moon.jpg');
-        ">
+    <div>
         <div id="layout" style="
             background: transparent;
             ">
             <header>
                 <div style="display: flex;flex-direction: row;">
-                    <textarea maxlength="100" placeholder="标题" class="title" id="title"></textarea>
+                    <textarea maxlength="100" placeholder="标题" class="title" id="title" readonly></textarea>
                     <!-- 上传博客 -->
-                    <button id="publish-btn">修改</button>
-                    <button id="return-btn">放弃</button>
+                    <button id="publish-btn"><span style="
+                    white-space: nowrap;
+                    padding: 1px 2px;
+                    ">提交</spans></button>
+                    <!-- <button id="return-btn">放弃</button> -->
                 </div>
             </header>
             <div class="btns">
@@ -228,7 +238,7 @@
         </div>
         <div id="failureInfoDialog" class="confirmation-dialog" style="display: none;">
             <div class="dialog-content">
-                <p id="dialogText">修改失败：暗号错误</p>
+                <p id="dialogText">修改失败</p>
             </div>
         </div>
         <div id="passwdDialog" class="confirmation-dialog" style="display: none;">
@@ -308,6 +318,8 @@
     <script src="js/jquery.min.js"></script>
     <script src="../editormd.min.js"></script>
     <script src="js/util.js"></script>
+    <!-- 引入 uuid 库 -->
+    <script src="https://cdn.jsdelivr.net/npm/uuid/dist/umd/uuidv4.min.js"></script>
     <script type="text/javascript">
         var testEditor;
 
@@ -318,10 +330,19 @@
 
         const params = parseQueryString(window.location.href);
         var id = params.id;
+        var currTitle = params.title;
+        let badurl = window.location.origin;
+        if (badurl.endsWith("/")) {
+            badurl = badurl + NotFound;
+        }
+        else {
+            badurl = badurl + '/' + NotFound;
+        }
+        if (!id) {
+            window.location.href = badurl;
+        }
         var markdown; // 初始内容
         $(function () {
-            enableUnloadWarning("您确定要离开此页面吗？");
-
             // 发送 POST 请求到服务器
             var url = backend_url + "/blog";
             $.ajax({
@@ -333,7 +354,7 @@
                 },
                 success: function (response) {
                     let { title, author, content, time, id } = response;
-                    title = title === '' ? '无标题' : title;
+                    title = title ? title : currTitle;
                     const headTitleEle = document.querySelector('title');
                     headTitleEle.textContent = title;
                     const titleEle = document.getElementById('title');
@@ -387,6 +408,7 @@
                 },
                 error: function (xhr, status, error) {
                     console.error("Error sending string:", error);
+                    window.location.href = badurl;
                 }
             });
         });
@@ -535,8 +557,10 @@
             // const uuid = uuidv4();
             var title = document.getElementById('title').value;
             var content = testEditor.getMarkdown();
+            let tags = [];
+            tags.push("笔记");
             // 发送 POST 请求到服务器
-            var url = backend_url + '/update';
+            var url = backend_url + '/write-through';
             $.ajax({
                 url: url, // 服务器端接收请求的URL
                 type: "POST", // 请求类型为POST
@@ -544,19 +568,25 @@
                     withCredentials: true // 允许发送 cookie
                 },
                 data: {
-                    type: 'blog',
+                    type: 'note',
                     uuid: id,
                     title: title,
                     content: content,
-                    pwd: pwdArr,
+                    // pwd: pwdArr,
+                    tags: tags
                 }, // 发送的数据，这里是一个对象，包含你要发送的内容
                 success: function (response) {
                     if (response.code === 0) {
                         const infoDialog = document.getElementById("successInfoDialog");
                         infoDialog.style.display = 'flex';
                         setTimeout(() => {
-                            window.location.href = `${Page_Blog_Home}`;
+                            infoDialog.style.display = 'none';
+                            console.log("note id: " + response.id);
+                            // 通知父页面进行操作..
+
                         }, 1000);
+                        // // 刷新
+                        // location.reload();
                     }
                     else if (response.code === -1) { // 暗号错误
                         const infoDialog = document.getElementById("failureInfoDialog");
@@ -564,6 +594,8 @@
                         setTimeout(() => {
                             infoDialog.style.display = 'none';
                         }, 3000);
+                        // 刷新
+                        location.reload();
                     }
                     else if (response.code === -2) { // 内部错误
                         const dialogText = document.getElementById("dialogText");
@@ -572,36 +604,44 @@
                         infoDialog.style.display = 'flex';
                         setTimeout(() => {
                             infoDialog.style.display = 'none';
-                            dialogText.textContent = "修改失败：暗号错误"
+                            dialogText.textContent = "修改失败"
                         }, 3000);
+                        // 刷新
+                        location.reload();
                     }
                 },
                 error: function (xhr, status, error) {
                     // 请求失败的回调函数
                     console.error("Error sending string:", error);
-                    alert("服务器连接失败！");
+                    const dialogText = document.getElementById("dialogText");
+                    dialogText.textContent = "连接异常";
+                    const infoDialog = document.getElementById("failureInfoDialog");
+                    infoDialog.style.display = 'flex';
+                    setTimeout(() => {
+                        infoDialog.style.display = 'none';
+                        dialogText.textContent = "修改失败"
+                    }, 3000);
                 }
             });
         };
 
         $("#publish-btn").click(function () {
             // 获取 textarea 元素
-            var title = document.getElementById('title').value;
-            if (title === '') {
-                alert('标题不能为空！');
-                return;
-            }
-            var content = testEditor.getMarkdown();
-            if (content === '') {
-                alert('内容不能为空！');
-                return;
-            }
-            const passwdDialog = document.getElementById("passwdDialog");
-            passwdDialog.style.display = 'flex';
+            // var title = document.getElementById('title').value;
+            // if (title === '') {
+            //     alert('标题不能为空！');
+            //     return;
+            // }
+            // var content = testEditor.getMarkdown();
+            // if (content === '') {
+            //     alert('内容不能为空！');
+            //     return;
+            // }
+            // const passwdDialog = document.getElementById("passwdDialog");
+            // passwdDialog.style.display = 'flex';
+            publish();
         });
     </script>
 </body>
-<!-- 引入 uuid 库 -->
-<script src="https://cdn.jsdelivr.net/npm/uuid/dist/umd/uuidv4.min.js"></script>
 
 </html>

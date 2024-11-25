@@ -1659,13 +1659,15 @@
                 let { noteID, noteTitle } = resp.result;
                 noteTitle = noteTitle ? noteTitle + " 的笔记" : "笔记";
                 let badurl = window.location.origin;
+                let origin = window.location.origin;
                 if (badurl.endsWith("/")) {
                     badurl = badurl + "404";
                 }
                 else {
                     badurl = badurl + "/404";
+                    origin = origin + "/";
                 }
-                const noteUrl = noteID ? `${backend_yingwu}${Page_Blog_Write_Through}?id=${noteID}&title=${noteTitle}` : badurl
+                const noteUrl = noteID ? `${origin}${Page_Blog_Write_Through}?id=${noteID}&title=${noteTitle}` : badurl
 
                 // 获取 iframe 元素
                 const iframe = document.getElementById('note-iframe');

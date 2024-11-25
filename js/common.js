@@ -182,7 +182,7 @@ const authorize = async () => {
                 localStorage.setItem('blog_website_login', "true");
                 localStorage.setItem('blog_website_login_userid', userID);
                 freshPage();
-                return userID;
+                return { userID };
             }
             return false;
         }

@@ -88,96 +88,111 @@ const freshPage = () => {
 }
 
 const authorize = async () => {
-    try {
-        freshPage();
-        // 获取 URL 参数
-        const urlParams = new URLSearchParams(window.location.search);
-        const code = urlParams.get('code');
-        const state = urlParams.get('state');
-        const prevState = localStorage.getItem("state");
+    freshPage();
+    // 获取 URL 参数
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+    const state = urlParams.get('state');
+    const prevState = localStorage.getItem("state");
 
-        if (state && state !== prevState) {
-            console.log("state changed.");
-            window.location.href = window.location.origin;
-            return false; // 状态校验失败，返回 false
+    if (state && state !== prevState) {
+        console.log("state changed.");
+        window.location.href = window.location.origin;
+        return false; // 状态校验失败，返回 false
+    }
+
+    // 检查参数是否存在
+    if (code && state) {
+        // 显示加载弹窗
+        const loadingModal = document.getElementById('loadingModal');
+        if (loadingModal) {
+            loadingModal.style.display = 'block';
         }
 
-        // 检查参数是否存在
-        if (code && state) {
-            // 显示加载弹窗
-            const loadingModal = document.getElementById('loadingModal');
+        // 准备后端 URL
+        const currentUrl = window.location.href;
+        const url = new URL(currentUrl); // 创建 URL 对象
+        const tempUrl = url.origin + url.pathname;
+        const baseUrl = tempUrl.endsWith('/') ? tempUrl.slice(0, -1) : tempUrl; // 如果末尾有 '/', 就去掉
+
+        // 调用后端接口
+        try {
+            const response = await $.ajax({
+                url: backend_url + '/auth',
+                type: 'POST',
+                xhrFields: {
+                    withCredentials: true,
+                },
+                data: { code },
+            });
+
+            const res = response ? 'true' : 'false';
+            localStorage.setItem('blog_website_login', res);
+            if (response && response.id) {
+                localStorage.setItem('blog_website_login_userid', response.id);
+            }
+            console.log('授权结果：' + res);
+
+            document.body.classList.add('disabled');
+            freshPage();
+            document.body.classList.remove('disabled');
+
+            // 隐藏加载弹窗
             if (loadingModal) {
-                loadingModal.style.display = 'block';
+                loadingModal.style.display = 'none';
             }
 
-            // 准备后端 URL
-            const currentUrl = window.location.href;
-            const url = new URL(currentUrl); // 创建 URL 对象
-            const tempUrl = url.origin + url.pathname;
-            const baseUrl = tempUrl.endsWith('/') ? tempUrl.slice(0, -1) : tempUrl; // 如果末尾有 '/', 就去掉
-
-            // 调用后端接口
-            try {
-                const response = await $.ajax({
-                    url: backend_url + '/auth',
-                    type: 'POST',
-                    xhrFields: {
-                        withCredentials: true,
-                    },
-                    data: { code },
-                });
-
-                const res = response ? 'true' : 'false';
-                localStorage.setItem('blog_website_login', res);
-                if (response && response.id) {
-                    localStorage.setItem('blog_website_login_userid', response.id);
-                }
-                console.log('授权结果：' + res);
-
-                document.body.classList.add('disabled');
-                freshPage();
-                document.body.classList.remove('disabled');
-
-                // 隐藏加载弹窗
-                if (loadingModal) {
-                    loadingModal.style.display = 'none';
-                }
-
-                if (!response) { // 授权失败
-                    alert("您不在白名单当中，请联系网站管理员");
-                    return false;
-                }
-
-                // 重定向到原始页面
-                window.location.href = baseUrl.toString();
-                return {
-                    userID: response.id?response.id:''
-                };
-            } catch (error) {
-                // AJAX 错误处理
-                if (loadingModal) {
-                    loadingModal.style.display = 'none';
-                }
-
-                if (error.status === 500) {
-                    console.error("服务器异常：", error.responseText);
-                    alert(error.responseText);
-                } else {
-                    console.error("Error sending string:", error.statusText || error.message);
-                }
-
-                window.location.href = baseUrl.toString();
+            if (!response) { // 授权失败
+                alert("您不在白名单当中，请联系网站管理员");
                 return false;
             }
-        }
-        const status = localStorage.getItem('blog_website_login');
-        return status === "true" ?
-            {
-                userID: localStorage.getItem('blog_website_login_userid') ? localStorage.getItem('blog_website_login_userid') : null
-            } :
-            false;
 
-    } catch (err) {
+            // 重定向到原始页面
+            window.location.href = baseUrl.toString();
+            return {
+                userID: response.id?response.id:''
+            };
+        } catch (error) {
+            // AJAX 错误处理
+            if (loadingModal) {
+                loadingModal.style.display = 'none';
+            }
+
+            if (error.status === 500) {
+                console.error("服务器异常：", error.responseText);
+                alert(error.responseText);
+            } else {
+                console.error("Error sending string:", error.statusText || error.message);
+            }
+
+            window.location.href = baseUrl.toString();
+            return false;
+        }
+    }
+
+    //
+    try {
+        const response = await fetch(`${backend_yingwu}${API_CheckCookie}`, {
+            credentials: 'include'
+        });
+        if (response.ok) {
+            const data = await response.json();
+            const { userID } = data;
+            if (userID) {
+                localStorage.setItem('blog_website_login', "true");
+                localStorage.setItem('blog_website_login_userid', userID);
+                freshPage();
+                return userID;
+            }
+            return false;
+        }
+        else {
+            localStorage.setItem('blog_website_login', "false");
+            localStorage.removeItem('blog_website_login_userid');
+            freshPage();
+            return false;
+        }
+    }catch (err) {
         console.error("Unexpected error during authorization:", err);
         return false;
     }

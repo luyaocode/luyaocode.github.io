@@ -17,6 +17,7 @@ const Page_Blog_Update = "/md/page/update";// 更新界面
 const Page_Blog_Write = "/md/page/write";//写作界面
 const Page_Blog_Write_Through = "/md/page/write-through";// 笔记界面
 const Page_Yingwu_Home = "/YingWuNetdisk/home";//云盘界面
+const API_CheckCookie = "/check_cookie";//检查登录状态
 
 // 服务器状态码
 const StatusCode = {

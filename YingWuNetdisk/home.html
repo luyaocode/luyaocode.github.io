@@ -1249,14 +1249,14 @@
             let btnLock;
             if (locked) {
                 btnLock = `
-                <button class="btn btn-success" onclick="lockFile(${record.hash},false)">
-                    <i class="bi bi-lock-open"></i>
+                <button class="btn btn-danger" onclick="lockFile('${record.hash}',false)">
+                    <i class="bi bi-lock"></i>
                 </button>
             `;
             } else {
                 btnLock = `
-                    <button class="btn btn-danger" onclick="lockFile(${record.hash},true)">
-                        <i class="bi bi-lock"></i>
+                    <button class="btn btn-success" onclick="lockFile('${record.hash}',true)">
+                        <i class="bi bi-lock-open"></i>
                     </button>
                 `;
             }

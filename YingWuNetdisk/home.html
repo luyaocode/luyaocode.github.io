@@ -1657,34 +1657,34 @@
         }
 
         // 请求笔记id
+        let badurl = window.location.origin;
+        if (badurl.endsWith("/")) {
+            badurl = badurl + "404";
+        }
+        else {
+            badurl = badurl + "/404";
+            origin = origin + "/";
+        }
+        const iframe = document.getElementById('note-iframe');
         try {
             const requrl = `${backend_yingwu}/files/note_info/${fileID}`;
             const response = await fetch(requrl, {
                 credentials: 'include'
             });
-
             // 检查响应状态
             if (response.ok) {
                 const resp = await response.json();
                 let { noteID, noteTitle } = resp.result;
                 noteTitle = noteTitle ? noteTitle + " 的笔记" : "笔记";
-                let badurl = window.location.origin;
                 let origin = window.location.origin;
-                if (badurl.endsWith("/")) {
-                    badurl = badurl + "404";
-                }
-                else {
-                    badurl = badurl + "/404";
-                    origin = origin + "/";
-                }
                 const noteUrl = noteID ? `${origin}${Page_Blog_Write_Through}?id=${noteID}&title=${noteTitle}` : badurl
-
-                // 获取 iframe 元素
-                const iframe = document.getElementById('note-iframe');
                 iframe.src = noteUrl;
             }
+            else {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
         } catch (err) {
-            console.error(err);
+            iframe.src = badurl;
         }
     }
 

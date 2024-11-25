@@ -203,6 +203,10 @@
                     padding: 1px 2px;
                     ">提交</spans></button>
                     <!-- <button id="return-btn">放弃</button> -->
+                    <button id="refresh-btn"><span style="
+                        white-space: nowrap;
+                        padding: 1px 2px;
+                        ">刷新</spans></button>
                 </div>
             </header>
             <div class="btns">
@@ -641,6 +645,10 @@
             // passwdDialog.style.display = 'flex';
             publish();
         });
+
+        $("#refresh-btn").click(() => {
+            location.reload();
+        })
     </script>
 </body>
 

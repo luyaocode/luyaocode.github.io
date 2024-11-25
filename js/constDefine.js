@@ -8,15 +8,15 @@ const backend_yingwu = "https://api.chaosgomoku.fun:8080";
 // const backend_yingwu = "http://localhost:8080";
 
 // url
-const Homepage = "/";
-const NotFound = "404";
-const Page_Blog_Home = "/blog/home";
-const Page_Blog_Blog = "/md/page/detail";
-const Page_Blog_Setting = "/blog/setting";
-const Page_Blog_Update = "/md/page/update";
-const Page_Blog_Write = "/md/page/write";
-const Page_Blog_Write_Through = "/md/page/write-through";
-const Page_Yingwu_Home = "/YingWuNetdisk/home";
+const Homepage = "/";//网站主界面
+const NotFound = "404";//404界面
+const Page_Blog_Home = "/blog/home";// 博客主界面
+const Page_Blog_Blog = "/md/page/detail";// 博客阅读界面
+const Page_Blog_Setting = "/blog/setting";// 设置界面
+const Page_Blog_Update = "/md/page/update";// 更新界面
+const Page_Blog_Write = "/md/page/write";//写作界面
+const Page_Blog_Write_Through = "/md/page/write-through";// 笔记界面
+const Page_Yingwu_Home = "/YingWuNetdisk/home";//云盘界面
 
 // 服务器状态码
 const StatusCode = {

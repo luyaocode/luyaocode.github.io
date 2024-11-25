@@ -1491,7 +1491,7 @@
             return response;
         } catch (error) {
             console.error(error);
-            showToast("删除失败", 'top-right', 'bg-warning');
+            showToast("删除失败", 'top-right', 'bg-danger');
             return [];
         }
     }
@@ -2532,6 +2532,7 @@
         } catch (error) {
             closePreview();
             console.error("加载PDF失败：", error);
+            showToast("加载PDF失败", 'top-right', 'bg-warning')
         }
     }
 

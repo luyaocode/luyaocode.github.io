@@ -667,7 +667,6 @@
                                 <th>大小</th>
                                 <th>上传者</th>
                                 <th>过期时间</th>
-                                <th>状态</th>
                                 <th>操作</th>
                             </tr>
                         </thead>
@@ -1970,7 +1969,13 @@
             const row = document.createElement('tr');
             const size = (file.size / (1024 * 1024)).toFixed(2);
             let strExpired = "";
-            const lockedStatus = file.locked ? "已锁定" : "";
+            let operationBtn = `<button class="btn btn-primary btn-sm" onclick="downloadFile('${file.hash}')">下载</button>`;
+
+            let lockedStatus = "";
+            if (file.locked) {
+                lockedStatus = `<i style="color:red" class="fas fa-lock"></i>`;
+                operationBtn = "";
+            }
             let color = "white";
             if (file.uploaded_by < 0) {
                 uploadedBy = "匿名"
@@ -1982,22 +1987,6 @@
                 if (!file.expired_at.Valid) {
                     strExpired = "永久有效";
                     color = "green";
-                    row.innerHTML = `
-                        <td>
-                            <a href="javascript:void(0);" onclick="previewFile('${file.hash}')">
-                                <span class="file-name">${file.filename}</span>
-                            </a>
-                        </td>
-                        <td><small>${size} MB</small></td>
-                        <td><small>${uploadedBy}</small></td>
-                        <td>
-                            <span style="color:${color}" class="expired-time">${strExpired}</span>
-                        </td>
-                        <td><span style="color:red;" class="lock-status">${lockedStatus}</span></td>
-                        <td>
-                            <button class="btn btn-primary btn-sm" onclick="downloadFile('${file.hash}')">下载</button>
-                        </td>
-                    `;
                 }
                 else {
                     const expiredAt = new Date(`${file.expired_at.Time}`);
@@ -2011,18 +2000,6 @@
                         const minutes = diffInMinutes % 60; // 分钟
                         strExpired = `${hours}小时${minutes}分后`
                         color = "red";
-                        row.innerHTML = `
-                            <td><a href="javascript:void(0);" onclick="previewFile('${file.hash}')">${file.filename}</a></td>
-                            <td><small>${size} MB</small></td>
-                            <td><small>${uploadedBy}</small></td>
-                            <td>
-                                <span style="color:${color}" class="expired-time">${strExpired}</span>
-                            </td>
-                            <td><span style="color:red;"  class="lock-status">${lockedStatus}</span></td>
-                            <td>
-                                <button class="btn btn-primary btn-sm" onclick="downloadFile('${file.hash}')">下载</button>
-                            </td>
-                        `;
                     }
                     else {
                         const diffInMinutes = Math.floor(0 - diffInMs / 60000); // 转换为分钟
@@ -2030,18 +2007,24 @@
                         const minutes = diffInMinutes % 60; // 分钟
                         strExpired = `已过期${hours}小时${minutes}分`
                         color = "gray";
-                        row.innerHTML = `
-                            <td><a href="javascript:void(0);" onclick="previewFile('${file.hash}')">${file.filename}</a></td>
-                            <td><small>${size} MB</small></td>
-                            <td>
-                                <span style="color:${color}" class="expired-time">${strExpired}</span>
-                            </td>
-                            <td><span style="color:red;"  class="lock-status">${lockedStatus}</span></td>
-                        `;
+                        operationBtn = '';
                     }
                 }
             }
 
+            row.innerHTML = `
+                <td>
+                    <a href="javascript:void(0);" onclick="previewFile('${file.hash}')">
+                        <span class="file-name">${file.filename} ${lockedStatus}</span>
+                    </a>
+                </td>
+                <td><small>${size} MB</small></td>
+                <td><small>${uploadedBy}</small></td>
+                <td>
+                    <span style="color:${color}" class="expired-time">${strExpired}</span>
+                </td>
+                <td>${operationBtn}</td>
+            `;
             uploadedFileList.appendChild(row);
         });
     }

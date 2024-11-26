@@ -1251,13 +1251,13 @@
             let btnLock;
             if (locked) {
                 btnLock = `
-                <button class="btn btn-danger" onclick="lockFile('${record.hash}',false)">
+                <button class="btn btn-sm btn-success" onclick="lockFile('${record.hash}',false)">
                     <i class="fas fa-lock"></i>
                 </button>
             `;
             } else {
                 btnLock = `
-                    <button class="btn btn-success" onclick="lockFile('${record.hash}',true)">
+                    <button class="btn btn-sm btn-warning" onclick="lockFile('${record.hash}',true)">
                         <i class="fas fa-unlock"></i>
                     </button>
                 `;
@@ -1271,7 +1271,7 @@
                 <td>${uploadedAt}</td>
                 <td>${btnLock}</td>
                 <td>
-                <button class="btn btn-primary btn-sm" onclick="deleteFile('${record.hash}')">删除</button>
+                <button class="btn btn-danger btn-sm" onclick="deleteFile('${record.hash}')">删除</button>
                 </td>
                 `;
             uploadTableBody.appendChild(row);

@@ -1179,15 +1179,16 @@
 
     async function handleLockFiles(fileIDs, status) {
         const response = await lockFiles(fileIDs, status);
+        const operation = status ? "锁定" : "解锁";
         if (response.ok) {
             const data = await response.json();
             const { successFiles, failureCount } = data.result;
             if (successFiles && successFiles.length > 0) {
                 if (!failureCount) {
-                    showToast("操作成功");
+                    showToast("已" + operation);
                 }
                 else {
-                    showToast("成功 " + successFiles.length + "个，失败 " + failureCount + "个");
+                    showToast("成功" + operation + successFiles.length + "个，失败 " + failureCount + "个");
                 }
                 const status = localStorage.getItem("blog_website_login");
                 if (status === "true") {
@@ -1195,11 +1196,11 @@
                 }
             }
             else {
-                showToast("操作失败", "top-right", "bg-warning");
+                showToast(operation + "失败", "top-right", "bg-warning");
             }
         }
         else {
-            showToast("操作失败", "top-right", "bg-warning");
+            showToast(operation + "失败", "top-right", "bg-warning");
         }
     }
 

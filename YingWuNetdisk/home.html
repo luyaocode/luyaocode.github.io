@@ -146,6 +146,7 @@
             border: 1px solid white;
         }
 
+        .lock-status,
         .expired-time {
             font-size: 12px;
             white-space: nowrap;
@@ -666,6 +667,7 @@
                                 <th>大小</th>
                                 <th>上传者</th>
                                 <th>过期时间</th>
+                                <th>状态</th>
                                 <th>操作</th>
                             </tr>
                         </thead>
@@ -1715,6 +1717,7 @@
                 }
                 else if (downloadResponse.status === 403) {
                     showToast("文件已被所有者锁定", 'top-right', 'bg-warning');
+                    closePreview();
                     return;
                 }
                 else {
@@ -1966,6 +1969,7 @@
             const row = document.createElement('tr');
             const size = (file.size / (1024 * 1024)).toFixed(2);
             let strExpired = "";
+            const lockedStatus = file.locked ? "已锁定" : "";
             let color = "white";
             if (file.uploaded_by < 0) {
                 uploadedBy = "匿名"
@@ -1988,6 +1992,7 @@
                         <td>
                             <span style="color:${color}" class="expired-time">${strExpired}</span>
                         </td>
+                        <td><span style="color:red;" class="lock-status">${lockedStatus}</span></td>
                         <td>
                             <button class="btn btn-primary btn-sm" onclick="downloadFile('${file.hash}')">下载</button>
                         </td>
@@ -2012,6 +2017,7 @@
                             <td>
                                 <span style="color:${color}" class="expired-time">${strExpired}</span>
                             </td>
+                            <td><span style="color:red;"  class="lock-status">${lockedStatus}</span></td>
                             <td>
                                 <button class="btn btn-primary btn-sm" onclick="downloadFile('${file.hash}')">下载</button>
                             </td>
@@ -2029,6 +2035,7 @@
                             <td>
                                 <span style="color:${color}" class="expired-time">${strExpired}</span>
                             </td>
+                            <td><span style="color:red;"  class="lock-status">${lockedStatus}</span></td>
                         `;
                     }
                 }

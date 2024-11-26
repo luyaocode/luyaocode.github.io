@@ -1615,6 +1615,9 @@
                     mergeDownloadedFilesHistory([...arr, downloadedFile]);
                 }
             }
+            else if (downloadResponse.status === 403) {
+                showToast("文件已被所有者锁定", 'top-right', 'bg-warning');
+            }
             else {
                 showToast("下载失败", 'top-right', 'bg-warning');
             }
@@ -1709,6 +1712,10 @@
                             await cache.put(requestUrl, responseWithMetadata);
                         }
                     }
+                }
+                else if (downloadResponse.status === 403) {
+                    showToast("文件已被所有者锁定", 'top-right', 'bg-warning');
+                    return;
                 }
                 else {
                     showToast("文件不存在", 'top-right', 'bg-warning');

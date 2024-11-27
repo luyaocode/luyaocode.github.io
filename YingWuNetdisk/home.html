@@ -243,6 +243,12 @@
             margin-left: 10%;
         }
 
+        .confirm-delete-modal {
+            max-width: 60%;
+            margin-left: 20%;
+            margin-top: 10%;
+        }
+
         .modal-body {
             overflow: auto;
         }
@@ -1019,6 +1025,41 @@
             </div>
         </div>
     </div>
+    <!-- 删除文件警告模态框 -->
+    <div class="modal confirm-delete-modal" id="confirmDeleteFileModal" tabindex="-1" role="dialog"
+        aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content border-danger">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="confirmDeleteModalLabel">
+                        <i class="fas fa-exclamation-triangle"></i> 确认删除文件
+                    </h5>
+                </div>
+                <div class="modal-body">
+                    <div class="container mt-2">
+                        <p><strong>警告：</strong> 您确定要删除文件吗？此操作不可撤销。</p>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th style="width: 5%;">序号</th> <!-- 序号列，减小宽度 -->
+                                    <th>文件名</th> <!-- 文件名列 -->
+                                </tr>
+                            </thead>
+                            <tbody id="delete-file-list">
+                                <!-- 动态生成的文件列表将插入到这里 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="btnCancelDeleteFile" class="btn btn-secondary"
+                        data-bs-dismiss="modal">取消</button>
+                    <button type="button" id="btnConfirmDeleteFile" class="btn btn-danger">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
 </body>
 <script src="../js/jquery.min.js"></script>
@@ -1176,6 +1217,19 @@
         return selectedHashes;
     }
 
+    // 获取所有选中的文件哈希、文件名
+    function getSelectedFileInfo() {
+        const selectedFiles = [];
+        const fileCheckboxes = document.querySelectorAll('.file-select:checked'); // 获取所有选中的复选框
+        fileCheckboxes.forEach(checkbox => {
+            // 获取当前选中行的文件哈希和文件名
+            const hash = checkbox.getAttribute('data-hash');
+            const filename = checkbox.closest('tr').querySelector('td:nth-child(2)').textContent; // 获取文件名
+            selectedFiles.push({ hash, filename });
+        });
+        return selectedFiles;
+    }
+
     async function handleLockFiles(fileIDs, status) {
         const response = await lockFiles(fileIDs, status);
         const operation = status ? "锁定" : "解锁";
@@ -1231,9 +1285,9 @@
 
     // 批量删除按钮点击事件
     document.getElementById('btnBatchDeleteUploadedHistory').addEventListener('click', async function () {
-        const selectedFiles = getSelectedFileHashes();
+        const selectedFiles = getSelectedFileInfo();
         if (selectedFiles.length > 0) {
-            handleDeleteFiles(selectedFiles);
+            openConfirmDeleteFileModal(selectedFiles);
         } else {
             showToast("请选择要删除的文件", "top-right", 'bg-info');
         }
@@ -1271,7 +1325,7 @@
                 <td>${uploadedAt}</td>
                 <td>${btnLock}</td>
                 <td>
-                <button class="btn btn-danger btn-sm" onclick="deleteFile('${record.hash}')">删除</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteFile({hash: '${record.hash}', filename: '${record.filename}'})">删除</button>
                 </td>
                 `;
             uploadTableBody.appendChild(row);
@@ -1525,10 +1579,22 @@
         return handleLockFiles(fileIDs, status);
     }
 
-    async function deleteFile(fileID) {
-        let fileIDs = [];
-        fileIDs.push(fileID);
-        return handleDeleteFiles(fileIDs);
+    async function onConfirmDeleteFileBtnClicked() {
+        const modal = document.getElementById("confirmDeleteFileModal");
+        const hashes = JSON.parse(modal.dataset.hashes);
+        if (hashes) {
+            await handleDeleteFiles(hashes);
+        }
+        else {
+            showToast("没有可删除的文件", "top-right", "bg-info");
+        }
+        confirmDeleteFileModal.hide();
+    }
+
+    async function deleteFile(file) {
+        let files = [];
+        files.push(file);
+        openConfirmDeleteFileModal(files);
     }
 
     async function deleteFiles(fileIDs) {
@@ -2138,9 +2204,22 @@
         keyboard: false      // 禁止按下 ESC 键关闭模态框
     });
 
+    const confirmDeleteFileModal = new bootstrap.Modal(document.getElementById('confirmDeleteFileModal'), {
+        backdrop: 'static',  // 禁止点击外部区域关闭模态框
+        keyboard: false      // 禁止按下 ESC 键关闭模态框
+    });
+    $('#confirmDeleteFileModal').on('hidden.bs.modal', function () {
+        this.dataset.hashes = '';
+    });
+
     function openConfirmClearCacheModal() {
         confirmClearCacheModal.show();
         renderCacheDetails();
+    }
+
+    function openConfirmDeleteFileModal(files) {
+        confirmDeleteFileModal.show();
+        renderDeleteFiles(files);
     }
 
     const clearCache = async () => {
@@ -2229,6 +2308,39 @@
         });
     }
 
+    function renderDeleteFiles(files) {
+        const deleteFileList = document.getElementById("delete-file-list");
+        deleteFileList.innerHTML = '';  // 清空之前的内容
+        const hashes = [];
+
+        // 遍历文件数组，生成表格行
+        files.forEach((file, index) => {
+            const row = document.createElement('tr');  // 创建表格行 <tr>
+
+            // 创建序号列
+            const serialNumberCell = document.createElement('td');
+            serialNumberCell.textContent = index + 1;  // 序号从 1 开始
+            row.appendChild(serialNumberCell);  // 将序号列添加到行中
+
+            // 创建文件名列
+            const filenameCell = document.createElement('td');
+            filenameCell.textContent = file.filename;
+            filenameCell.style.fontWeight = "bold";
+            row.appendChild(filenameCell);
+
+            // 将该行添加到表格中
+            deleteFileList.appendChild(row);
+
+            // 将文件的hash存储到数组中
+            hashes.push(file.hash);
+        });
+
+        // 将hashes数组存储到模态框的dataset中
+        const modal = document.getElementById("confirmDeleteFileModal");
+        modal.dataset.hashes = JSON.stringify(hashes);
+    }
+
+
     function requestUploadedHistory() {
         const status = localStorage.getItem("blog_website_login");
         if (status === "true") {
@@ -2295,6 +2407,9 @@
         $("#btnOpenConfirmClearModal").click(openConfirmClearCacheModal);
         $("#btnConfirmClearCache").click(clearCache);
         $("#btnCancelClearCache").click(() => confirmClearCacheModal.hide());
+        $("#btnCancelDeleteFile").click(() => confirmDeleteFileModal.hide());
+        $("#btnConfirmDeleteFile").click(onConfirmDeleteFileBtnClicked);
+
     });
 
 </script>

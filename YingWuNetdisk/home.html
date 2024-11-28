@@ -362,14 +362,21 @@
             flex-direction: column;
         }
 
-        #pdf-canvas-container {
+        #canvas_toolbar_container {
             width: 70%;
             flex-grow: 1;
             overflow: auto;
             position: relative;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: start;
+        }
+
+        #pdf-canvas-container {
+            width: 100%;
+            flex-grow: 1;
+            overflow: auto;
         }
 
         #pdf-canvas {
@@ -436,6 +443,7 @@
             border: none;
         }
 
+        #toolbar-top-container,
         #toggle-note-btn-container,
         #toggle-outline-btn-container {
             position: relative;
@@ -456,7 +464,7 @@
             padding: 10px 4px;
             cursor: pointer;
             font-size: 16px;
-            color: #cacaca;
+            color: #b6b6b6;
             border-radius: 3px;
             z-index: 1000;
         }
@@ -481,12 +489,14 @@
             padding: 10px 4px;
             cursor: pointer;
             font-size: 16px;
-            color: #cacaca;
+            color: #b6b6b6;
             border-radius: 3px;
             z-index: 1000;
         }
 
         #tool-sidebar {
+            display: flex;
+            flex-direction: row;
             position: absolute;
             top: 0;
             left: 0;
@@ -496,11 +506,12 @@
 
         #tool-sidebar button {
             border: none;
-            color: #9c9c9c;
-            padding: 8px 2px;
+            color: #b6b6b6;
             cursor: pointer;
             font-size: 20px;
             border-radius: 3px;
+            margin-right: 10px;
+            background-color: rgba(129, 129, 129, 0.2);
         }
 
         #resizer {
@@ -526,7 +537,7 @@
             transition: transform 0.3s ease;
         }
 
-        .btn-toggle-note.expand,
+        .btn-toggle-note.expand i,
         .tool-btn.expand i {
             transform: rotate(180deg);
         }
@@ -743,31 +754,35 @@
                         <div id="outline-list"></div>
                     </div>
                     <div id="toggle-outline-btn-container">
-                        <button id="btnTogglePdfOutline" class="tool-btn">
+                        <button id="btnTogglePdfOutline" class="tool-btn" title="目录">
                             <i class="fas fa-chevron-right"></i>
                         </button>
-                        <div id="tool-sidebar">
-                            <button id="zoom-in">
-                                <i class="bi bi-plus-circle"></i>
-                            </button>
-                            <button id="zoom-out">
-                                <i class="bi bi-dash-circle"></i>
-                            </button>
-                            <button id="reset-zoom">
-                                <i class="bi bi-arrow-counterclockwise"></i>
-                            </button>
-                        </div>
                         <div id="resizer"></div>
                     </div>
-                    <div id="pdf-canvas-container">
-                        <canvas id="pdf-canvas"></canvas>
+                    <div id="canvas_toolbar_container">
+                        <div id="toolbar-top-container">
+                            <div id="tool-sidebar">
+                                <button id="zoom-in" title="放大">
+                                    <i class="bi bi-plus-circle"></i>
+                                </button>
+                                <button id="zoom-out" title="缩小">
+                                    <i class="bi bi-dash-circle"></i>
+                                </button>
+                                <button id="reset-zoom" title="还原">
+                                    <i class="bi bi-arrow-counterclockwise"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div id="pdf-canvas-container">
+                            <canvas id="pdf-canvas"></canvas>
+                        </div>
                     </div>
                     <div id="toggle-note-btn-container">
-                        <button id="btnTogglePdfNote" class="btn-toggle-note">
+                        <button id="btnTogglePdfNote" class="btn-toggle-note" title="笔记">
                             <i class="fas fa-chevron-left"></i>
                         </button>
                     </div>
-                    <iframe id="note-iframe">
+                    <iframe id="note-iframe" class="d-none">
                     </iframe>
                 </div>
                 <div id="pdf-toolbar" class="d-flex flex-wrap justify-content-center align-items-center p-2">
@@ -2865,9 +2880,11 @@
         this.classList.toggle('expand');
         const noteContainer = $("#note-iframe");
         if (this.classList.contains("expand")) {
-            noteContainer.css("display", "flex");
+            // noteContainer.css("display", "flex");
+            noteContainer.toggleClass("d-none d-block");
         } else {
-            noteContainer.css("display", "none");
+            // noteContainer.css("display", "none");
+            noteContainer.toggleClass("d-block d-none");
         }
     });
 

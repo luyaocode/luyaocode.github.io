@@ -579,6 +579,7 @@
             -webkit-box-orient: vertical;
             overflow: hidden;
             text-overflow: ellipsis;
+            word-break: break-all;
         }
     </style>
     <script src="../js/cookieConsent.js"></script>
@@ -659,7 +660,7 @@
         <div class="row g-3">
             <!-- 上传文件列表 -->
             <div id="upload-area" class="col-md-8 upload-area">
-                <div class="file-list">
+                <div id="upload-files-table-container" class="file-list">
                     <table id="upload-files-table" class="table">
                         <thead>
                             <tr>
@@ -673,9 +674,9 @@
                             <!-- 动态添加上传文件信息 -->
                         </tbody>
                     </table>
-                    <div class="text-right">
-                        <button id="uploadFileButton" class="btn btn-primary btn-sm">上传文件</button>
-                    </div>
+                </div>
+                <div class="text-right">
+                    <button id="uploadFileButton" class="btn btn-primary btn-sm">上传文件</button>
                 </div>
                 <h6 class="mt-2">已上传文件</h6>
                 <div id="uploaded-files-table-container" class="file-list">
@@ -1383,6 +1384,7 @@
         $("#dropZone").toggleClass("night-mode");
         $("#upload-area").toggleClass("night-mode");
         $("#uploaded-files-table-container").toggleClass("night-mode");
+        $("#upload-files-table-container").toggleClass("night-mode");
         $("#uploaded_files_pagination").toggleClass("night-mode");
         $("#download-area").toggleClass("night-mode");
         $("#downloadedRank").toggleClass("night-mode");
@@ -1517,7 +1519,9 @@
             fileNameCell.appendChild(fileNameSpan);
 
             const fileSizeCell = document.createElement('td');
-            fileSizeCell.textContent = `${(files[i].size / (1024 * 1024)).toFixed(2)} MB`;
+            const sizeSmall = document.createElement('small');
+            sizeSmall.textContent = `${(files[i].size / (1024 * 1024)).toFixed(2)} MB`;
+            fileSizeCell.appendChild(sizeSmall);
 
             const progressCell = document.createElement('td');
             const progressBar = document.createElement('div');

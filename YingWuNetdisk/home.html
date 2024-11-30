@@ -580,7 +580,7 @@
             overflow: hidden;
             text-overflow: ellipsis;
             word-break: break-all;
-            min-width: fit-content;
+            min-width: 200px;
         }
 
         /* 进度条 */
@@ -666,23 +666,25 @@
         <div class="row g-3">
             <!-- 上传文件列表 -->
             <div id="upload-area" class="col-md-8 upload-area">
-                <div id="upload-files-table-container" class="file-list">
-                    <table id="upload-files-table" class="table">
-                        <thead>
-                            <tr>
-                                <th>文件名</th>
-                                <th>大小</th>
-                                <th>进度</th>
-                                <th>操作</th>
-                            </tr>
-                        </thead>
-                        <tbody id="uploadFileList">
-                            <!-- 动态添加上传文件信息 -->
-                        </tbody>
-                    </table>
-                </div>
-                <div class="text-right">
-                    <button id="uploadFileButton" class="btn btn-primary btn-sm">上传文件</button>
+                <div id="upload-container" class="d-none">
+                    <div id="upload-files-table-container" class="file-list">
+                        <table id="upload-files-table" class="table">
+                            <thead>
+                                <tr>
+                                    <th>文件名</th>
+                                    <th>大小</th>
+                                    <th>进度</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="uploadFileList">
+                                <!-- 动态添加上传文件信息 -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="text-right">
+                        <button id="uploadFileButton" class="btn btn-primary btn-sm">上传文件</button>
+                    </div>
                 </div>
                 <h6 class="mt-2">已上传文件</h6>
                 <div id="uploaded-files-table-container" class="file-list">
@@ -733,7 +735,7 @@
 
                 <h6 class="mt-2">文件下载排名</h6>
                 <div id="downloadedRank" class="file-list">
-                    <canvas id="downloadChart" width="400" height="300"></canvas>
+                    <canvas id="downloadChart" width="400" height="250"></canvas>
                 </div>
 
             </div>
@@ -1495,10 +1497,12 @@
     dropZone.addEventListener('drop', (e) => {
         e.preventDefault();
         dropZone.classList.remove('dragover');
+        $("#upload-container").removeClass("d-none");
         handleFiles(e.dataTransfer.files);
     });
 
     fileInput.addEventListener('change', (e) => {
+        $("#upload-container").removeClass("d-none");
         handleFiles(e.target.files);
     });
 

@@ -686,6 +686,13 @@
             window.location.href = redirectUrl;
         }
         $(function () {
+            let badurl = window.location.origin;
+            if (badurl.endsWith("/")) {
+                badurl = badurl + NotFound;
+            }
+            else {
+                badurl = badurl + '/' + NotFound;
+            }
             var testEditormdView, testEditormdView2;
             // 发送 POST 请求到服务器
             var url = backend_url + "/blog";
@@ -697,6 +704,9 @@
                     id: id,
                 },
                 success: function (response) {
+                    if (!response) {
+                        window.location.href = badurl;
+                    }
                     // document.getElementById("sidebar").style.display = 'none';
                     let { title, author, content, time, id } = response;
                     title = title === '' ? '无标题' : title;
@@ -738,6 +748,7 @@
                 },
                 error: function (xhr, status, error) {
                     console.error("Error sending string:", error);
+                    window.location.href = badurl;
                 }
             });
             //console.log("返回一个 jQuery 实例 =>", testEditormdView);

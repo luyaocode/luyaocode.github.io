@@ -1482,7 +1482,7 @@
     const uploadFileList = document.getElementById('uploadFileList');
     const uploadedFileList = document.getElementById('uploadedFileList');
     const downloadFileList = document.getElementById('downloadFileList');
-    const maxFileSize = 100 * 1024 * 1024; // 100MB
+    const maxFileSize = 1 * 1024 * 1024 * 1024; // 1GB
     let selectedFiles = [];
 
     dropZone.addEventListener('dragover', (e) => {
@@ -1509,7 +1509,7 @@
     function handleFiles(files) {
         for (let i = 0; i < files.length; i++) {
             if (files[i].size > maxFileSize) {
-                showToast(`${files[i].name} 超过最大上传限制 (100MB)`, "top-right", "bg-warning");
+                showToast(`${files[i].name} 超过最大上传限制 (1GB)`, "top-right", "bg-warning");
                 continue;
             }
             // 检查文件名是否重复

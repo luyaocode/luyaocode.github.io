@@ -30,7 +30,7 @@
 
         .page-link {
             padding: 5px 10px;
-            font-size: 14px;
+            font-size: 12px;
         }
 
         .navbar {
@@ -65,7 +65,7 @@
             border-radius: 5px;
             padding: 40px 10px;
             text-align: center;
-            margin-bottom: 10px;
+            /* margin-bottom: 10px; */
             position: relative;
             transition: background-color 0.3s;
             background-color: #e9f7ff;
@@ -86,7 +86,7 @@
         .file-list {
             max-height: 500px;
             overflow-y: auto;
-            margin-bottom: 10px;
+            /* margin-bottom: 10px; */
             background-color: #ffffff;
             border-radius: 5px;
             padding: 10px;
@@ -261,12 +261,18 @@
         .table {
             width: 100%;
             table-layout: auto;
+            margin-bottom: 0;
         }
 
         .table td,
         .table th {
             vertical-align: middle;
             max-width: 100%;
+            padding: 0.1rem 0.1rem;
+        }
+
+        .table td a {
+            text-decoration: none;
         }
 
         /* 无文本加载弹窗 */
@@ -686,7 +692,7 @@
                         <button id="uploadFileButton" class="btn btn-primary btn-sm">上传文件</button>
                     </div>
                 </div>
-                <h6 class="mt-2">已上传文件</h6>
+                <small class="mt-2">已上传文件</small>
                 <div id="uploaded-files-table-container" class="file-list">
                     <table id="uploaded-files-table" class="table">
                         <thead>
@@ -1419,7 +1425,7 @@
 <script>
     // 分页参数
     let currentUploadedPage = 1;  // 当前页
-    const UploadedFilesPerPage = 10;  // 每页显示的文件数
+    const UploadedFilesPerPage = 9;  // 每页显示的文件数
 
     // 更新分页信息
     function updateUploadedFilesPagination(totalCount, page) {
@@ -2077,7 +2083,7 @@
                 uploadedBy = "匿名"
             }
             else {
-                uploadedBy = "用户 " + file.uploaded_by
+                uploadedBy = file.uploaded_by
             }
             if (file.expired_at) {
                 if (!file.expired_at.Valid) {

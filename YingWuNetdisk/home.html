@@ -224,6 +224,7 @@
             flex-direction: column;
         }
 
+        #text-content,
         #image-content {
             display: none;
             flex-direction: column;
@@ -832,6 +833,17 @@
                         </button>
                     </div>
                     <img id="image-preview" class="img-fluid" alt="img-preview">
+                </div>
+            </div>
+            <div id="text-content">
+                <div class="d-flex flex-column">
+                    <div id="text-toolbar" class="d-flex justify-content-end flex-row align-items-center rounded"
+                        style="position: sticky; top:0">
+                        <button id="closePreview-text" class="btn btn-sm btn-danger">
+                            <i class="bi bi-x-circle"></i>
+                        </button>
+                    </div>
+                    <div id="text-preview"></div>
                 </div>
             </div>
         </div>
@@ -1744,7 +1756,9 @@
             if (cachedResponse) {
                 // 如果缓存中有文件，直接获取 Blob 和文件名
                 const cachedBlob = await cachedResponse.blob();
-                const fileExtension = cachedResponse.headers.get('X-File-Extension') || '';
+                let fileExtension = cachedResponse.headers.get('X-File-Extension') || '';
+                fileExtension = decodeURIComponent(fileExtension);
+
                 const cacheTimestamp = cachedResponse.headers.get('X-Cache-Timestamp');
                 const currentTime = Date.now();
                 const expirationTime = 30 * 24 * 60 * 60 * 1000;  // 设置过期时间（30天，单位：毫秒）
@@ -1801,6 +1815,7 @@
                         // 创建 Blob URL
                         const blobUrl = URL.createObjectURL(blob);
                         let fileExtension = fileName.substring(fileName.lastIndexOf('.') + 1);
+                        fileExtension = encodeURIComponent(fileExtension);
                         openPreview(fileExtension, blobUrl, fileID);
                         setTimeout(() => URL.revokeObjectURL(blobUrl), 60000 * 30);
 
@@ -2721,8 +2736,9 @@
             showImage(contentSrc);
         }
         else {
-            closePreview();
-            showToast("该文件格式暂不支持预览", 'top-right', 'bg-warning')
+            // closePreview();
+            // showToast("该文件格式暂不支持预览", 'top-right', 'bg-warning')
+            showText(contentSrc);
         }
     }
 
@@ -2885,6 +2901,8 @@
         document.getElementById("image-preview").src = "";
         $("#image-content").css("display", "none");
         $("#pdf-content").css("display", "none");
+        $("#text-content").css("display", "none");
+        document.getElementById("text-preview").innerText = '';
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         exitFullscreen();
         previewFileID = null;
@@ -2993,7 +3011,21 @@
     // 关闭图片预览
     document.getElementById('closePreview-img').addEventListener('click', closePreview);
 
-    //
+    // 文本预览
+    function showText(blobUrl) {
+        $("#text-content").css("display", "flex");
+
+        const reader = new FileReader();
+        reader.onload = function (event) {
+            const textContent = event.target.result;
+            document.getElementById('text-preview').innerText = textContent;
+        };
+        fetch(blobUrl)
+            .then(response => response.blob())  // 获取 Blob 数据
+            .then(blob => reader.readAsText(blob)) // 使用 FileReader 读取文本内容
+            .catch(error => console.error('Error reading blob:', error));
+    }
+    document.getElementById('closePreview-text').addEventListener('click', closePreview);
 </script>
 
 <!--注册回调、鉴权  -->

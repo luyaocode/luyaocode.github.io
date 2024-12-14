@@ -336,7 +336,7 @@
         #pdf-container {
             display: flex;
             flex-direction: row;
-            overflow: scroll;
+            overflow: auto;
             width: 100%;
         }
 
@@ -350,7 +350,7 @@
 
         #pdf-toolbar {
             position: sticky;
-            margin-top: 40px;
+            /* margin-top: 40px; */
             bottom: 0;
             z-index: 1000;
             background-color: #f7f7f7;
@@ -2838,7 +2838,7 @@
             } else if (pdfContainer.msRequestFullscreen) { // IE/Edge
                 pdfContainer.msRequestFullscreen();
             }
-            $("#pdf-toolbar").css("margin-top", "0px");
+            // $("#pdf-toolbar").css("margin-top", "0px");
         }
     }
     function toggleFullScreen() {
@@ -2858,7 +2858,7 @@
             } else if (document.msExitFullscreen) { // IE/Edge
                 document.msExitFullscreen();
             }
-            $("#pdf-toolbar").css("margin-top", "40px");
+            // $("#pdf-toolbar").css("margin-top", "40px");
         }
     }
     // 全屏按钮点击事件

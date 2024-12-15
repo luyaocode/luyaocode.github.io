@@ -594,6 +594,22 @@
         .progress {
             min-width: 60px;
         }
+
+        #uploaded_files_pagination {
+            margin: 0;
+        }
+
+        #uploaded_search_toolbar {
+            display: flex;
+        }
+
+        #pageInfo {
+            white-space: nowrap;
+        }
+
+        #uploaded_search_input_group {
+            margin: 10px;
+        }
     </style>
     <script src="../js/cookieConsent.js"></script>
 </head>
@@ -694,6 +710,34 @@
                     </div>
                 </div>
                 <small class="mt-2">已上传文件</small>
+                <div id="uploaded_search_toolbar">
+                    <!-- 分页控件 -->
+                    <ul class="pagination align-items-center" id="uploaded_files_pagination">
+                        <li class="page-item" id="prevPage">
+                            <a class="page-link no-focus" href="javascript:void(0);"
+                                onclick="changePage(currentUploadedPage - 1)" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item disabled" id="pageInfo">
+                            <small class="page-link">第 1 页 / 共 1 页</small>
+                        </li>
+                        <li class="page-item" id="nextPage">
+                            <a class="page-link no-focus" href="javascript:void(0);"
+                                onclick="changePage(currentUploadedPage + 1)" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    </ul>
+                    <div id="uploaded_search_input_group" class="input-group" style="width:auto;">
+                        <input type="text" id="keyword" class="form-control form-control-sm no-focus" placeholder="关键词"
+                            required data-bs-toggle="tooltip" data-bs-placement="bottom" title="请输入关键词">
+                        <div class="input-group-append">
+                            <button id="searchButton" class="btn btn-primary btn-sm ms-2">查询</button>
+                        </div>
+                    </div>
+                </div>
+
                 <div id="uploaded-files-table-container" class="file-list">
                     <table id="uploaded-files-table" class="table">
                         <thead>
@@ -708,24 +752,7 @@
                         <tbody id="uploadedFileList"></tbody>
                     </table>
                 </div>
-                <!-- 分页控件 -->
-                <ul class="pagination align-items-center" id="uploaded_files_pagination">
-                    <li class="page-item" id="prevPage">
-                        <a class="page-link" href="javascript:void(0);" onclick="changePage(currentUploadedPage - 1)"
-                            aria-label="Previous">
-                            <span aria-hidden="true">&laquo;</span>
-                        </a>
-                    </li>
-                    <li class="page-item disabled" id="pageInfo">
-                        <span class="page-link">第 1 页 / 共 10 页</span>
-                    </li>
-                    <li class="page-item" id="nextPage">
-                        <a class="page-link" href="javascript:void(0);" onclick="changePage(currentUploadedPage + 1)"
-                            aria-label="Next">
-                            <span aria-hidden="true">&raquo;</span>
-                        </a>
-                    </li>
-                </ul>
+
             </div>
 
 
@@ -1140,7 +1167,7 @@
         // 添加当前页 / 总页数文本
         const pageInfo = document.createElement('li');
         pageInfo.classList.add('page-item', 'disabled');
-        pageInfo.innerHTML = `<span class="page-link">第 ${currentUploadedFileHistoryPage} 页 / 共 ${totalPages} 页</span>`;
+        pageInfo.innerHTML = `<small class="page-link">第 ${currentUploadedFileHistoryPage} 页 / 共 ${totalPages} 页</small>`;
         pagination.appendChild(pageInfo);
 
         // 创建 "下一页" 按钮
@@ -1170,7 +1197,7 @@
         // 添加当前页 / 总页数文本
         const pageInfo = document.createElement('li');
         pageInfo.classList.add('page-item', 'disabled');
-        pageInfo.innerHTML = `<span class="page-link">第 ${currentDownloadedFileHistoryPage} 页 / 共 ${totalPages} 页</span>`;
+        pageInfo.innerHTML = `<small class="page-link">第 ${currentDownloadedFileHistoryPage} 页 / 共 ${totalPages} 页</small>`;
         pagination.appendChild(pageInfo);
 
         // 创建 "下一页" 按钮
@@ -1415,6 +1442,7 @@
         $("#download-area").toggleClass("night-mode");
         $("#downloadedRank").toggleClass("night-mode");
         $("#fileId").toggleClass("night-mode");
+        $("#keyword").toggleClass("night-mode");
         $(".modal-content").toggleClass("modal-night-mode");
         $(".table").toggleClass("modal-night-mode");
         $(".page-link").toggleClass("night-mode");
@@ -1454,7 +1482,8 @@
     // 切换分页
     function changePage(page) {
         if (page < 1) return;
-        fetch(`${backend_yingwu}/files?page=${page}&limit=${UploadedFilesPerPage}`,
+        const keyword = searchInput.value;
+        fetch(`${backend_yingwu}/files?keyword=${keyword}&page=${page}&limit=${UploadedFilesPerPage}`,
             {
                 method: 'GET',
                 credentials: 'include'
@@ -1743,6 +1772,23 @@
         }
     }
 
+    const searchFile = (keyword) => {
+        const page = 1;
+        fetch(`${backend_yingwu}/files?keyword=${keyword}&page=${page}&limit=${UploadedFilesPerPage}`,
+            {
+                method: 'GET',
+                credentials: 'include'
+            }
+        )
+            .then(response => response.json())
+            .then(data => {
+                renderUploadedFiles(data.files);
+                updateUploadedFilesPagination(data.totalCount, page);
+                currentUploadedPage = page;
+            })
+            .catch(error => console.error('Error loading files:', error));
+    }
+
     const previewFile = async (fileID) => {
         document.getElementById('preview-container').style.display = 'flex'; // 显示预览容器
         const requestUrl = `${backend_yingwu}/files/preview/${fileID}`;
@@ -1994,6 +2040,33 @@
         downloadFile(fileId);
     };
 
+    // 搜索框
+    const searchInput = document.getElementById('keyword');
+    const searchButton = document.getElementById('searchButton');
+    searchInput.addEventListener('input', function () {
+        const tooltip = bootstrap.Tooltip.getInstance(this);
+        if (this.value) {
+            if (tooltip) {
+                tooltip.dispose(); // 移除工具提示
+            }
+        } else {
+            if (!tooltip) {
+                new bootstrap.Tooltip(this).show(); // 显示工具提示
+            } else {
+                tooltip.show(); // 确保工具提示可见
+            }
+        }
+    });
+    searchButton.onclick = async function () {
+        const keyword = searchInput.value;
+
+        if (!keyword) {
+            bootstrap.Tooltip.getInstance(searchInput) || new bootstrap.Tooltip(searchInput).show(); // 显示工具提示
+            return;
+        }
+        searchFile(keyword);
+    };
+
     function renderDownloadedFilesRank(files) {
         // 提取文件名和下载量，确保下载量为整数
         const labels = files.map(file => file.filename);
@@ -2080,7 +2153,7 @@
     }
 
     function renderUploadedFiles(uploads) {
-        if (!uploads || uploads.length == 0) return;
+        // if (!uploads || uploads.length == 0) return;
         uploadedFileList.innerHTML = '';
 
         uploads.forEach(file => {

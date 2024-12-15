@@ -61,3 +61,12 @@ button:focus,
     outline: none;  /* 移除焦点的外边框 */
     box-shadow: none;  /* 移除任何额外的阴影 */
 }
+
+/* 无焦点轮廓 */
+.no-focus:active,
+.no-focus:focus {
+    box-shadow: none;
+    /* 移除阴影效果 */
+    outline: none;
+    /* 移除焦点轮廓 */
+}

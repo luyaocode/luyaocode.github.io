@@ -3113,6 +3113,7 @@
 
         document.getElementById('tagsDropdown').addEventListener('change', (event) => {
             const selectedTag = event.target.value;
+            currentUploadedPage = 1;
             changePage(currentUploadedPage);
         });
     });

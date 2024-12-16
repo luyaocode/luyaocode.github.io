@@ -649,6 +649,39 @@
         .tagcell {
             display: flex;
         }
+
+        .uploaded_toolbar_container {
+            display: flex;
+            flex-direction: row;
+            gap: 10px;
+            justify-content: left;
+        }
+
+        .share-btn i {
+            color: #00ff55;
+            font-size: 20px;
+        }
+
+        .share-btn:hover i {
+            color: #0ab924;
+        }
+
+        .share-btn,
+        .download_btn {
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            height: 30px;
+        }
+
+        .download_btn i {
+            color: #918f8f;
+            font-size: 20px;
+        }
+
+        .download_btn:hover i {
+            color: #5b5e60;
+        }
     </style>
     <script src="../js/cookieConsent.js"></script>
 </head>
@@ -786,12 +819,12 @@
                 <div id="uploaded-files-table-container" class="file-list">
                     <table id="uploaded-files-table" class="table">
                         <colgroup>
-                            <col style="width: 50%;"> <!-- 文件名 -->
+                            <col style="width: 48%;"> <!-- 文件名 -->
                             <col style="width: 15%;"> <!-- 标签 -->
                             <col style="width: 10%;"> <!-- 大小 -->
                             <col style="width: 10%;"> <!-- 上传者 -->
                             <col style="width: 5%;"> <!-- 过期时间 -->
-                            <col style="width: 10%;"> <!-- 操作 -->
+                            <col style="width: 12%;"> <!-- 操作 -->
                         </colgroup>
                         <thead>
                             <tr>
@@ -2421,7 +2454,16 @@
             }
             const size = (file.size / (1024 * 1024)).toFixed(2);
             let strExpired = "";
-            let operationBtn = `<button class="btn btn-primary btn-sm" onclick="downloadFile('${file.hash}')">下载</button>`;
+            let operationBtn = `
+                <div class="uploaded_toolbar_container">
+                    <button class="download_btn" onclick="downloadFile('${file.hash}')">
+                        <i class="fas fa-download"></i>
+                    </button>
+                    <button onclick="shareFile('${file.hash}')" class="share-btn">
+                        <i class="fas fa-share-alt"></i>
+                    </button>
+                </div>
+            `;
 
             let lockedStatus = "";
             if (file.locked) {
@@ -2538,6 +2580,11 @@
         `;
             failureTableBody.appendChild(row);
         });
+    }
+
+    function shareFile(hash) {
+        const fullPath = `${backend_yingwu}/files/download/${hash}`;
+        copyText(fullPath);
     }
 
     // 复制单个文件标识

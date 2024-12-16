@@ -618,14 +618,14 @@
 
         #uploaded_search_toolbar {
             display: flex;
+            width: 100%;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
         }
 
         #pageInfo {
             white-space: nowrap;
-        }
-
-        #uploaded_search_input_group {
-            margin: 10px;
         }
 
         #uploaded_history_toolbar {
@@ -687,6 +687,22 @@
         #batchSetTagModal,
         #editFileModal {
             z-index: 3000;
+        }
+
+        #keyword {
+            min-width: 200px;
+        }
+
+        .custom-close-btn {
+            color: red;
+            font-size: 1.5rem;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+        }
+
+        .custom-close-btn:hover {
+            opacity: 0.7;
         }
     </style>
     <script src="../js/cookieConsent.js"></script>
@@ -804,7 +820,7 @@
                             </a>
                         </li>
                         <li class="page-item disabled" id="pageInfo">
-                            <small class="page-link">第 1 页 / 共 1 页</small>
+                            <small class="page-link">第 1 页 / 共 xx 页</small>
                         </li>
                         <li class="page-item" id="nextPage">
                             <a class="page-link no-focus" href="javascript:void(0);"
@@ -819,6 +835,12 @@
                         <div class="input-group-append">
                             <button id="searchButton" class="btn btn-primary btn-sm ms-2">查询</button>
                         </div>
+                    </div>
+                    <!-- 下拉框 -->
+                    <div>
+                        <select id="tagsDropdown" class="form-select form-select-sm no-focus" style="width: 150px;">
+                            <option value="">无</option>
+                        </select>
                     </div>
                 </div>
 
@@ -974,7 +996,9 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button class="custom-close-btn" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="fas fa-times"></i> <!-- 使用 "times" 图标作为关闭按钮 -->
+                    </button>
                 </div>
                 <div class="modal-body">
                     <!-- 上传成功表格 -->
@@ -1016,7 +1040,9 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="uploadModalLabel">上传记录</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button class="custom-close-btn" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="fas fa-times"></i> <!-- 使用 "times" 图标作为关闭按钮 -->
+                    </button>
                 </div>
                 <div id="uploaded_history_toolbar">
                     <!-- 分页控件 -->
@@ -1083,7 +1109,9 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="downloadModalLabel">下载记录</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button class="custom-close-btn" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="fas fa-times"></i> <!-- 使用 "times" 图标作为关闭按钮 -->
+                    </button>
                 </div>
                 <div class="modal-body">
                     <table class="table table-bordered" id="downloadTable">
@@ -1127,7 +1155,9 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="loginModalLabel">登录</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button class="custom-close-btn" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="fas fa-times"></i> <!-- 使用 "times" 图标作为关闭按钮 -->
+                    </button>
                 </div>
                 <div class="modal-body">
                     <!-- 登录选项按钮 -->
@@ -1659,6 +1689,7 @@
         $("#downloadedRank").toggleClass("night-mode");
         $("#fileId").toggleClass("night-mode");
         $("#keyword").toggleClass("night-mode");
+        $("#tagsDropdown").toggleClass("night-mode");
         $(".modal-content").toggleClass("modal-night-mode");
         $(".table").toggleClass("modal-night-mode");
         $(".page-link").toggleClass("night-mode");
@@ -1699,7 +1730,8 @@
     function changePage(page) {
         if (page < 1) return;
         const keyword = searchInput.value;
-        fetch(`${backend_yingwu}/files?keyword=${keyword}&page=${page}&limit=${UploadedFilesPerPage}`,
+        const selectedTag = document.getElementById('tagsDropdown').value;
+        fetch(`${backend_yingwu}/files?keyword=${keyword}&tag=${selectedTag}&page=${page}&limit=${UploadedFilesPerPage}`,
             {
                 method: 'GET',
                 credentials: 'include'
@@ -1727,6 +1759,38 @@
             })
             .catch(error => console.error('Error loading downloaded files rank:', error));
     }
+
+    const requestTags = () => {
+        fetch(`${backend_yingwu}/files/tags`,
+            {
+                method: 'GET',
+                credentials: 'include'
+            }
+        )
+            .then(response => response.json())
+            .then(data => {
+                renderTags(data.result);
+            })
+            .catch(error => console.error('Error loading tags: ', error));
+    }
+
+    // 渲染标签到下拉框
+    const renderTags = (tagsMap) => {
+        const dropdown = document.getElementById('tagsDropdown');
+        dropdown.innerHTML = '<option value="">无</option>'; // 清空已有的选项
+
+        // 将 tagsMap 转换为数组，并按值（出现次数）降序排序
+        const sortedTags = Object.entries(tagsMap)
+            .sort((a, b) => b[1] - a[1]);  // 排序，按出现次数降序排序
+
+        // 遍历排序后的标签并渲染到下拉框
+        sortedTags.forEach(([tag, count]) => {
+            const option = document.createElement('option');
+            option.value = tag; // 设置选项的值
+            option.textContent = `${tag} (${count})`; // 设置选项的文本，显示标签名和计数
+            dropdown.appendChild(option);
+        });
+    };
 
     // 上传文件结果弹窗
     const modalElement = document.getElementById('uploadedModal');
@@ -2859,6 +2923,7 @@
         tagInput.type = 'text';
         tagInput.classList.add('form-control', 'form-control-sm', 'mt-2');
         tagInput.placeholder = '输入标签...';
+        tagInput.maxLength = 20;
         tagInput.addEventListener('keydown', (event) => {
             if (event.key === 'Enter') {
                 saveNewTag(containerName, tagInput.value);
@@ -2874,7 +2939,7 @@
         const tagsContainer = document.getElementById(containerName);
         const tagElement = document.createElement('span');
         tagElement.classList.add('badge', 'bg-primary', 'me-2', 'editable-tag');
-        tagElement.textContent = tagText.replace(/\s+/g, '');;
+        tagElement.textContent = tagText.replace(/\s+/g, '');
         tagElement.addEventListener('click', () => editTag(containerName, tagElement));
         tagsContainer.appendChild(tagElement);
     }
@@ -2885,6 +2950,7 @@
         input.type = 'text';
         input.value = tagElement.textContent.replace(/\s+/g, '');; // 将标签的文本填充到输入框
         input.classList.add('form-control', 'form-control-sm');
+        input.maxLength = 20; // 设置最大字符数为 20
 
         // 当用户按下 Enter 键时保存修改
         input.addEventListener('keydown', function (event) {
@@ -2913,6 +2979,10 @@
             .filter(text => text.length > 0);  // 只保留有内容的
         if (tags.includes(trimmedTag)) {
             showToast("标签已存在", 'top-right', 'bg-warning');
+            return;
+        }
+        if (tags.length > 9) {
+            showToast("标签数量超限", 'top-right', 'bg-warning');
             return;
         }
         if (trimmedTag) {
@@ -2959,6 +3029,7 @@
     $(document).ready(function () {
         changePage(currentUploadedPage);
         requestDownloadedFilesRank();
+        requestTags();
         $('#uploadedModal').on('hidden.bs.modal', function () {
             // 模态框关闭时，隐藏成功和失败表格
             const successTable = document.getElementById('success-table');
@@ -2969,7 +3040,7 @@
         });
 
         // 保证点击关闭按钮时模态框关闭
-        $('#uploadedModal .btn-close').on('click', function () {
+        $('#uploadedModal .custom-close-btn').on('click', function () {
             uploadedModal.hide();
         });
 
@@ -3027,6 +3098,11 @@
         $("#btnConfirmDeleteFile").click(onConfirmDeleteFileBtnClicked);
         $("#btnConfirmEditFile").click(onConfirmEditFileBtnClicked);
         $("#btnConfirmBatchSetFileTags").click(onConfirmBatchSetFileTagsBtnClicked);
+
+        document.getElementById('tagsDropdown').addEventListener('change', (event) => {
+            const selectedTag = event.target.value;
+            changePage(currentUploadedPage);
+        });
     });
 
 </script>

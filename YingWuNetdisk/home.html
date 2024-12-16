@@ -641,7 +641,7 @@
         }
 
         .tagcell {
-            max-width: 20px;
+            display: flex;
         }
     </style>
     <script src="../js/cookieConsent.js"></script>
@@ -1481,7 +1481,7 @@
             if (record.tags && record.tags.length > 0) {
                 const tagArr = record.tags.split(" ").filter(tag => tag.trim() !== '');
                 tagCell = `
-                    <small style="white-space:break-spaces;">
+                    <small class="tagcell">
                         ${tagArr.map(tag => `<span class="tag_style">${tag}</span>`).join("")}
                     </small>
                 `;

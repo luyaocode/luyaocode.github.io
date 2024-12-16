@@ -598,8 +598,8 @@
         /* 列表 */
         .file-name {
             display: -webkit-box;
-            line-clamp: 3;
-            -webkit-line-clamp: 3;
+            line-clamp: 1;
+            -webkit-line-clamp: 1;
             -webkit-box-orient: vertical;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -731,6 +731,12 @@
                 <div id="upload-container" class="d-none">
                     <div id="upload-files-table-container" class="file-list">
                         <table id="upload-files-table" class="table">
+                            <colgroup>
+                                <col style="width: 70%;"> <!-- 文件名 -->
+                                <col style="width: 10%;"> <!-- 大小 -->
+                                <col style="width: 10%;"> <!-- 进度 -->
+                                <col style="width: 10%;"> <!-- 操作 -->
+                            </colgroup>
                             <thead>
                                 <tr>
                                     <th>文件名</th>
@@ -779,6 +785,14 @@
 
                 <div id="uploaded-files-table-container" class="file-list">
                     <table id="uploaded-files-table" class="table">
+                        <colgroup>
+                            <col style="width: 50%;"> <!-- 文件名 -->
+                            <col style="width: 15%;"> <!-- 标签 -->
+                            <col style="width: 10%;"> <!-- 大小 -->
+                            <col style="width: 10%;"> <!-- 上传者 -->
+                            <col style="width: 5%;"> <!-- 过期时间 -->
+                            <col style="width: 10%;"> <!-- 操作 -->
+                        </colgroup>
                         <thead>
                             <tr>
                                 <th>文件名</th>
@@ -980,6 +994,15 @@
                 </div>
                 <div class="modal-body">
                     <table class="table table-bordered" id="uploadTable">
+                        <colgroup>
+                            <col style="width: 1%;"> <!-- 选框 -->
+                            <col style="width: 30%;"> <!-- 文件名 -->
+                            <col style="width: 15%;"> <!-- 标签 -->
+                            <col style="width: 27%;"> <!-- 标识 -->
+                            <col style="width: 15%;"> <!-- 上传时间 -->
+                            <col style="width: 2%;"> <!-- 状态 -->
+                            <col style="width: 10%;"> <!-- 操作 -->
+                        </colgroup>
                         <thead>
                             <tr>
                                 <th><input type="checkbox" id="selectAllUploadedHistory" class="form-check-input"></th>
@@ -2442,8 +2465,8 @@
 
             row.innerHTML = `
                 <td>
-                    <a href="javascript:void(0);" onclick="previewFile('${file.hash}')">
-                        <span class="file-name">${file.filename} ${lockedStatus}</span>
+                    <a href="javascript:void(0);">
+                        <span class="file-name" onclick="previewFile('${file.hash}')" title="${file.filename}">${file.filename} ${lockedStatus}</span>
                     </a>
                 </td>
                 <td>${tagCell}</td>

@@ -244,7 +244,8 @@
             margin-left: 10%;
         }
 
-        .confirm-delete-modal {
+        .confirm-delete-modal,
+        .edit-file-modal {
             max-width: 60%;
             margin-left: 20%;
             margin-top: 10%;
@@ -303,7 +304,17 @@
             color: #5bc0de;
             /* 浅蓝色 */
             font-weight: bold;
+            white-space: wrap;
             /* 可选，突出显示 */
+        }
+
+        .timestamp {
+            white-space: wrap;
+        }
+
+        .edit_btn_cell {
+            display: flex;
+            gap: 2px;
         }
 
         /* 浅蓝色 URL */
@@ -610,6 +621,24 @@
         #uploaded_search_input_group {
             margin: 10px;
         }
+
+        #uploaded_history_toolbar {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-left: 10px;
+        }
+
+        #uploadedFileHistoryPagination {
+            margin: 0;
+        }
+
+        .tag_style {
+            margin-right: 5px;
+            padding: 2px 5px;
+            border-radius: 4px;
+            border: 1px solid gray;
+        }
     </style>
     <script src="../js/cookieConsent.js"></script>
 </head>
@@ -743,6 +772,7 @@
                         <thead>
                             <tr>
                                 <th>文件名</th>
+                                <th>标签</th>
                                 <th>大小</th>
                                 <th>上传者</th>
                                 <th>过期时间</th>
@@ -925,6 +955,19 @@
                     <h5 class="modal-title" id="uploadModalLabel">上传记录</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
+                <div id="uploaded_history_toolbar">
+                    <!-- 分页控件 -->
+                    <ul class="pagination justify-content-center" id="uploadedFileHistoryPagination">
+                        <!-- 分页按钮将动态添加到这里 -->
+                    </ul>
+                    <!-- 批量删除按钮 -->
+                    <button type="button" id="btnBatchDeleteUploadedHistory" class="btn btn-danger btn-sm">
+                        批量删除
+                    </button>
+                    <!-- <button type="button" id="btnBatchSetTag" class="btn btn-primary btn-sm">
+                        批量设置标签
+                    </button> -->
+                </div>
                 <div class="modal-body">
                     <table class="table table-bordered" id="uploadTable">
                         <thead>
@@ -932,6 +975,7 @@
                                 <th><input type="checkbox" id="selectAllUploadedHistory" class="form-check-input"></th>
                                 <!-- 全选框 -->
                                 <th>文件名</th>
+                                <th>标签</th>
                                 <th>文件标识</th>
                                 <th>上传时间</th>
                                 <th>状态</th>
@@ -942,16 +986,7 @@
                             <!-- 上传记录列表 -->
                         </tbody>
                     </table>
-                    <!-- 批量删除按钮 -->
-                    <button type="button" id="btnBatchDeleteUploadedHistory" class="btn btn-danger btn-sm">
-                        批量删除
-                    </button>
-                    <!-- 分页控件 -->
-                    <nav aria-label="Page navigation">
-                        <ul class="pagination justify-content-center" id="uploadedFileHistoryPagination">
-                            <!-- 分页按钮将动态添加到这里 -->
-                        </ul>
-                    </nav>
+
                     <table class="table table-bordered" id="uploadTableLocal">
                         <thead>
                             <tr>
@@ -1130,7 +1165,47 @@
             </div>
         </div>
     </div>
+    <!-- 编辑文件模态框 -->
+    <div class="modal edit-file-modal" id="editFileModal" tabindex="-1" role="dialog"
+        aria-labelledby="editFileModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content border-warning">
+                <div class="modal-header bg-warning text-white">
+                    <h5 class="modal-title" id="editFileModalLabel">
+                        <i class="fas fa-edit"></i> 编辑文件信息
+                    </h5>
+                </div>
+                <div class="modal-body">
+                    <div class="container mt-2">
+                        <form id="editFileForm">
+                            <!-- 文件名修改 -->
+                            <div class="mb-3">
+                                <label for="fileNameInput" class="form-label">文件名</label>
+                                <input type="text" class="form-control" id="fileNameInput" placeholder="输入新的文件名">
+                            </div>
 
+                            <!-- 标签修改 -->
+                            <div class="mb-3">
+                                <div class="flex-row">
+                                    <label for="fileTagsInput" class="form-label">标签</label>
+                                    <button class="btn btn-sm btn-secondary mt-2" type="button"
+                                        onclick="createTagInput()" style="margin-bottom: 10px;">+</button>
+                                </div>
+                                <div id="tagsContainer">
+                                    <!-- 动态渲染的标签 -->
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="btnCancelEditFile" class="btn btn-secondary"
+                        data-bs-dismiss="modal">取消</button>
+                    <button type="button" id="btnConfirmEditFile" class="btn btn-warning">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </body>
 <script src="../js/jquery.min.js"></script>
@@ -1212,6 +1287,7 @@
 
     // 加载上传记录页面数据
     async function loadUploadPage(pageNum) {
+        triggerSelectAllUploadedHistory(false);
         try {
             const response = await fetch(`${backend_yingwu}/files/uploads?page=${pageNum}&limit=${recordsPerPage}`, {
                 credentials: 'include'
@@ -1277,6 +1353,14 @@
             checkbox.checked = isChecked;
         });
     });
+
+    // 手动触发全选框点击事件
+    function triggerSelectAllUploadedHistory(checked) {
+        const selectAllCheckbox = document.getElementById('selectAllUploadedHistory');
+        // 模拟用户点击（触发 change 事件）
+        selectAllCheckbox.checked = checked;  // 可以设置为 `true` 或 `false`，模拟勾选或取消勾选
+        selectAllCheckbox.dispatchEvent(new Event('change'));  // 手动触发 `change` 事件
+    }
 
     // 获取所有选中的文件哈希
     function getSelectedFileHashes() {
@@ -1364,6 +1448,16 @@
         }
     });
 
+    // 批量设置标签
+    document.getElementById('btnBatchSetTag').addEventListener('click', async function () {
+        const selectedFiles = getSelectedFileInfo();
+        if (selectedFiles.length > 0) {
+            openSetTagModal(selectedFiles);
+        } else {
+            showToast("请选择要设置标签的文件", "top-right", 'bg-info');
+        }
+    });
+
     // 渲染上传记录到表格
     function renderUploadRecords(records) {
         const uploadTableBody = document.getElementById('uploadTable').getElementsByTagName('tbody')[0];
@@ -1387,16 +1481,28 @@
                     </button>
                 `;
             }
+            let tagCell = "";
+            if (record.tags && record.tags.length > 0) {
+                const tagArr = record.tags.split(" ");
+                tagCell = `
+                    <small>
+                        ${tagArr.map(tag => `<span class="tag_style">${tag}</span>`).join("")}
+                    </small>
+                `;
+            }
             const row = document.createElement('tr');
-
             row.innerHTML = `
                 <td><input type="checkbox" class="file-select" data-hash="${record.hash}"></td>
                 <td>${record.filename}</td>
-                <td><span class="label-style">${label}</span></td>
-                <td>${uploadedAt}</td>
+                <td>${tagCell}</td>
+                <td><small class="label-style">${label}</small></td>
+                <td><small class="timestamp">${uploadedAt}</small></td>
                 <td>${btnLock}</td>
                 <td>
-                    <button class="btn btn-danger btn-sm" onclick="deleteFile({hash: '${record.hash}', filename: '${record.filename}'})">删除</button>
+                    <div class="edit_btn_cell">
+                        <button class="btn btn-primary btn-sm" onclick="editFile({hash: '${record.hash}', filename: '${record.filename}',tags:'${record.tags}'})">编辑</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteFile({hash: '${record.hash}', filename: '${record.filename}'})">删除</button>
+                    </div>
                 </td>
                 `;
             uploadTableBody.appendChild(row);
@@ -1669,10 +1775,51 @@
         confirmDeleteFileModal.hide();
     }
 
+    async function onConfirmEditFileBtnClicked() {
+        const modal = document.getElementById("editFileModal");
+        // 创建一个包含 tags 字符串的对象
+        const filename = fileNameInput.value;
+        const allTags = Array.from(document.querySelectorAll('#tagsContainer span'))
+            .map(span => span.textContent.trim())  // 去除多余空格
+            .filter(text => text.length > 0);  // 只保留有内容的
+        const tags = allTags.join(" ");  // 用空格连接所有元素
+        const hash = JSON.parse(modal.dataset.hash);
+        const info = {
+            filename,
+            tags
+        }
+
+        // 使用 fetch 发送 POST 请求
+        fetch(`${backend_yingwu}/files/file_info/${hash}`, {
+            method: 'POST',
+            body: JSON.stringify(info),
+            credentials: "include",
+        })
+            .then(response => {
+                if (response.status === 200) {
+                    return response.json();
+                } else {
+                    throw new Error(response.status);
+                }
+            })
+            .then(result => {
+                showToast("修改成功");
+                loadUploadPage(currentUploadedFileHistoryPage);
+                editFileModal.hide();
+            })
+            .catch(error => {
+                editFileModal.hide();
+            });
+    }
+
     async function deleteFile(file) {
         let files = [];
         files.push(file);
         openConfirmDeleteFileModal(files);
+    }
+
+    async function editFile(file) {
+        openEditFileModal(file);
     }
 
     async function deleteFiles(fileIDs) {
@@ -2158,6 +2305,15 @@
 
         uploads.forEach(file => {
             const row = document.createElement('tr');
+            let tagCell = "";
+            if (file.tags && file.tags.length > 0) {
+                tagArr = file.tags.split(" ");
+                tagCell = `
+                    <small>
+                        ${tagArr.map(tag => `<span class="tag_style">${tag}</span>`).join("")}
+                    </small>
+                `;
+            }
             const size = (file.size / (1024 * 1024)).toFixed(2);
             let strExpired = "";
             let operationBtn = `<button class="btn btn-primary btn-sm" onclick="downloadFile('${file.hash}')">下载</button>`;
@@ -2208,6 +2364,7 @@
                         <span class="file-name">${file.filename} ${lockedStatus}</span>
                     </a>
                 </td>
+                <td>${tagCell}</td>
                 <td><small>${size} MB</small></td>
                 <td><small>${uploadedBy}</small></td>
                 <td>
@@ -2333,8 +2490,15 @@
         backdrop: 'static',  // 禁止点击外部区域关闭模态框
         keyboard: false      // 禁止按下 ESC 键关闭模态框
     });
+    const editFileModal = new bootstrap.Modal(document.getElementById('editFileModal'), {
+        backdrop: 'static',  // 禁止点击外部区域关闭模态框
+        keyboard: false      // 禁止按下 ESC 键关闭模态框
+    });
     $('#confirmDeleteFileModal').on('hidden.bs.modal', function () {
         this.dataset.hashes = '';
+    });
+    $('#editFileModal').on('hidden.bs.modal', function () {
+        this.dataset.hash = '';
     });
 
     function openConfirmClearCacheModal() {
@@ -2345,6 +2509,11 @@
     function openConfirmDeleteFileModal(files) {
         confirmDeleteFileModal.show();
         renderDeleteFiles(files);
+    }
+
+    function openEditFileModal(file) {
+        editFileModal.show();
+        renderEditFile(file);
     }
 
     const clearCache = async () => {
@@ -2465,6 +2634,120 @@
         modal.dataset.hashes = JSON.stringify(hashes);
     }
 
+    const inputElement = document.getElementById('fileNameInput');
+    fileNameInput.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();  // 阻止回车键的默认行为（即表单提交）
+        }
+    });
+
+    function renderEditFile(file) {
+        const tagsContainer = document.getElementById('tagsContainer');
+        tagsContainer.innerHTML = ''; // 清空现有标签
+        document.getElementById('fileNameInput').placeholder = file.filename;
+        document.getElementById('fileNameInput').value = file.filename;
+        // 将每个标签渲染为 span 元素
+        const tagArray = file.tags ? file.tags.split(' ') : [];
+        tagArray.forEach(tag => {
+            const tagElement = document.createElement('span');
+            tagElement.classList.add('badge', 'bg-primary', 'me-2', 'editable-tag');
+            tagElement.textContent = tag.trim();
+            tagElement.addEventListener('click', () => editTag(tagElement));
+            tagsContainer.appendChild(tagElement);
+        });
+        // 将hash存储到模态框的dataset中
+        const modal = document.getElementById("editFileModal");
+        modal.dataset.hash = JSON.stringify(file.hash);
+    }
+
+    // 创建输入框的函数
+    function createTagInput() {
+        const tagsContainer = document.getElementById('tagsContainer');
+        const tagInput = document.createElement('input');
+        tagInput.type = 'text';
+        tagInput.classList.add('form-control', 'form-control-sm', 'mt-2');
+        tagInput.placeholder = '输入标签...';
+        tagInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                saveNewTag(tagInput.value);
+            }
+        });
+
+        tagsContainer.appendChild(tagInput);
+        tagInput.focus(); // 使输入框获取焦点
+    }
+
+    // 创建标签的函数
+    function createTag(tagText) {
+        const tagElement = document.createElement('span');
+        tagElement.classList.add('badge', 'bg-primary', 'me-2', 'editable-tag');
+        tagElement.textContent = tagText.trim();
+        tagElement.addEventListener('click', () => editTag(tagElement));
+        tagsContainer.appendChild(tagElement);
+    }
+
+    function editTag(tagElement) {
+        // 创建一个输入框
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.value = tagElement.textContent.trim(); // 将标签的文本填充到输入框
+        input.classList.add('form-control', 'form-control-sm');
+
+        // 当用户按下 Enter 键时保存修改
+        input.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter') {
+                saveTagEdit(tagElement, input.value);
+            }
+        });
+
+        // 当用户点击输入框外部时保存修改
+        input.addEventListener('blur', function () {
+            saveTagEdit(tagElement, input.value);
+        });
+
+        // 替换标签为输入框
+        tagElement.innerHTML = ''; // 清空标签内容
+        tagElement.appendChild(input); // 将输入框添加到标签位置
+        input.focus(); // 使输入框获得焦点
+    }
+
+    // 保存新标签
+    function saveNewTag(tagText) {
+        const trimmedTag = tagText.trim();
+        const tags = Array.from(document.querySelectorAll('#tagsContainer span'))
+            .map(span => span.textContent.trim())  // 去除多余空格
+            .filter(text => text.length > 0);  // 只保留有内容的
+        if (tags.includes(trimmedTag)) {
+            showToast("标签已存在", 'top-right', 'bg-warning');
+            return;
+        }
+        if (trimmedTag) {
+            // 创建新的标签并显示
+            createTag(trimmedTag);
+        }
+
+        // 移除输入框
+        const tagInput = tagsContainer.querySelector('input');
+        if (tagInput) {
+            tagInput.remove();
+        }
+
+        // 可以在这里处理保存新标签的逻辑，例如发送到服务器或更新数据模型
+    }
+
+    function saveTagEdit(tagElement, newTag) {
+        newTag = newTag.trim();
+        const tags = Array.from(document.querySelectorAll('#tagsContainer span'))
+            .map(span => span.textContent.trim())  // 去除多余空格
+            .filter(text => text.length > 0);  // 只保留有内容的
+        if (tags.includes(newTag)) {
+            showToast("标签已存在", 'top-right', 'bg-warning');
+            return;
+        }
+        // 更新标签文本
+        tagElement.textContent = newTag;
+        tagElement.classList.remove('editable-tag');
+    }
 
     function requestUploadedHistory() {
         const status = localStorage.getItem("blog_website_login");
@@ -2534,7 +2817,7 @@
         $("#btnCancelClearCache").click(() => confirmClearCacheModal.hide());
         $("#btnCancelDeleteFile").click(() => confirmDeleteFileModal.hide());
         $("#btnConfirmDeleteFile").click(onConfirmDeleteFileBtnClicked);
-
+        $("#btnConfirmEditFile").click(onConfirmEditFileBtnClicked);
     });
 
 </script>
@@ -2581,7 +2864,7 @@
     // 放大功能
     zoomInButton.addEventListener('click', function () {
         if (zoomLevel < 2.0) {
-            zoomLevel += 0.25;
+            zoomLevel = 0.25;
             zoomLevel = parseFloat(zoomLevel.toFixed(2));
             updateCanvasZoom();
         }

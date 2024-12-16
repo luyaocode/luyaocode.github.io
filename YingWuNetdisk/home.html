@@ -639,6 +639,10 @@
             border-radius: 4px;
             border: 1px solid gray;
         }
+
+        .tagcell {
+            max-width: 20px;
+        }
     </style>
     <script src="../js/cookieConsent.js"></script>
 </head>
@@ -1449,14 +1453,6 @@
     });
 
     // 批量设置标签
-    document.getElementById('btnBatchSetTag').addEventListener('click', async function () {
-        const selectedFiles = getSelectedFileInfo();
-        if (selectedFiles.length > 0) {
-            openSetTagModal(selectedFiles);
-        } else {
-            showToast("请选择要设置标签的文件", "top-right", 'bg-info');
-        }
-    });
 
     // 渲染上传记录到表格
     function renderUploadRecords(records) {
@@ -1483,9 +1479,9 @@
             }
             let tagCell = "";
             if (record.tags && record.tags.length > 0) {
-                const tagArr = record.tags.split(" ");
+                const tagArr = record.tags.split(" ").filter(tag => tag.trim() !== '');
                 tagCell = `
-                    <small>
+                    <small style="white-space:break-spaces;">
                         ${tagArr.map(tag => `<span class="tag_style">${tag}</span>`).join("")}
                     </small>
                 `;
@@ -1780,7 +1776,7 @@
         // 创建一个包含 tags 字符串的对象
         const filename = fileNameInput.value;
         const allTags = Array.from(document.querySelectorAll('#tagsContainer span'))
-            .map(span => span.textContent.trim())  // 去除多余空格
+            .map(span => span.textContent.replace(/\s+/g, ''))  // 去除多余空格
             .filter(text => text.length > 0);  // 只保留有内容的
         const tags = allTags.join(" ");  // 用空格连接所有元素
         const hash = JSON.parse(modal.dataset.hash);
@@ -2307,9 +2303,9 @@
             const row = document.createElement('tr');
             let tagCell = "";
             if (file.tags && file.tags.length > 0) {
-                tagArr = file.tags.split(" ");
+                tagArr = file.tags.split(" ").filter(tag => tag.trim() !== '');
                 tagCell = `
-                    <small>
+                    <small class="tagcell">
                         ${tagArr.map(tag => `<span class="tag_style">${tag}</span>`).join("")}
                     </small>
                 `;
@@ -2647,11 +2643,11 @@
         document.getElementById('fileNameInput').placeholder = file.filename;
         document.getElementById('fileNameInput').value = file.filename;
         // 将每个标签渲染为 span 元素
-        const tagArray = file.tags ? file.tags.split(' ') : [];
+        const tagArray = file.tags ? file.tags.split(' ').filter(tag => tag.trim() !== '') : [];
         tagArray.forEach(tag => {
             const tagElement = document.createElement('span');
             tagElement.classList.add('badge', 'bg-primary', 'me-2', 'editable-tag');
-            tagElement.textContent = tag.trim();
+            tagElement.textContent = tag.replace(/\s+/g, '');;
             tagElement.addEventListener('click', () => editTag(tagElement));
             tagsContainer.appendChild(tagElement);
         });
@@ -2681,7 +2677,7 @@
     function createTag(tagText) {
         const tagElement = document.createElement('span');
         tagElement.classList.add('badge', 'bg-primary', 'me-2', 'editable-tag');
-        tagElement.textContent = tagText.trim();
+        tagElement.textContent = tagText.replace(/\s+/g, '');;
         tagElement.addEventListener('click', () => editTag(tagElement));
         tagsContainer.appendChild(tagElement);
     }
@@ -2690,7 +2686,7 @@
         // 创建一个输入框
         const input = document.createElement('input');
         input.type = 'text';
-        input.value = tagElement.textContent.trim(); // 将标签的文本填充到输入框
+        input.value = tagElement.textContent.replace(/\s+/g, '');; // 将标签的文本填充到输入框
         input.classList.add('form-control', 'form-control-sm');
 
         // 当用户按下 Enter 键时保存修改
@@ -2713,9 +2709,9 @@
 
     // 保存新标签
     function saveNewTag(tagText) {
-        const trimmedTag = tagText.trim();
+        const trimmedTag = tagText.replace(/\s+/g, '');;
         const tags = Array.from(document.querySelectorAll('#tagsContainer span'))
-            .map(span => span.textContent.trim())  // 去除多余空格
+            .map(span => span.textContent.replace(/\s+/g, ''))  // 去除多余空格
             .filter(text => text.length > 0);  // 只保留有内容的
         if (tags.includes(trimmedTag)) {
             showToast("标签已存在", 'top-right', 'bg-warning');
@@ -2738,7 +2734,7 @@
     function saveTagEdit(tagElement, newTag) {
         newTag = newTag.trim();
         const tags = Array.from(document.querySelectorAll('#tagsContainer span'))
-            .map(span => span.textContent.trim())  // 去除多余空格
+            .map(span => span.textContent.replace(/\s+/g, ''))  // 去除多余空格
             .filter(text => text.length > 0);  // 只保留有内容的
         if (tags.includes(newTag)) {
             showToast("标签已存在", 'top-right', 'bg-warning');

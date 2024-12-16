@@ -244,8 +244,14 @@
             margin-left: 10%;
         }
 
-        .confirm-delete-modal,
-        .edit-file-modal {
+        .confirm-delete-modal {
+            max-width: 60%;
+            margin-left: 20%;
+            margin-top: auto;
+        }
+
+        .edit-file-modal,
+        .batch-set-file-tags-modal {
             max-width: 60%;
             margin-left: 20%;
             margin-top: 10%;
@@ -968,9 +974,9 @@
                     <button type="button" id="btnBatchDeleteUploadedHistory" class="btn btn-danger btn-sm">
                         批量删除
                     </button>
-                    <!-- <button type="button" id="btnBatchSetTag" class="btn btn-primary btn-sm">
+                    <button type="button" id="btnBatchSetTag" class="btn btn-primary btn-sm">
                         批量设置标签
-                    </button> -->
+                    </button>
                 </div>
                 <div class="modal-body">
                     <table class="table table-bordered" id="uploadTable">
@@ -1193,7 +1199,8 @@
                                 <div class="flex-row">
                                     <label for="fileTagsInput" class="form-label">标签</label>
                                     <button class="btn btn-sm btn-secondary mt-2" type="button"
-                                        onclick="createTagInput()" style="margin-bottom: 10px;">+</button>
+                                        onclick="createTagInput(`tagsContainer`)"
+                                        style="margin-bottom: 10px;">+</button>
                                 </div>
                                 <div id="tagsContainer">
                                     <!-- 动态渲染的标签 -->
@@ -1206,6 +1213,40 @@
                     <button type="button" id="btnCancelEditFile" class="btn btn-secondary"
                         data-bs-dismiss="modal">取消</button>
                     <button type="button" id="btnConfirmEditFile" class="btn btn-warning">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 批量设置文件标签模态框 -->
+    <div class="modal batch-set-file-tags-modal" id="batchSetTagModal" tabindex="-1" role="dialog"
+        aria-labelledby="batchSetFileTagModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content border-warning">
+                <div class="modal-header bg-warning text-white">
+                    <h5 class="modal-title" id="batchSetFileTagModalLabel">
+                        <i class="fas fa-edit"></i> 批量设置标签
+                    </h5>
+                </div>
+                <div class="modal-body">
+                    <div class="container mt-2">
+                        <!-- 标签修改 -->
+                        <div class="mb-3">
+                            <div class="flex-row">
+                                <label for="batchFileTagsInput" class="form-label">标签</label>
+                                <button class="btn btn-sm btn-secondary mt-2" type="button"
+                                    onclick="createTagInput(`batchTagsContainer`)"
+                                    style="margin-bottom: 10px;">+</button>
+                            </div>
+                            <div id="batchTagsContainer">
+                                <!-- 动态渲染的标签 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="btnCancelBatchSetFileTags" class="btn btn-secondary"
+                        data-bs-dismiss="modal">取消</button>
+                    <button type="button" id="btnConfirmBatchSetFileTags" class="btn btn-warning">确定</button>
                 </div>
             </div>
         </div>
@@ -1453,6 +1494,14 @@
     });
 
     // 批量设置标签
+    document.getElementById('btnBatchSetTag').addEventListener('click', async function () {
+        const selectedFiles = getSelectedFileInfo();
+        if (selectedFiles.length > 0) {
+            batchSetTag(selectedFiles);
+        } else {
+            showToast("请选择文件", "top-right", 'bg-info');
+        }
+    });
 
     // 渲染上传记录到表格
     function renderUploadRecords(records) {
@@ -1805,6 +1854,43 @@
             })
             .catch(error => {
                 editFileModal.hide();
+            });
+    }
+
+    async function onConfirmBatchSetFileTagsBtnClicked() {
+        const modal = document.getElementById("batchSetTagModal");
+        // 创建一个包含 tags 字符串的对象
+        const filename = fileNameInput.value;
+        const allTags = Array.from(document.querySelectorAll('#batchTagsContainer span'))
+            .map(span => span.textContent.replace(/\s+/g, ''))  // 去除多余空格
+            .filter(text => text.length > 0);  // 只保留有内容的
+        const tags = allTags.join(" ");  // 用空格连接所有元素
+        const hashes = JSON.parse(modal.dataset.hashes);
+        const data = {
+            files: hashes,
+            tags
+        }
+
+        // 使用 fetch 发送 POST 请求
+        fetch(`${backend_yingwu}/files/tags`, {
+            method: 'POST',
+            body: JSON.stringify(data),
+            credentials: "include",
+        })
+            .then(response => {
+                if (response.status === 200) {
+                    return response.json();
+                } else {
+                    throw new Error(response.status);
+                }
+            })
+            .then(result => {
+                showToast("修改成功");
+                loadUploadPage(currentUploadedFileHistoryPage);
+                batchSetFileTagModal.hide();
+            })
+            .catch(error => {
+                batchSetFileTagModal.hide();
             });
     }
 
@@ -2490,11 +2576,18 @@
         backdrop: 'static',  // 禁止点击外部区域关闭模态框
         keyboard: false      // 禁止按下 ESC 键关闭模态框
     });
+    const batchSetFileTagModal = new bootstrap.Modal(document.getElementById('batchSetTagModal'), {
+        backdrop: 'static',  // 禁止点击外部区域关闭模态框
+        keyboard: false      // 禁止按下 ESC 键关闭模态框
+    });
     $('#confirmDeleteFileModal').on('hidden.bs.modal', function () {
         this.dataset.hashes = '';
     });
     $('#editFileModal').on('hidden.bs.modal', function () {
         this.dataset.hash = '';
+    });
+    $('#batchSetFileTagModal').on('hidden.bs.modal', function () {
+        this.dataset.hashes = '';
     });
 
     function openConfirmClearCacheModal() {
@@ -2505,6 +2598,11 @@
     function openConfirmDeleteFileModal(files) {
         confirmDeleteFileModal.show();
         renderDeleteFiles(files);
+    }
+
+    function batchSetTag(files) {
+        batchSetFileTagModal.show();
+        renderBatchSetTagFiles(files);
     }
 
     function openEditFileModal(file) {
@@ -2648,7 +2746,7 @@
             const tagElement = document.createElement('span');
             tagElement.classList.add('badge', 'bg-primary', 'me-2', 'editable-tag');
             tagElement.textContent = tag.replace(/\s+/g, '');;
-            tagElement.addEventListener('click', () => editTag(tagElement));
+            tagElement.addEventListener('click', () => editTag("tagsContainer", tagElement));
             tagsContainer.appendChild(tagElement);
         });
         // 将hash存储到模态框的dataset中
@@ -2656,16 +2754,24 @@
         modal.dataset.hash = JSON.stringify(file.hash);
     }
 
+    function renderBatchSetTagFiles(files) {
+        const tagsContainer = document.getElementById('batchTagsContainer');
+        tagsContainer.innerHTML = ''; // 清空现有标签
+        const hashes = files.map(file => file.hash);
+        const modal = document.getElementById("batchSetTagModal");
+        modal.dataset.hashes = JSON.stringify(hashes);
+    }
+
     // 创建输入框的函数
-    function createTagInput() {
-        const tagsContainer = document.getElementById('tagsContainer');
+    function createTagInput(containerName) {
+        const tagsContainer = document.getElementById(containerName);
         const tagInput = document.createElement('input');
         tagInput.type = 'text';
         tagInput.classList.add('form-control', 'form-control-sm', 'mt-2');
         tagInput.placeholder = '输入标签...';
         tagInput.addEventListener('keydown', (event) => {
             if (event.key === 'Enter') {
-                saveNewTag(tagInput.value);
+                saveNewTag(containerName, tagInput.value);
             }
         });
 
@@ -2674,15 +2780,16 @@
     }
 
     // 创建标签的函数
-    function createTag(tagText) {
+    function createTag(containerName, tagText) {
+        const tagsContainer = document.getElementById(containerName);
         const tagElement = document.createElement('span');
         tagElement.classList.add('badge', 'bg-primary', 'me-2', 'editable-tag');
         tagElement.textContent = tagText.replace(/\s+/g, '');;
-        tagElement.addEventListener('click', () => editTag(tagElement));
+        tagElement.addEventListener('click', () => editTag(containerName, tagElement));
         tagsContainer.appendChild(tagElement);
     }
 
-    function editTag(tagElement) {
+    function editTag(containerName, tagElement) {
         // 创建一个输入框
         const input = document.createElement('input');
         input.type = 'text';
@@ -2692,13 +2799,13 @@
         // 当用户按下 Enter 键时保存修改
         input.addEventListener('keydown', function (event) {
             if (event.key === 'Enter') {
-                saveTagEdit(tagElement, input.value);
+                saveTagEdit(containerName, tagElement, input.value);
             }
         });
 
         // 当用户点击输入框外部时保存修改
         input.addEventListener('blur', function () {
-            saveTagEdit(tagElement, input.value);
+            saveTagEdit(containerName, tagElement, input.value);
         });
 
         // 替换标签为输入框
@@ -2708,9 +2815,10 @@
     }
 
     // 保存新标签
-    function saveNewTag(tagText) {
+    function saveNewTag(containerName, tagText) {
+        const tagsContainer = document.getElementById(containerName);
         const trimmedTag = tagText.replace(/\s+/g, '');;
-        const tags = Array.from(document.querySelectorAll('#tagsContainer span'))
+        const tags = Array.from(document.querySelectorAll(`#${containerName} span`))
             .map(span => span.textContent.replace(/\s+/g, ''))  // 去除多余空格
             .filter(text => text.length > 0);  // 只保留有内容的
         if (tags.includes(trimmedTag)) {
@@ -2719,7 +2827,7 @@
         }
         if (trimmedTag) {
             // 创建新的标签并显示
-            createTag(trimmedTag);
+            createTag(containerName, trimmedTag);
         }
 
         // 移除输入框
@@ -2731,9 +2839,9 @@
         // 可以在这里处理保存新标签的逻辑，例如发送到服务器或更新数据模型
     }
 
-    function saveTagEdit(tagElement, newTag) {
+    function saveTagEdit(containerName, tagElement, newTag) {
         newTag = newTag.trim();
-        const tags = Array.from(document.querySelectorAll('#tagsContainer span'))
+        const tags = Array.from(document.querySelectorAll(`#${containerName} span`))
             .map(span => span.textContent.replace(/\s+/g, ''))  // 去除多余空格
             .filter(text => text.length > 0);  // 只保留有内容的
         if (tags.includes(newTag)) {
@@ -2814,6 +2922,7 @@
         $("#btnCancelDeleteFile").click(() => confirmDeleteFileModal.hide());
         $("#btnConfirmDeleteFile").click(onConfirmDeleteFileBtnClicked);
         $("#btnConfirmEditFile").click(onConfirmEditFileBtnClicked);
+        $("#btnConfirmBatchSetFileTags").click(onConfirmBatchSetFileTagsBtnClicked);
     });
 
 </script>

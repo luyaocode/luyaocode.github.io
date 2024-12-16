@@ -1366,6 +1366,10 @@
 
     // 更新上传记录分页
     function updateUploadPagination(totalRecords) {
+        let isNightMode = false;
+        const user_attr = JSON.parse(localStorage.getItem('USER_ATTR'));
+        if (user_attr && user_attr.custom_style === CustomStyle.NightMode) isNightMode = true;
+
         const totalPages = Math.ceil(totalRecords / recordsPerPage);
         const pagination = document.getElementById('uploadedFileHistoryPagination');
         pagination.innerHTML = ''; // 清空现有分页内容
@@ -1376,13 +1380,13 @@
         if (currentUploadedFileHistoryPage === 1 || totalPages === 0) {
             prevButton.classList.add('disabled'); // 如果是第一页，禁用上一页按钮
         }
-        prevButton.innerHTML = `<a class="page-link" href="javascript:void(0);" onclick="loadUploadPage(${currentUploadedFileHistoryPage - 1})">&laquo;</a>`;
+        prevButton.innerHTML = `<a class="page-link ${isNightMode ? "night-mode" : ""}" href="javascript:void(0);" onclick="loadUploadPage(${currentUploadedFileHistoryPage - 1})">&laquo;</a>`;
         pagination.appendChild(prevButton);
 
         // 添加当前页 / 总页数文本
         const pageInfo = document.createElement('li');
         pageInfo.classList.add('page-item', 'disabled');
-        pageInfo.innerHTML = `<small class="page-link">第 ${currentUploadedFileHistoryPage} 页 / 共 ${totalPages} 页</small>`;
+        pageInfo.innerHTML = `<small class="page-link ${isNightMode ? "night-mode" : ""}">第 ${currentUploadedFileHistoryPage} 页 / 共 ${totalPages} 页</small>`;
         pagination.appendChild(pageInfo);
 
         // 创建 "下一页" 按钮
@@ -1391,11 +1395,15 @@
         if (currentUploadedFileHistoryPage === totalPages || totalPages === 0) {
             nextButton.classList.add('disabled'); // 如果是最后一页，禁用下一页按钮
         }
-        nextButton.innerHTML = `<a class="page-link" href="javascript:void(0);" onclick="loadUploadPage(${currentUploadedFileHistoryPage + 1})">&raquo;</a>`;
+        nextButton.innerHTML = `<a class="page-link ${isNightMode ? "night-mode" : ""}" href="javascript:void(0);" onclick="loadUploadPage(${currentUploadedFileHistoryPage + 1})">&raquo;</a>`;
         pagination.appendChild(nextButton);
     }
     // 更新下载记录分页
     function updateDownloadPagination(totalRecords) {
+        let isNightMode = false;
+        const user_attr = JSON.parse(localStorage.getItem('USER_ATTR'));
+        if (user_attr && user_attr.custom_style === CustomStyle.NightMode) isNightMode = true;
+
         const totalPages = Math.ceil(totalRecords / recordsPerPage);
         const pagination = document.getElementById('downloadedFileHistoryPagination');
         pagination.innerHTML = ''; // 清空现有分页内容
@@ -1406,13 +1414,13 @@
         if (currentDownloadedFileHistoryPage === 1 || totalPages === 0) {
             prevButton.classList.add('disabled'); // 如果是第一页，禁用上一页按钮
         }
-        prevButton.innerHTML = `<a class="page-link" href="javascript:void(0);" onclick="loadDownloadPage(${currentDownloadedFileHistoryPage - 1})">&laquo;</a>`;
+        prevButton.innerHTML = `<a class="page-link ${isNightMode ? "night-mode" : ""}" href="javascript:void(0);" onclick="loadDownloadPage(${currentDownloadedFileHistoryPage - 1})">&laquo;</a>`;
         pagination.appendChild(prevButton);
 
         // 添加当前页 / 总页数文本
         const pageInfo = document.createElement('li');
         pageInfo.classList.add('page-item', 'disabled');
-        pageInfo.innerHTML = `<small class="page-link">第 ${currentDownloadedFileHistoryPage} 页 / 共 ${totalPages} 页</small>`;
+        pageInfo.innerHTML = `<small class="page-link ${isNightMode ? "night-mode" : ""}">第 ${currentDownloadedFileHistoryPage} 页 / 共 ${totalPages} 页</small>`;
         pagination.appendChild(pageInfo);
 
         // 创建 "下一页" 按钮
@@ -1421,7 +1429,7 @@
         if (currentDownloadedFileHistoryPage === totalPages || totalPages === 0) {
             nextButton.classList.add('disabled'); // 如果是最后一页，禁用下一页按钮
         }
-        nextButton.innerHTML = `<a class="page-link" href="javascript:void(0);" onclick="loadDownloadPage(${currentDownloadedFileHistoryPage + 1})">&raquo;</a>`;
+        nextButton.innerHTML = `<a class="page-link ${isNightMode ? "night-mode" : ""}" href="javascript:void(0);" onclick="loadDownloadPage(${currentDownloadedFileHistoryPage + 1})">&raquo;</a>`;
         pagination.appendChild(nextButton);
     }
 
@@ -2137,7 +2145,8 @@
 
     const searchFile = (keyword) => {
         const page = 1;
-        fetch(`${backend_yingwu}/files?keyword=${keyword}&page=${page}&limit=${UploadedFilesPerPage}`,
+        const selectedTag = document.getElementById('tagsDropdown').value;
+        fetch(`${backend_yingwu}/files?keyword=${keyword}&tag=${selectedTag}&page=${page}&limit=${UploadedFilesPerPage}`,
             {
                 method: 'GET',
                 credentials: 'include'

@@ -173,6 +173,11 @@
             color: #000;
         }
 
+        #test-editormd-view.night-mode tr {
+            background-color: #9d9d9d;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
         /* 在 Bootstrap 的栅格系统中，768 像素通常是切换到小屏幕（如手机）布局的临界点。 */
         @media (max-width: 768px) {
             #sidebar {
@@ -931,6 +936,7 @@
         $('#disqus_thread').toggleClass('night-mode');
         $('#title-container').toggleClass('night-mode');
         $('#sidebar').toggleClass('night-mode');
+
 
         // 更新按钮图标和样式
         if (nightModeActive) {
